@@ -7,7 +7,9 @@ Internal development of Extend Warranty for Woocommerce
 
 ## Currently working:
 - admin menu > Extend > Settings
+- in settings, if woocommerce is not enabled, displays an error notice, and won't check if the extend product exists
+- in Settings, if the extend product protection item doesnt exist, a button is displayed to create it. (functional)
 
 ## To Do
-- in the settings page: control if Woocommerce is installed, and control if the warranty product exists. If not, create a button to generate the product
+- include extend sdk when module is enabled
 
