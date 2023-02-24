@@ -304,7 +304,7 @@ class Extend_Protection_Admin {
 
     public function extend_enable_cart_offers_callback() {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="extend_enable_cart_offers" %s> <label for="extend_enable_cart_offers">Display protection offers in the Cart</label>',
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="extend_enable_cart_offers" %s> <label for="extend_enable_cart_offers">Display protection offers in the cart</label>',
             ( isset( $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] ) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] === 'extend_enable_cart_offers' ) ? 'checked' : ''
         );
     }
@@ -373,4 +373,5 @@ class Extend_Protection_Admin {
             isset( $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'] ) ? esc_attr( $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key']) : ''
         );
     }
+
 }

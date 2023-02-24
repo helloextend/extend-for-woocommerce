@@ -15,7 +15,7 @@
  * @wordpress-plugin
  * Plugin Name:       Extend Protection for Woocommerce
  * Plugin URI:        https://docs.extend.com/docs
- * Description:       WooCommerce plugin to display Extend Protection Offers.
+ * Description:       Product Protection Done Right.
  * Version:           1.0.0
  * Author:            Extend
  * Author URI:        https://extend.com/
@@ -147,5 +147,24 @@ if ( ! function_exists( 'is_woocommerce_activated' ) ) {
         if ( class_exists( 'woocommerce' ) ) { return true; } else { return false; }
     }
 }
+
+
+if(!function_exists('extend_protection_links')){
+    function extend_protection_links($links, $file) {
+       // $base = plugin_basename(__FILE__);
+        //if ($file == $base) {
+
+        if ( strpos( $file, basename(__FILE__) ) ) {
+
+
+
+            $links[] = '<a href="https://www.extend.com/get-help" class="extend_support" title="Get Help"></a>';
+            $links[] = '<a href="https://www.linkedin.com/company/helloextend" class="extend_linkedin" title="Follow us on LinkedIn"></a>';
+        }
+        return $links;
+    }
+}
+add_filter( 'plugin_row_meta','extend_protection_links',10,2);
+
 
 run_extend_protection();

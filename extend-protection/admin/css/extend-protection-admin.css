@@ -14,3 +14,20 @@
     font-style: italic;
 }
 
+.extend_linkedin{
+    background-image: url('../../images/linkedin.png');
+}
+
+.extend_support{
+    background-image: url('../../images/support.png');
+}
+
+.extend_linkedin, .extend_support {
+    height: 16px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-left: 20px;
+    text-decoration: none;
+    vertical-align: middle;
+    display: inline-block;
+}
