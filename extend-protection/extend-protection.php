@@ -82,6 +82,9 @@ function run_extend_protection() {
 
 function extend_render_settings_page(){
 
+    if ( ! is_woocommerce_activated() ) {
+        echo '<div class="error"><p><strong>' . sprintf( esc_html__( 'Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services' ), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>' ) . '</strong></p></div>';
+    }
 
     echo '<div style="padding-top:30px">';
     echo ' <img src="'.plugins_url().'/extend-protection/images/Extend_logo_slogan.svg" alt="Extend Logo with Slogan" style="width: 170px;">
@@ -100,6 +103,23 @@ function extend_render_settings_page(){
 				?>
 			</form>
 			<?php
+
+            //Extend Product Management
+            if ( is_woocommerce_activated() ) {
+                $post_id = null;
+                $product_sku = 'extend-product-protection';
+                echo "<span class='settings-product-protection-item'>Extend Product Protection Item <em>(sku : ".$product_sku .")</em> " ;
+                $post_id = wc_get_product_id_by_sku($product_sku);
+
+                if (!$post_id){
+                    echo "... is missing <br/> <button class='button button-primary'>Create Item</button>";
+                }else {
+                    echo " exists! (ID: ".$post_id.")";
+                }
+                echo "</span>";
+            }
+
+
 }
 
 
@@ -117,6 +137,15 @@ function extend_protection_style(){
     // Register stylesheets
     wp_register_style('extend_protection_style', plugins_url('extend-protection/css/extend.css'));
     wp_enqueue_style('extend_protection_style');
+}
+
+/**
+ * Check if WooCommerce is activated
+ */
+if ( ! function_exists( 'is_woocommerce_activated' ) ) {
+    function is_woocommerce_activated() {
+        if ( class_exists( 'woocommerce' ) ) { return true; } else { return false; }
+    }
 }
 
 run_extend_protection();

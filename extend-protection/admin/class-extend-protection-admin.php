@@ -65,7 +65,7 @@ class Extend_Protection_Admin {
         add_action( 'admin_init', array( $this, 'extend_protection_for_woocommerce_settings_page_init' ) );
         add_action('admin_enqueue_scripts', 'extend_protection_style');
         //add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
-	}
+    }
 
 	/**
 	 * Register the stylesheets for the admin area.
@@ -240,13 +240,6 @@ class Extend_Protection_Admin {
             'extend_protection_for_woocommerce_settings_setting_section' // section
         );
 
-        add_settings_field(
-            'extend_product_id', // id
-            'Extend Product Id', // title
-            array( $this, 'extend_product_id_callback' ), // callback
-            'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
-        );
     }
 
     public function extend_protection_for_woocommerce_settings_sanitize($input) {
@@ -295,10 +288,6 @@ class Extend_Protection_Admin {
             $sanitary_values['extend_live_api_key'] = sanitize_textarea_field( $input['extend_live_api_key'] );
         }
 
-        if ( isset( $input['extend_product_id'] ) ) {
-            $sanitary_values['extend_product_id'] = sanitize_text_field( $input['extend_product_id'] );
-        }
-
         return $sanitary_values;
     }
 
@@ -315,14 +304,14 @@ class Extend_Protection_Admin {
 
     public function extend_enable_cart_offers_callback() {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="extend_enable_cart_offers" %s> <label for="extend_enable_cart_offers">Display Protection Offers in the Cart</label>',
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="extend_enable_cart_offers" %s> <label for="extend_enable_cart_offers">Display protection offers in the Cart</label>',
             ( isset( $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] ) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] === 'extend_enable_cart_offers' ) ? 'checked' : ''
         );
     }
 
     public function extend_enable_cart_balancing_callback() {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_balancing]" id="extend_enable_cart_balancing" value="extend_enable_cart_balancing" %s> <label for="extend_enable_cart_balancing">Automatically Adjust Quantities</label>',
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_balancing]" id="extend_enable_cart_balancing" value="extend_enable_cart_balancing" %s> <label for="extend_enable_cart_balancing">Automatically adjust quantities</label>',
             ( isset( $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing'] ) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing'] === 'extend_enable_cart_balancing' ) ? 'checked' : ''
         );
     }
@@ -384,14 +373,4 @@ class Extend_Protection_Admin {
             isset( $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'] ) ? esc_attr( $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key']) : ''
         );
     }
-
-    public function extend_product_id_callback() {
-        printf(
-            '<input class="regular-text" type="text" name="extend_protection_for_woocommerce_settings[extend_product_id]" id="extend_product_id" value="%s">',
-            isset( $this->extend_protection_for_woocommerce_settings_options['extend_product_id'] ) ? esc_attr( $this->extend_protection_for_woocommerce_settings_options['extend_product_id']) : ''
-        );
-    }
-
-
-
 }
