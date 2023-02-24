@@ -86,7 +86,6 @@ function run_extend_protection()
 
 function extend_render_settings_page()
 {
-
     if (!is_woocommerce_activated()) {
         echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
@@ -171,6 +170,20 @@ if (!function_exists('extend_protection_links')) {
     }
 }
 add_filter('plugin_row_meta', 'extend_protection_links', 10, 2);
+
+
+/*extend_logger */
+
+if ( ! function_exists('write_log')) {
+    function write_log ( $log )  {
+        if ( is_array( $log ) || is_object( $log ) ) {
+            error_log( print_r( $log, true ) );
+        } else {
+            error_log( $log );
+        }
+    }
+}
+
 
 /* local bypass of curl error ssl */
 add_filter('https_ssl_verify', '__return_false');

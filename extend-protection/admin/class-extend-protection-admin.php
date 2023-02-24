@@ -50,6 +50,13 @@ class Extend_Protection_Admin
      */
     private $extend_protection_for_woocommerce_settings_options;
 
+
+    private string $env;
+    private string $sdk_url;
+    private string $store_id;
+    private string $api_host;
+    private string $api_key;
+
     /**
      * Initialize the class and set its properties.
      *
@@ -67,7 +74,31 @@ class Extend_Protection_Admin
         add_action('admin_menu', array($this, 'extend_admin_menu'), 50);
         add_action('admin_init', array($this, 'extend_protection_for_woocommerce_settings_page_init'));
         add_action('admin_enqueue_scripts', 'extend_protection_style');
-        //add_action( 'admin_menu', array( $this, 'settings_menu' ), 50 );
+
+
+
+        /* retrieve environment variables */
+        $this->env = $this->extend_protection_for_woocommerce_settings_options['extend_environment'] ?? 'sandbox';
+        $this->sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
+
+        if( $this->env == 'sandbox'){
+            $this->api_host = 'https://api-demo.helloextend.com';
+            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_store_id'];
+            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_api_key'];
+        }else {
+            $this->api_host = 'https://api.helloextend.com';
+            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_live_store_id'];
+            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'];
+        }
+
+        if($this->store_id){
+            $this->api_host .= '/stores/' . $this->store_id ;
+        }
+
+        //write_log('>> env: '.$this->env. ' > apihost url : '.$this->api_host );
+
+
+
     }
 
     /**
@@ -354,12 +385,14 @@ class Extend_Protection_Admin
 
     public function extend_environment_callback()
     {
-        ?> <select name="extend_protection_for_woocommerce_settings[environment]" id="environment">
+        ?>
+        <select name="extend_protection_for_woocommerce_settings[extend_environment]" id="extend_environment">
         <?php $selected = (isset($this->extend_protection_for_woocommerce_settings_options['extend_environment']) && $this->extend_protection_for_woocommerce_settings_options['extend_environment'] === 'sandbox') ? 'selected' : ''; ?>
         <option value="sandbox" <?php echo $selected; ?>>Sandbox</option>
         <?php $selected = (isset($this->extend_protection_for_woocommerce_settings_options['extend_environment']) && $this->extend_protection_for_woocommerce_settings_options['extend_environment'] === 'live') ? 'selected' : ''; ?>
         <option value="live" <?php echo $selected; ?>>Live</option>
-    </select> <?php
+    </select>
+        <?php
     }
 
     public function extend_sandbox_store_id_callback()
