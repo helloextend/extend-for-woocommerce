@@ -117,7 +117,7 @@ function extend_render_settings_page(){
                     echo '<form method="post"  action=""><input type="submit" name="extend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
 
                 }else {
-                    echo " exists! (ID: ".$post_id.")";
+                    echo " exists! (ID: ".$post_id.") &#9989;";
                 }
                 echo "</span>";
             }
