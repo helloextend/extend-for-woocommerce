@@ -36,6 +36,7 @@ if ( ! defined( 'WPINC' ) ) {
  * Rename this for your plugin and update it as you release new versions.
  */
 define( 'EXTEND_PROTECTION_VERSION', '1.0.0' );
+define( 'EXTEND_PRODUCT_PROTECTION_SKU', 'extend-product-protection');
 
 /**
  * The code that runs during plugin activation.
@@ -104,24 +105,23 @@ function extend_render_settings_page(){
 			</form>
 			<?php
 
-            //Extend Product Management
+            //Extend Product Protection Item  Management
             if ( is_woocommerce_activated() ) {
                 $post_id = null;
-                $product_sku = 'extend-product-protection';
-                echo "<span class='settings-product-protection-item'>Extend Product Protection Item <em>(sku : ".$product_sku .")</em> " ;
-                $post_id = wc_get_product_id_by_sku($product_sku);
+
+                echo "<span class='settings-product-protection-item'>Extend Product Protection Item <em>(sku : ".EXTEND_PRODUCT_PROTECTION_SKU.")</em> " ;
+                $post_id = wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);
 
                 if (!$post_id){
-                    echo "... is missing <br/> <button class='button button-primary'>Create Item</button>";
+                    echo "... is missing <br/> "; //<button class='button button-primary' id='extend-product-protection-create'>Create Item</button>";
+                    echo '<form method="post"  action=""><input type="submit" name="extend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
+
                 }else {
                     echo " exists! (ID: ".$post_id.")";
                 }
                 echo "</span>";
             }
-
-
 }
-
 
 
 
@@ -148,7 +148,7 @@ if ( ! function_exists( 'is_woocommerce_activated' ) ) {
     }
 }
 
-
+/* links on the plugin definition */
 if(!function_exists('extend_protection_links')){
     function extend_protection_links($links, $file) {
        // $base = plugin_basename(__FILE__);
@@ -165,6 +165,35 @@ if(!function_exists('extend_protection_links')){
     }
 }
 add_filter( 'plugin_row_meta','extend_protection_links',10,2);
+
+/* local bypass of curl error ssl */
+add_filter('https_ssl_verify', '__return_false');
+
+
+
+/* item create */
+add_action( 'init', 'extend_product_protection_create' );
+function extend_product_protection_create() {
+    if( isset( $_POST['extend-product-protection-create'] ) ) {
+        $product = new WC_Product_Simple();
+        $product->set_name( 'Extend Product Protection' );
+        $product->set_status( 'publish' );
+        $product->set_sku(EXTEND_PRODUCT_PROTECTION_SKU);
+        $product->set_catalog_visibility( 'hidden' );
+        $product->set_price( 1.00 );
+        $product->set_regular_price( 1.00 );
+        $product->set_virtual( true );
+        $product->save();
+
+        //upload image and associate to product
+        $product_id = $product->get_id();
+        $upload = wc_rest_upload_image_from_url(plugins_url().'/extend-protection/images/Extend_icon.png');
+        $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
+        $product->set_image_id($product_img_id);
+        $product->save();
+
+    }
+}
 
 
 run_extend_protection();
