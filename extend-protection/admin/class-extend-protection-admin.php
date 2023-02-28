@@ -53,9 +53,9 @@ class Extend_Protection_Admin
 
     private string $env;
     private string $sdk_url;
-    private string $store_id;
-    private string $api_host;
-    private string $api_key;
+    private ?string $store_id;
+    private ?string $api_host;
+    private ?string $api_key;
 
     /**
      * Initialize the class and set its properties.
@@ -83,12 +83,12 @@ class Extend_Protection_Admin
 
         if( $this->env == 'sandbox'){
             $this->api_host = 'https://api-demo.helloextend.com';
-            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_store_id'];
-            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_api_key'];
+            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_store_id'] ?? null ;
+            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_api_key'] ?? null ;
         }else {
             $this->api_host = 'https://api.helloextend.com';
-            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_live_store_id'];
-            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'];
+            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_live_store_id'] ?? null ;
+            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'] ?? null ;
         }
 
         if($this->store_id){
@@ -150,12 +150,13 @@ class Extend_Protection_Admin
     }
 
     /**
-     * Add menu items.
+     * Add menu items in the admin.
      */
     public function extend_admin_menu()
     {
         global $menu, $admin_page_hooks;
 
+        //the extend menu has an icon defined here:
         $extend_icon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjA2IiBoZWlnaHQ9IjE2MyIgdmlld0JveD0iMCAwIDIwNiAxNjMiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMTAuNzg5IDMyLjczNkwxMzYuMTczIC0zLjgxNDdlLTA2SDE5Ny44ODhMMTQxLjc2IDY5LjEwOTJMMTEwLjc4OSAzMi43MzZaIiBmaWxsPSIjMDBDOUZGIi8+CjxwYXRoIGQ9Ik0xMTAuNzg5IDMyLjczNkwxMzYuMTczIC0zLjgxNDdlLTA2SDE5Ny44ODhMMTQxLjc2IDY5LjEwOTJMMTEwLjc4OSAzMi43MzZaIiBzdHJva2U9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMDUuMzQ1IDE2Mi42MTFIMTQxLjU2OEMxNDEuNTY4IDE2Mi42MTEgMTAzLjI0NyAxMTcuMDI5IDEwMS4xODggMTE0LjI5MkM5MS42ODY4IDEyNi45NTkgNjIuODI2NCAxNjIuNjExIDYyLjgyNjQgMTYyLjYxMUgwTDY5LjgzMzkgNzguMDUzMUwzLjIwNjQ0IDAuMDYyNDczM0g2Ni42MjY4TDIwNS4zNDUgMTYyLjYxMVoiIGZpbGw9IiMwMzMyQ0MiLz4KPHBhdGggZD0iTTIwNS4zNDUgMTYyLjYxMUgxNDEuNTY4QzE0MS41NjggMTYyLjYxMSAxMDMuMjQ3IDExNy4wMjkgMTAxLjE4OCAxMTQuMjkyQzkxLjY4NjggMTI2Ljk1OSA2Mi44MjY0IDE2Mi42MTEgNjIuODI2NCAxNjIuNjExSDBMNjkuODMzOSA3OC4wNTMxTDMuMjA2NDQgMC4wNjI0NzMzSDY2LjYyNjhMMjA1LjM0NSAxNjIuNjExWiIgc3Ryb2tlPSJ3aGl0ZSIvPgo8L3N2Zz4K';
 
         add_menu_page('Extend Protection', 'Extend', 'manage_options', 'extend', null, $extend_icon, '55.5');
@@ -164,16 +165,10 @@ class Extend_Protection_Admin
         add_submenu_page('extend', 'About', 'About', 'manage_options', 'extend-about', 'extend_render_about_page');
     }
 
-    /**
-     * Add menu items.
-     */
-    public function settings_menu()
-    {
-        $settings_page = add_submenu_page('woocommerce', 'WooCommerce settings', 'Settings', 'manage_options', 'extend-settings', array($this, 'settings_page'));
-
-        add_action('load-' . $settings_page, array($this, 'settings_page_init'));
-    }
-
+    /*
+        register all settings
+        they will end up in wp_options table, option_name = extend_protection_for_woocommerce_settings
+    */
 
     public function extend_protection_for_woocommerce_settings_page_init()
     {
@@ -280,6 +275,8 @@ class Extend_Protection_Admin
 
     }
 
+    /* sanitize all the fields before saving */
+
     public function extend_protection_for_woocommerce_settings_sanitize($input)
     {
         $sanitary_values = array();
@@ -335,6 +332,8 @@ class Extend_Protection_Admin
 
     }
 
+    /* all callback functions for registering fields and displaying them with their saved values */
+
     public function enable_extend_callback()
     {
         printf(
@@ -370,7 +369,7 @@ class Extend_Protection_Admin
     public function extend_enable_modal_offers_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_modal_offers]" id="extend_enable_modal_offers" value="extend_enable_modal_offers" %s>',
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_modal_offers]" id="extend_enable_modal_offers" value="extend_enable_modal_offers" %s> <label for="extend_enable_modal_offers">Display offers in a modal (PDP and cart)</label>' ,
             (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers'] === 'extend_enable_modal_offers') ? 'checked' : ''
         );
     }
@@ -378,7 +377,7 @@ class Extend_Protection_Admin
     public function extend_automated_product_sync_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_automated_product_sync]" id="extend_automated_product_sync" value="extend_automated_product_sync" %s>',
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_automated_product_sync]" id="extend_automated_product_sync" value="extend_automated_product_sync" %s> <label for="extend_automated_product_sync">Automatically sync your catalog with Extend (for warranty mapping)</label>',
             (isset($this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync']) && $this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync'] === 'extend_automated_product_sync') ? 'checked' : ''
         );
     }
