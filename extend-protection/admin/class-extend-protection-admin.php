@@ -273,6 +273,17 @@ class Extend_Protection_Admin
             'extend_protection_for_woocommerce_settings_setting_section' // section
         );
 
+        //once options have been registered, initialize values in the db:
+    
+        if (get_option('extend_protection_for_woocommerce_settings') == null ){
+            $settings = [
+                'extend_enable_pdp_offers' => '1',
+                'extend_enable_cart_offers' => '1',
+                'extend_enable_modal_offers' => '1',
+                'extend_enable_cart_balancing' => '1'
+            ];
+            update_option('extend_protection_for_woocommerce_settings', $settings);
+        }
     }
 
     /* sanitize all the fields before saving */
@@ -337,48 +348,48 @@ class Extend_Protection_Admin
     public function enable_extend_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[enable_extend]" id="enable_extend" value="enable_extend" %s>',
-            (isset($this->extend_protection_for_woocommerce_settings_options['enable_extend']) && $this->extend_protection_for_woocommerce_settings_options['enable_extend'] === 'enable_extend') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[enable_extend]" id="enable_extend" value="1" %s>',
+            (isset($this->extend_protection_for_woocommerce_settings_options['enable_extend']) && $this->extend_protection_for_woocommerce_settings_options['enable_extend'] === '1') ? 'checked' : ''
         );
     }
 
     public function extend_enable_cart_offers_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="extend_enable_cart_offers" %s> <label for="extend_enable_cart_offers">Display protection offers in the cart</label>',
-            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] === 'extend_enable_cart_offers') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_offers]" id="extend_enable_cart_offers" value="1" %s> <label for="extend_enable_cart_offers">Display protection offers in the cart</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'] === '1') ? 'checked' : ''
         );
     }
 
     public function extend_enable_cart_balancing_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_balancing]" id="extend_enable_cart_balancing" value="extend_enable_cart_balancing" %s> <label for="extend_enable_cart_balancing">Automatically adjust quantities</label>',
-            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing'] === 'extend_enable_cart_balancing') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_cart_balancing]" id="extend_enable_cart_balancing" value="1" %s> <label for="extend_enable_cart_balancing">Automatically adjust quantities</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing'] === '1') ? 'checked' : ''
         );
     }
 
     public function extend_enable_pdp_offers_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_pdp_offers]" id="extend_enable_pdp_offers" value="extend_enable_pdp_offers" %s> <label for="extend_enable_pdp_offers">Display offers on product page</label>',
-            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_pdp_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_pdp_offers'] === 'extend_enable_pdp_offers') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_pdp_offers]" id="extend_enable_pdp_offers" value="1" %s> <label for="extend_enable_pdp_offers">Display offers on product page</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_pdp_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_pdp_offers'] === '1') ? 'checked' : ''
         );
     }
 
     public function extend_enable_modal_offers_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_modal_offers]" id="extend_enable_modal_offers" value="extend_enable_modal_offers" %s> <label for="extend_enable_modal_offers">Display offers in a modal (PDP and cart)</label>' ,
-            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers'] === 'extend_enable_modal_offers') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_enable_modal_offers]" id="extend_enable_modal_offers" value="1" %s> <label for="extend_enable_modal_offers">Display offers in a modal (PDP and cart)</label>' ,
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers']) && $this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers'] === '1') ? 'checked' : ''
         );
     }
 
     public function extend_automated_product_sync_callback()
     {
         printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_automated_product_sync]" id="extend_automated_product_sync" value="extend_automated_product_sync" %s> <label for="extend_automated_product_sync">Automatically sync your catalog with Extend (for warranty mapping)</label>',
-            (isset($this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync']) && $this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync'] === 'extend_automated_product_sync') ? 'checked' : ''
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_automated_product_sync]" id="extend_automated_product_sync" value="1" %s> <label for="extend_automated_product_sync">Automatically sync your catalog with Extend (for warranty mapping)</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync']) && $this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync'] === '1') ? 'checked' : ''
         );
     }
 
