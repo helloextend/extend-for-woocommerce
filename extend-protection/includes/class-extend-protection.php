@@ -58,6 +58,16 @@ class Extend_Protection
      */
     protected $version;
 
+
+    /**
+     * Renders PDP offers on the Product Page.
+     *
+     * @since    1.0.0
+     * @access   protected
+     * @var      string $pdp_offer The current version of the plugin.
+     */
+    protected $pdp_offer;
+
     /**
      * Define the core functionality of the plugin.
      *
@@ -80,7 +90,7 @@ class Extend_Protection
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
-
+        $this->define_pdp_offer_hooks();
     }
 
     /**
@@ -92,6 +102,7 @@ class Extend_Protection
      * - Extend_Protection_i18n. Defines internationalization functionality.
      * - Extend_Protection_Admin. Defines all hooks for the admin area.
      * - Extend_Protection_Public. Defines all hooks for the public side of the site.
+     * - Extend_Protection_PDP_Offer. Renders Extend offers on PDP page.
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
@@ -124,6 +135,14 @@ class Extend_Protection
          * side of the site.
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-extend-protection-public.php';
+
+        /**
+         * The class responsible adding .extend-offer div and the JS to render Extend
+         * offers on the PDP page
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-pdp-offer.php';
+
+        //TODO: If Extend is enabled, enqueue SDK JS
 
         $this->loader = new Extend_Protection_Loader();
 
@@ -162,6 +181,18 @@ class Extend_Protection
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 
+    }
+
+    /**
+     * Register all of the hooks related to the PDP offers functionality
+     * of the plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_pdp_offer_hooks()
+    {
+        $this->pdp_offer = new Extend_Protection_PDP_Offer($this->get_extend_protection(), $this->get_version());
     }
 
     /**
