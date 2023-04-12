@@ -5,28 +5,18 @@
         // if(!ExtendWooCommerce || !ExtendProductIntegration) return;
         if(!ExtendProductIntegration) return;
 
+        // TODO: Put this in a global file and run if extend_enabled === 1
         window.Extend.config({storeId: '6caaf44e-0410-4529-9674-4dc6a4e0e800', environment: 'production'});
 
         // Deconstructs ExtendProductIntegration variables
         const { type: product_type, id: product_id, sku,  env, extend_enabled, extend_pdp_offers_enabled, extend_modal_offers_enabled } = ExtendProductIntegration;
 
-        console.log("product_type", product_type);
-        console.log("product_id", product_id);
-        console.log("sku", sku);
-        console.log("env", env);
-        console.log("extend_enabled", extend_enabled);
-        console.log("extend_pdp_offers_enabled", extend_pdp_offers_enabled, typeof extend_pdp_offers_enabled);
-        console.log("extend_modal_offers_enabled", extend_modal_offers_enabled, typeof extend_modal_offers_enabled);
-
-        // TODO: If PDP offers are not enabled, hide Extend offer div
+        // If PDP offers are not enabled, hide Extend offer div
         if(extend_pdp_offers_enabled === '0'){
             const extendOffer = document.querySelector('.extend-offer')
             extendOffer.style.display = 'none';
         }
 
-        // TODO: product_type ==='simple' — Find out why this matters
-
-        // TODO: Render offers
         if(product_type ==='simple'){
             Extend.buttons.render('.extend-offer', {
                 referenceId: product_id,

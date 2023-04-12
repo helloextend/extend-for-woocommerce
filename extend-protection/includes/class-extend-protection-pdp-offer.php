@@ -75,28 +75,25 @@ class Extend_Protection_PDP_Offer
 
         /* retrieve environment variables */
         // TODO: Move all these variables to a more global location
-        $this->extend_protection_for_woocommerce_settings_options = get_option('extend_protection_for_woocommerce_settings');
-        $this->extend_environment = $this->extend_protection_for_woocommerce_settings_options['extend_environment'];
+        $this->extend_protection_all_settings = get_option('extend_protection_for_woocommerce_settings');
+        $this->enable_extend = $this->extend_protection_all_settings['enable_extend'];
+        $this->extend_enable_cart_offers = $this->extend_protection_all_settings['extend_enable_cart_offers'];
+        $this->extend_enable_cart_balancing = $this->extend_protection_all_settings['extend_enable_cart_balancing'];
+        $this->extend_enable_pdp_offers = $this->extend_protection_all_settings['extend_enable_pdp_offers'];
+        $this->extend_enable_modal_offers = $this->extend_protection_all_settings['extend_enable_modal_offers'];
+        $this->extend_environment = $this->extend_protection_all_settings['extend_environment'];
 
         /* Set variables depending on environment */
         if ($this->extend_environment == 'live') {
-            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['extend_live_store_id'];
-            $this->sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
-            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_live_api_key'];
+            $this->store_id = $this->extend_protection_all_settings['extend_live_store_id'];
+            $this->api_host = 'https://api.helloextend.com';
+            $this->api_key = $this->extend_protection_all_settings['extend_live_api_key'];
         }
         else {
-            $this->store_id = $this->extend_protection_for_woocommerce_settings_options['store_id'];
-            $this->sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
-            $this->api_key = $this->extend_protection_for_woocommerce_settings_options['extend_sandbox_api_key'];
+            $this->store_id = $this->extend_protection_all_settings['extend_sandbox_store_id'];
+            $this->api_host = 'https://api-sandbox.helloextend.com';
+            $this->api_key = $this->extend_protection_all_settings['extend_sandbox_api_key'];
         }
-
-        /* Retrieve offers and product sync settings */
-        $this->enable_extend = $this->extend_protection_for_woocommerce_settings_options['enable_extend'];
-        $this->extend_enable_cart_offers = $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_offers'];
-        $this->extend_enable_cart_balancing = $this->extend_protection_for_woocommerce_settings_options['extend_enable_cart_balancing'];
-        $this->extend_enable_pdp_offers = $this->extend_protection_for_woocommerce_settings_options['extend_enable_pdp_offers'];
-        $this->extend_enable_modal_offers = $this->extend_protection_for_woocommerce_settings_options['extend_enable_modal_offers'];
-        $this->extend_automated_product_sync = $this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync'];
 
         //TODO: Retrieve SDK URL and enqueue it as a dependency
         $this->sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
@@ -123,7 +120,6 @@ class Extend_Protection_PDP_Offer
      */
     public function product_offer()
     {
-        // TODO: Make sure global is working
         global $product;
 
         $id = $product->get_id();
@@ -136,15 +132,13 @@ class Extend_Protection_PDP_Offer
 
         $sdk_url = $this->sdk_url;
 
+        $extend_pdp_offers_enabled = $this->extend_enable_pdp_offers;
+
+        $extend_modal_offers_enabled = $this->extend_enable_modal_offers;
+
         $extend_enabled = $this->enable_extend;
 
-        // TODO: change this to a dynamic variable
-        $extend_pdp_offers_enabled = true;
-
-        $extend_modal_offers_enabled = true;
-
-        if($extend_enabled) {
-            echo "Extend Enabled: $extend_enabled";
+        if($extend_enabled === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_product_integration_script');
             wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration', compact('id', 'sku', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
@@ -155,7 +149,9 @@ class Extend_Protection_PDP_Offer
                             <li>Type: $type</li>
                             <li>Env: $env</li>
                             <li>SDK URL: $sdk_url</li>
-                            <li>Extend Enabled: $extend_enabled</li>
+                            <li>Extend Enabled: $extend_enabled</li>	
+                            <li>Extend PDP Offers Enabled: $extend_pdp_offers_enabled</li>
+                            <li>Extend Modal Offers Enabled: $extend_modal_offers_enabled</li>
                         </ul>
                 </div>";
         }
