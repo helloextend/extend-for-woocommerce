@@ -98,12 +98,6 @@ class Extend_Protection_PDP_Offer
         //TODO: Retrieve SDK URL and enqueue it as a dependency
         $this->sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
 
-        // TODO: see if you can move this to a global
-        wp_register_script('extend_script', $this->sdk_url);
-        wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_script']);
-
-        // TODO: Make sure SDK is already loaded globally
-
         $this->hooks_checker();
 
     }
@@ -126,6 +120,12 @@ class Extend_Protection_PDP_Offer
 
         $sku = $product->get_sku();
 
+        $categories = get_the_terms( $id, 'product_cat' );
+
+        $first_category = $categories[0]->name;
+
+        $price = $product->get_price() * 100;
+
         $type = $product->get_type();
 
         $env = $this->extend_environment;
@@ -141,12 +141,14 @@ class Extend_Protection_PDP_Offer
         if($extend_enabled === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_product_integration_script');
-            wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration', compact('id', 'sku', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
+            wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration', compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
             echo "<div class=\"extend-offer\">
                     <h3>EXTEND OFFERS</h3> 
                         <ul>
                             <li>ID: $id</li>
                             <li>Type: $type</li>
+                            <li>Price: $price</li>
+                            <li>Category: $first_category</li>
                             <li>Env: $env</li>
                             <li>SDK URL: $sdk_url</li>
                             <li>Extend Enabled: $extend_enabled</li>	
