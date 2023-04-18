@@ -3,13 +3,10 @@
     $(document).ready(function($) {
 
         // if(!ExtendWooCommerce || !ExtendProductIntegration) return;
-        if(!ExtendProductIntegration) return;
-
-        // TODO: Put this in a global file and run if extend_enabled === 1
-        window.Extend.config({storeId: '6caaf44e-0410-4529-9674-4dc6a4e0e800', environment: 'production'});
+        if(!ExtendWooCommerce || !ExtendProductIntegration) return;
 
         // Deconstructs ExtendProductIntegration variables
-        const { type: product_type, id: product_id, sku,  env, extend_enabled, extend_pdp_offers_enabled, extend_modal_offers_enabled } = ExtendProductIntegration;
+        const { type: product_type, id: product_id, sku, first_category, price, env, extend_enabled, extend_pdp_offers_enabled, extend_modal_offers_enabled } = ExtendProductIntegration;
 
         // If PDP offers are not enabled, hide Extend offer div
         if(extend_pdp_offers_enabled === '0'){
@@ -20,28 +17,44 @@
         if(product_type ==='simple'){
             Extend.buttons.render('.extend-offer', {
                 referenceId: product_id,
+                price: price,
+                category: first_category
             })
         } else if (product_type ==='variable') {
 
             Extend.buttons.render('.extend-offer', {
                 referenceId: product_id,
+                price: price,
+                category: first_category
             });
 
             setTimeout(function(){
                 let variation_id = jQuery('[name="variation_id"]').val();
                 console.log("variation_id: ", variation_id);
                 if(variation_id ) {
-                    let comp = Extend.buttons.instance('.extend-offer');
-                    comp.setActiveProduct(variation_id)
+                    Extend.setActiveProduct('.extend-offer', {
+                        referenceId: variation_id,
+                        price: price,
+                        category: first_category
+                        }
+                    );
                 }
             }, 600);
 
             jQuery( ".single_variation_wrap" ).on( "show_variation", function ( event, variation )  {
                 let component = Extend.buttons.instance('.extend-offer');
                 let variation_id = variation.variation_id;
+                let productPrice = parseFloat(document.querySelector('.woocommerce-variation-price > .price > .woocommerce-Price-amount').textContent.replace("$", "")) * 100
                 console.log("variation_id changed: ", variation_id);
+                console.log("productPrice: ", productPrice);
                 if(variation_id && component) {
-                    component.setActiveProduct(variation.variation_id)
+                    Extend.setActiveProduct('.extend-offer',
+                        {
+                            referenceId: variation_id,
+                            price: productPrice,
+                            category: first_category
+                        }
+                    );
                 }
             });
         } else {
@@ -68,14 +81,13 @@
                 var planCopy = { ...plan, covered_product_id: product.id }
                 var data = {
                     quantity: 1,
-                    plan: planCopy
+                    plan: planCopy,
+                    price: (plan.price / 100).toFixed(2)
                 }
-                // TODO: Function that adds plan data to cart
-                console.log("Extend Plan to be added to cart: ", data);
-                // ExtendWooCommerce.addPlanToCart(data)
-                //     .then(() => {
+                ExtendWooCommerce.addPlanToCart(data)
+                    .then(() => {
                         triggerAddToCart();
-                //     })
+                    })
             } else{
                 if(extend_modal_offers_enabled === '1'){
                     Extend.modal.open({
@@ -85,14 +97,15 @@
                                 var planCopy = { ...plan, covered_product_id: product.id }
                                 var data = {
                                     quantity: 1,
-                                    plan: planCopy
+                                    plan: planCopy,
+                                    price: (plan.price / 100).toFixed(2)
                                 }
                                 // TODO: Function that adds plan data to cart
                                 console.log("Extend Plan to be added to cart: ", data);
-                                // ExtendWooCommerce.addPlanToCart(data)
-                                //     .then(() => {
+                                ExtendWooCommerce.addPlanToCart(data)
+                                    .then(() => {
                                         triggerAddToCart();
-                                //     })
+                                    })
                             } else {
                                 triggerAddToCart()
                             }
