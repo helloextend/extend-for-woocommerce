@@ -69,6 +69,32 @@ class Extend_Protection
     protected $pdp_offer;
 
     /**
+     * Renders global hooks
+     *
+     * @since    1.0.0
+     * @access   protected
+     * @var      string $global_hooks The current version of the plugin.
+     */
+    protected $global_hooks;
+    private $sdk_url = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
+
+    /**
+     * URL of plugin directory.
+     *
+     * @var    string
+     * @since  1.0.0
+     */
+    protected $url = '';
+
+    /**
+     * Path of plugin directory.
+     *
+     * @var    string
+     * @since  1.0.0
+     */
+    protected $path = '';
+
+    /**
      * Define the core functionality of the plugin.
      *
      * Set the plugin name and the plugin version that can be used throughout the plugin.
@@ -86,11 +112,16 @@ class Extend_Protection
         }
         $this->extend_protection = 'extend-protection';
 
+        $this->url  = plugin_dir_url( __FILE__ );
+        $this->path     = plugin_dir_path( __FILE__ );
+
         $this->load_dependencies();
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
         $this->define_pdp_offer_hooks();
+        $this->define_global_hooks();
+
     }
 
     /**
@@ -137,12 +168,17 @@ class Extend_Protection
         require_once plugin_dir_path(dirname(__FILE__)) . 'public/class-extend-protection-public.php';
 
         /**
-         * The class responsible adding .extend-offer div and the JS to render Extend
+         * The class responsible for adding .extend-offer div and the JS to render Extend
          * offers on the PDP page
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-pdp-offer.php';
 
-        //TODO: If Extend is enabled, enqueue SDK JS
+        /**
+         * The class responsible for loading the global class and enqueing the JS
+         * to add extend offers to the cart
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-global.php';
+
 
         $this->loader = new Extend_Protection_Loader();
 
@@ -181,6 +217,20 @@ class Extend_Protection
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
 
+    }
+
+    /** Register globals class and add hooks to render Extend offers on PDP page
+     * @since 1.0.0
+     * @access private
+     *
+     */
+    private function define_global_hooks()
+    {
+        wp_register_script('extend_script', $this->sdk_url);
+        wp_register_script('extend_global_script', $this->url . '../js/global.js', ['jquery', 'extend_script'], filemtime($this->path .'../js/global.js' ), true);
+        wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_script']);
+
+        $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
     }
 
     /**
