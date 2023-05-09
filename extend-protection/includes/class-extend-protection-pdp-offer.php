@@ -76,11 +76,11 @@ class Extend_Protection_PDP_Offer
         /* retrieve environment variables */
         // TODO: Move all these variables to a more global location
         $this->extend_protection_all_settings = get_option('extend_protection_for_woocommerce_settings');
-        $this->enable_extend = $this->extend_protection_all_settings['enable_extend'];
-        $this->extend_enable_cart_offers = $this->extend_protection_all_settings['extend_enable_cart_offers'];
-        $this->extend_enable_cart_balancing = $this->extend_protection_all_settings['extend_enable_cart_balancing'];
-        $this->extend_enable_pdp_offers = $this->extend_protection_all_settings['extend_enable_pdp_offers'];
-        $this->extend_enable_modal_offers = $this->extend_protection_all_settings['extend_enable_modal_offers'];
+        $this->enable_extend = array_key_exists('enable_extend', $this->extend_protection_all_settings) ? $this->extend_protection_all_settings['enable_extend'] : 0;
+        $this->extend_enable_cart_offers = array_key_exists('extend_enable_cart_offers', $this->extend_protection_all_settings) ? $this->extend_protection_all_settings['extend_enable_cart_offers'] : 0;
+        $this->extend_enable_cart_balancing = array_key_exists('extend_enable_cart_balancing', $this->extend_protection_all_settings) ? $this->extend_protection_all_settings['extend_enable_cart_balancing'] : 0;
+        $this->extend_enable_pdp_offers = array_key_exists('extend_enable_pdp_offers', $this->extend_protection_all_settings) ? $this->extend_protection_all_settings['extend_enable_pdp_offers'] : 0;
+        $this->extend_enable_modal_offers = array_key_exists('extend_enable_modal_offers', $this->extend_protection_all_settings) ? $this->extend_protection_all_settings['extend_enable_modal_offers'] : 0;
         $this->extend_environment = $this->extend_protection_all_settings['extend_environment'];
 
         /* Set variables depending on environment */
@@ -104,6 +104,7 @@ class Extend_Protection_PDP_Offer
 
     public function hooks_checker() {
         // TODO: use has_action() to iterate through all the different hooks on the pdp page
+
         add_action('woocommerce_before_add_to_cart_form', [$this, 'product_offer']);
     }
 
