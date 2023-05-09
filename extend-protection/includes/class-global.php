@@ -235,7 +235,7 @@ class Extend_Protection_Global
             $store_id = $extend_all_options['extend_sandbox_store_id'];
         }
 
-        $extend_enabled = $extend_all_options['enable_extend'];
+        $extend_enabled = array_key_exists('enable_extend', $extend_all_options) ? $extend_all_options['enable_extend'] : 0;
 
         $ajaxurl = admin_url( 'admin-ajax.php' );
 
