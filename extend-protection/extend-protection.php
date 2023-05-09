@@ -134,6 +134,33 @@ function extend_render_about_page()
 
 function extend_render_documentation_page()
 {
+    echo "<h2>Extend Purchase Protection Documentation</h2>";
+    echo "<br/>";
+    echo "<h3>Product Protection</h3>";
+
+
+    wp_enqueue_script( 'jquery-ui-accordion' );
+
+
+
+echo '
+    <div class="accordion">
+    <div>
+        <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
+        <div>
+            <img src="'.plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg'.'" >
+        </div>
+    </div>
+    <div>
+        <h3><a href="#" id="extend_2">2 - Second</a></h3>
+        <div>Phasellus mattis tincidunt nibh.</div>
+    </div>
+    <div>
+        <h3><a href="#" id="extend_3">3 - Third</a></h3>
+        <div>Nam dui erat, auctor a, dignissim quis.</div>
+    </div>
+</div>
+';
 
 }
 

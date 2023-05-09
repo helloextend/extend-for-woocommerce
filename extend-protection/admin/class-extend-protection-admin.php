@@ -218,6 +218,14 @@ class Extend_Protection_Admin
         );
 
         add_settings_field(
+            'extend_pdp_offer_location', // id
+            'PDP Offer Location', // title
+            array($this, 'extend_pdp_offer_location_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
+
+        add_settings_field(
             'extend_enable_modal_offers', // id
             'Enable Modal Offers', // title
             array($this, 'extend_enable_modal_offers_callback'), // callback
@@ -315,6 +323,10 @@ class Extend_Protection_Admin
             $sanitary_values['extend_automated_product_sync'] = $input['extend_automated_product_sync'];
         }
 
+        if (isset($input['extend_pdp_offer_location'])) {
+            $sanitary_values['extend_pdp_offer_location'] = $input['extend_pdp_offer_location'];
+        }
+
         if (isset($input['extend_environment'])) {
             $sanitary_values['extend_environment'] = $input['extend_environment'];
         }
@@ -391,6 +403,36 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_automated_product_sync]" id="extend_automated_product_sync" value="1" %s> <label for="extend_automated_product_sync">Automatically sync your catalog with Extend (for warranty mapping)</label>',
             (isset($this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync']) && $this->extend_protection_for_woocommerce_settings_options['extend_automated_product_sync'] === '1') ? 'checked' : ''
         );
+    }
+
+    public function extend_pdp_offer_location_callback()
+    {
+        $extend_pdp_offer_dropdown_values = array('woocommerce_before_add_to_cart_form', 'woocommerce_before_variations_form',
+            'woocommerce_before_add_to_cart_button', 'woocommerce_before_single_variation', 'woocommerce_single_variation',
+            'woocommerce_before_add_to_cart_quantity', 'woocommerce_after_add_to_cart_quantity', 'woocommerce_after_single_variation',
+            'woocommerce_after_add_to_cart_button', 'woocommerce_after_variations_form', 'woocommerce_after_add_to_cart_form',
+            'woocommerce_product_meta_start', 'woocommerce_product_meta_end', 'woocommerce_share');
+
+        ?>
+        <select name="extend_protection_for_woocommerce_settings[extend_pdp_offer_location]" id="extend_pdp_offer_location">
+            <?php
+            //set default value if option is not set yet
+            if (!isset($this->extend_protection_for_woocommerce_settings_options['extend_pdp_offer_location'])){
+                $this->extend_protection_for_woocommerce_settings_options['extend_pdp_offer_location']='woocommerce_before_add_to_cart_button';
+            }
+
+            //build dropdown from array of possible hooks
+            foreach($extend_pdp_offer_dropdown_values as $extend_pdp_hooks){
+                $selected = (isset($this->extend_protection_for_woocommerce_settings_options['extend_pdp_offer_location'])
+                    && $this->extend_protection_for_woocommerce_settings_options['extend_pdp_offer_location'] === $extend_pdp_hooks ) ? 'selected' : '';
+                echo '<option value="'.$extend_pdp_hooks. '" '.$selected.'>'.$extend_pdp_hooks.'</option>';
+            }
+            ?>
+        </select>
+        <?php
+        //show information in a popup
+
+        echo  '<label for="extend_automated_product_sync"><a href="?page=extend-docs#offer_placement">What\'s this ?</a></label>';
     }
 
     public function extend_environment_callback()

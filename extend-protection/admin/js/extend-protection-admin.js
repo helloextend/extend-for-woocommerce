@@ -34,6 +34,11 @@
 	// 	console.log('Im working!');
 	// });
 
+	$(document).ready(function($) {
+		$(".accordion").accordion({ header: "h3" });
+		$(".accordion").last().accordion("option", "icons", false);
+	});
+
 
 })( jQuery );
 
