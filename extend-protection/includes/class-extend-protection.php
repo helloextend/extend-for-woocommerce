@@ -120,6 +120,7 @@ class Extend_Protection
         $this->define_admin_hooks();
         $this->define_public_hooks();
         $this->define_pdp_offer_hooks();
+        $this->define_cart_offer_hooks();
         $this->define_global_hooks();
 
     }
@@ -172,6 +173,11 @@ class Extend_Protection
          * offers on the PDP page
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-pdp-offer.php';
+
+        /**
+         * The class responsible for rendering extend offers on the cart page
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-cart-offer.php';
 
         /**
          * The class responsible for loading the global class and enqueing the JS
@@ -243,6 +249,18 @@ class Extend_Protection
     private function define_pdp_offer_hooks()
     {
         $this->pdp_offer = new Extend_Protection_PDP_Offer($this->get_extend_protection(), $this->get_version());
+    }
+
+    /**
+     * Register all of the hooks related to the cart offers functionality
+     * of the plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_cart_offer_hooks()
+    {
+        $this->cart_offer = new Extend_Protection_Cart_Offer($this->get_extend_protection(), $this->get_version());
     }
 
     /**
