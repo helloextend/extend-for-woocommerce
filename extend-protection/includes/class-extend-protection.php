@@ -119,10 +119,9 @@ class Extend_Protection
         $this->set_locale();
         $this->define_admin_hooks();
         $this->define_public_hooks();
+        $this->define_global_hooks();
         $this->define_pdp_offer_hooks();
         $this->define_cart_offer_hooks();
-        $this->define_global_hooks();
-
     }
 
     /**
@@ -233,8 +232,8 @@ class Extend_Protection
     private function define_global_hooks()
     {
         wp_register_script('extend_script', $this->sdk_url);
-        wp_register_script('extend_global_script', $this->url . '../js/global.js', ['jquery', 'extend_script'], filemtime($this->path .'../js/global.js' ), true);
-        wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_script']);
+        wp_register_script('extend_global_script', $this->url . '../js/global.js', ['jquery', 'extend_script'], '1.0.0', true);
+        wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_global_script'], '1.0.0', true);
 
         $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
     }
