@@ -54,23 +54,48 @@ class Extend_Protection_Cart_Offer {
      * @since  0.0.0
      */
     public function hooks() {
+
+        //after cart add cart offers
+        add_action('woocommerce_after_cart', [$this, 'cart_offers']);
+
         //after cart item name add offer element
         add_action('woocommerce_after_cart_item_name', [$this, 'after_cart_item_name'], 10, 2);
+
     }
-
-
 
     // after_cart_item_name($cart_item, $key)
     // @param $cart_item : cart_item contains item information
     // @param $key : key is the cart_item's key and is not used
     // echos the offer element to the cart page
-    public function after_cart_item_name(){
-        //if it's not a warranty, add offer element
-        echo "<div class='extend-cart-offer'> CART OFFERS </div>";
-//        if(!isset($cart_item['extendData'])){
-//            $item_id = $cart_item['variation_id']?$cart_item['variation_id']:$cart_item['product_id'];
-//            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$item_id'> ";
-//        }
+    public function after_cart_item_name($cart_item, $key)
+    {
+        // if it's not a warranty, add offer element
+        if(!isset($cart_item['extendData'])){
+            $item_id = $cart_item['variation_id']?$cart_item['variation_id']:$cart_item['product_id'];
+            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$item_id'> CART OFFERS</div>";
+        }
+    }
+
+    // cart_offers()
+    // renders cart offers
+    public function cart_offers()
+    {
+        // get Extend options
+        $extend_all_options = get_option('extend_protection_for_woocommerce_settings');
+        //  $extend_cart_offers = $extend_all_options['extend_cart_offers'];
+
+        // For TESTING purposes only
+        $cart = WC()->cart;
+        $extend_cart_offers_enabled = true;
+
+
+        // TODO: Check if extend cart offers are enabled
+        // if ($extend_cart_offers == '1') {
+            wp_enqueue_script('extend_script');
+            wp_enqueue_script('extend_cart_integration_script');
+            $ajaxurl = admin_url( 'admin-ajax.php' );
+            wp_localize_script('extend_cart_integration_script', 'ExtendCartIntegration', compact('cart', 'extend_cart_offers_enabled'));
+        // }
 
     }
 

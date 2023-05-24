@@ -234,6 +234,7 @@ class Extend_Protection
         wp_register_script('extend_script', $this->sdk_url);
         wp_register_script('extend_global_script', $this->url . '../js/global.js', ['jquery', 'extend_script'], '1.0.0', true);
         wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_global_script'], '1.0.0', true);
+        wp_register_script('extend_cart_integration_script', $this->url . '../js/extend-cart-offers.js', ['jquery', 'extend_script'], '1.0.0', true);
 
         $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
     }

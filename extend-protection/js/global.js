@@ -34,18 +34,26 @@
         }
 
         function warrantyAlreadyInCart (variantId, cart) {
-            var cartItems = Object.values(cart['cart_contents']);
+            console.log("warrantyAlreadyInCart cart", cart)
+            console.log("cart_contents", cart['cart_contents'])
+            let cartContents = cart['cart_contents'];
+            if (!cartContents) {
+                cartContents = cart;
+            }
+            const cartItems = Object.values(cartContents);
+            console.log("Final cartContents", cartContents)
             const extendWarranties = cartItems.filter(function (lineItem) {
                 //filter through the customAttributes and grab the referenceId
-                var extendData = lineItem.extendData;
-                if (extendData && extendData['covered_product_id'])
-                    var referenceId = extendData['covered_product_id'];
-                return (
-                    extendData &&
-                    !extendData.leadToken &&
-                    referenceId &&
-                    referenceId.toString() === variantId.toString()
-                );
+                let extendData = lineItem.extendData;
+                if (extendData && extendData['covered_product_id']) {
+                    let referenceId = extendData['covered_product_id'];
+                    return (
+                        extendData &&
+                        !extendData.leadToken &&
+                        referenceId &&
+                        referenceId.toString() === variantId.toString()
+                    );
+                }
             });
             return extendWarranties.length > 0;
         }
