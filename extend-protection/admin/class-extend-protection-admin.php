@@ -163,6 +163,8 @@ class Extend_Protection_Admin
         add_submenu_page('extend', 'Settings', 'Settings', 'manage_options', 'extend', 'extend_render_settings_page');
         add_submenu_page('extend', 'Documentation', 'Documentation', 'manage_options', 'extend-docs', 'extend_render_documentation_page');
         add_submenu_page('extend', 'About', 'About', 'manage_options', 'extend-about', 'extend_render_about_page');
+        add_submenu_page('extend', 'Error Log', 'Error Log', 'manage_options', 'custom-error-log', 'extend_logger_admin', '50');
+
     }
 
     /*

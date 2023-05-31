@@ -61,6 +61,14 @@ function deactivate_extend_protection()
 register_activation_hook(__FILE__, 'activate_extend_protection');
 register_deactivation_hook(__FILE__, 'deactivate_extend_protection');
 
+/* extend logger */
+/* Set the constants needed by the extend logger. */
+add_action( 'plugins_loaded',  'extend_logger_constants' );
+/* Load the functions files. */
+add_action( 'plugins_loaded', 'extend_logger_includes' );
+/* end extend logger*/
+
+
 /**
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
@@ -87,6 +95,7 @@ function run_extend_protection()
 function extend_render_settings_page()
 {
     if (!is_woocommerce_activated()) {
+        extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
         echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
 
@@ -116,7 +125,9 @@ function extend_render_settings_page()
         $post_id = wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);
 
         if (!$post_id) {
-            echo "... is missing <br/> "; //<button class='button button-primary' id='extend-product-protection-create'>Create Item</button>";
+            extend_log_error('Extend Product Protection item is missing. Please use the create item button in the Extend Settings page');
+
+            echo "... is missing <br/> ";
             echo '<form method="post"  action=""><input type="submit" name="extend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
 
         } else {
@@ -215,30 +226,70 @@ if ( ! function_exists('write_log')) {
 /* local bypass of curl error ssl */
 add_filter('https_ssl_verify', '__return_false');
 
-
 /* item create */
 add_action('init', 'extend_product_protection_create');
+
 
 function extend_product_protection_create()
 {
     if (isset($_POST['extend-product-protection-create'])) {
-        $product = new WC_Product_Simple();
-        $product->set_name('Extend Product Protection');
-        $product->set_status('publish');
-        $product->set_sku(EXTEND_PRODUCT_PROTECTION_SKU);
-        $product->set_catalog_visibility('hidden');
-        $product->set_price(1.00);
-        $product->set_regular_price(1.00);
-        $product->set_virtual(true);
-        $product->save();
+
+        // delete if sku exists first
+        $deleteproduct =   wc_get_product(wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU));
+        if (empty($product)){
+            extend_log_notice( 'Create Extend product protection item product function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' did not exist prior' );
+        }else{
+            extend_log_notice( 'Create Extend product protection item function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' existed prior' );
+            $deleteproduct->delete();
+        }
+
+        try {
+            // create new
+            $product = new WC_Product_Simple();
+            $product->set_name('Extend Product Protection');
+            $product->set_status('publish');
+            $product->set_sku(EXTEND_PRODUCT_PROTECTION_SKU);
+            $product->set_catalog_visibility('hidden');
+            $product->set_price(1.00);
+            $product->set_regular_price(1.00);
+            $product->set_virtual(true);
+            $product->save();
+        }
+        catch (\Exception $e){
+            extend_log_error($e->getMessage());
+        }
 
         //upload image and associate to product
-        $product_id = $product->get_id();
-        $upload = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
-        $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
-        $product->set_image_id($product_img_id);
-        $product->save();
+        try {
+            $product_id = $product->get_id();
+            $upload = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
+            $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
+            $product->set_image_id($product_img_id);
+            $product->save();
+        }
+        catch (\Exception $e){
+            extend_log_error($e->getMessage());
+        }
     }
 }
+
+/* extend logger */
+function extend_logger_constants(){
+    /* Set constant path to the plugin directory. */
+    define( 'EXTEND_LOGGER_DIR', trailingslashit( plugin_dir_path( __FILE__ ) ) );
+
+    /* Set constant path to the plugin URL. */
+    define( 'EXTEND_LOGGER_URI', trailingslashit( plugin_dir_url( __FILE__ ) ) );
+}
+
+function extend_logger_includes(){
+    /* Include main functions file, this does all the hard work. */
+    require_once( EXTEND_LOGGER_DIR . 'includes/extend_logger_functions.php');
+
+    /* Include main admin file, this sets up the plugin's admin area */
+    require_once( EXTEND_LOGGER_DIR . 'admin/extend_logger_admin.php');
+ //   require_once( EXTEND_LOGGER_DIR . 'admin/extend_logger_admin-bar.php');
+}
+
 
 run_extend_protection();
