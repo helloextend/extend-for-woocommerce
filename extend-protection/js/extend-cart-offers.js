@@ -23,24 +23,19 @@ jQuery(document).ready(function() {
     })
 
     // For each Extend offer in the cart:
-    jQuery('.cart-extend-offer').each(function(ix, val){
-        // Get the reference ID and quantity of the covered item.
-        let ref_id =  jQuery(val).data('covered');
+    document.querySelectorAll('.cart-extend-offer').forEach(function(val, ix){
+        // Get the reference ID and quantity of the covered item
+        let ref_id =  val.dataset.covered;
         let qty = jQuery(val).parents('.cart_item').find('input.qty').val();
         let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,\.]/g, '')
         let extendPrice = parseFloat(price) * 100
-        console.log("ref_id", ref_id)
-        console.log("qty", qty)
-        console.log("price", price)
-        console.log("extendPrice", extendPrice);
 
         // If the warranty is already in the cart or if Extend offers are disabled, stop processing this item.
         if(ExtendWooCommerce.warrantyAlreadyInCart(ref_id, window.ExtendCartIntegration.cart) || ExtendCartIntegration.extend_cart_offers_enabled === 'no'){
             return;
         }
 
-        // Initialize and render the Extend offer.
-        Extend.buttons.renderSimpleOffer('.cart-extend-offer', {
+        Extend.buttons.renderSimpleOffer(val, {
             referenceId: ref_id,
             onAddToCart: function({ plan, product }) {
                 // On adding to the cart, if both plan and product exist:
@@ -80,10 +75,6 @@ jQuery(document.body).on('updated_cart_totals', function () {
         let qty = jQuery(val).parents('.cart_item').find('input.qty').val(); // Get the quantity value from the corresponding input field
         let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,\.]/g, '')
         let extendPrice = parseFloat(price) * 100
-        console.log("ref_id", ref_id)
-        console.log("qty", qty)
-        console.log("price", price)
-        console.log("extendPrice", extendPrice);
 
         // Check if an Extend button instance exists for the current element
         if (Extend.buttons.instance('#' + val.id)) {
@@ -102,7 +93,7 @@ jQuery(document.body).on('updated_cart_totals', function () {
                 /** initialize offer */
 
                 // Render a simple offer using Extend.buttons.renderSimpleOffer()
-                Extend.buttons.renderSimpleOffer('.cart-extend-offer', {
+                Extend.buttons.renderSimpleOffer(val, {
                     referenceId: ref_id,
                     onAddToCart: function ({ plan, product }) {
                         if (plan && product) {
