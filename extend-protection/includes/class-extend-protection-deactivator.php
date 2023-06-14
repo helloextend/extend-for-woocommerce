@@ -31,6 +31,11 @@ class Extend_Protection_Deactivator {
 	 */
 	public static function deactivate() {
 
+        /* Extend Logging: On deactivation clear errors and notices from the database. */
+        delete_option( 'custom_error_log' );
+        delete_option( 'custom_notice_log' );
+        delete_option( 'extend_logger_new_logs' );
+        delete_option( 'extend_logger_ab_show' );
 	}
 
 }

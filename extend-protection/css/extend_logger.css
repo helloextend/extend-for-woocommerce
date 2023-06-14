@@ -1,0 +1,165 @@
+/*
+@package Custom Error Log
+@subpackage CSS
+
+This filestyles the plugin's admin pages
+*/
+
+/*
+Error Log Table
+*/
+
+h2.extend_logger-title {
+    margin-top: 30px;
+    float: left;
+}
+
+#error-log {
+    clear: both;
+}
+
+.extend_logger-table {
+    width: 100%;
+    text-align: left;
+    font-size: 0.9em;
+    border-collapse: collapse;
+}
+
+.extend_logger-table th {
+    background: #222;
+    color: #fff;
+    padding: 5px 0;
+    text-transform: uppercase;
+    font-weight: 400;
+}
+
+.extend_logger-table td {
+    padding-top: 7px;
+    padding-bottom: 7px;
+}
+
+.extend_logger-type-error {
+    width: 20px;
+    padding-left: 10px;
+    color: #dd3d36;
+}
+
+.extend_logger-type-error:before {
+    font-family: "dashicons";
+    content: "\f159";
+}
+
+.extend_logger-type-notice {
+    width: 20px;
+    padding-left: 10px;
+    color: #ffba00;
+}
+
+.extend_logger-type-notice:before {
+    font-family: "dashicons";
+    content: "\f159";
+}
+
+.extend_logger-table .extend_logger-date {
+    padding-left: 10px;
+    width: 90px;
+}
+
+.extend_logger-table .extend_logger-time {
+    width: 100px;
+}
+
+.extend_logger-table .extend_logger-dark td {
+    background: #e6e6e6;
+}
+
+.extend_logger-table .extend_logger-new-log td {
+    background: #b9ed91;
+    -webkit-transition: background-color .7s ease-in-out;
+    -moz-transition: background-color .7s ease-in-out;
+    -o-transition: background-color .7s ease-in-out;
+    -ms-transition: background-color .7s ease-in-out;
+    transition: background-color .7s ease-in-out;
+}
+
+.extend_logger-log-filter,
+.extend_logger-log-unfilter {
+    cursor: pointer;
+}
+
+.extend_logger-table .extend_logger-delete-button {
+    display: block;
+    appearance: none;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    border: none;
+    outline: none;
+    padding: 0;
+    margin: 3px 0 0 0;
+    background: none;
+    font-size: 1.5em;
+    line-height: 1;
+    cursor: pointer;
+    color: #222;
+    text-decoration: none;
+}
+
+.extend_logger-table .extend_logger-delete {
+    width:20px;
+}
+
+.extend_logger-table .extend_logger-delete-button:hover {
+    color: #d54e21;
+}
+
+.extend_logger-table .extend_logger-delete-button:before {
+    font-family: "dashicons";
+    content: "\f153";
+}
+
+div.ajax-response {
+    padding-top: 11px;
+    padding-bottom: 11px;
+    margin: 5px 0 15px !important;
+    display: block;
+    line-height: 19px;
+}
+
+a.extend_logger-delete-all {
+    float: right;
+    margin-bottom: 5px;
+    cursor: pointer;
+}
+
+#extend_logger-ab-toggle {
+    float: right;
+    margin-right: 15px;
+    margin-top: 30px;
+}
+
+#extend_logger-ab-toggle label {
+    font-size: 0.9em;
+    color: #999;
+    margin-right: 5px;
+}
+
+/*
+Introduction
+*/
+
+pre {
+    background-color: #222;
+    color:#fff;
+    padding:15px;
+    margin-bottom: 30px;
+    display: block;
+    white-space: pre-wrap;
+}
+
+.pre-comment {
+    color: #666;
+}
+
+.default {
+    color: #999;
+}

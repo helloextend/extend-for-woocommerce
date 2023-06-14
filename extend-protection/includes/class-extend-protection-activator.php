@@ -31,6 +31,11 @@ class Extend_Protection_Activator {
 	 */
 	public static function activate() {
 
+        /* Extend  Logging : On activation create two fields in the wp_options table to store our errors and notices. */
+        add_option( 'custom_error_log' );
+        add_option( 'custom_notice_log' );
+        add_option( 'extend_logger_new_logs' );
+        add_option( 'extend_logger_ab_show', true );
 	}
 
 }

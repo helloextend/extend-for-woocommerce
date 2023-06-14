@@ -14,7 +14,8 @@
             ...ExtendWooCommerce,
             addPlanToCart,
             getCart,
-            warrantyAlreadyInCart
+            warrantyAlreadyInCart,
+            extendAjaxLog
         }
 
         async function addPlanToCart (opts) {
@@ -56,6 +57,28 @@
                 }
             });
             return extendWarranties.length > 0;
+        }
+
+        function extendAjaxLog(message , method){
+
+            /* Now use an ajax call to write logs from js files... */
+            $.ajax({
+                type: 'POST',
+                url: ajaxurl,
+
+                data: {
+                    action: 'extend_logger_ajax_call',
+                    message: message,
+                    method: method,
+                },
+                success: function (xhr, x, checkStatus) {
+                    return null;
+                },
+                error: function(e) {
+                    console.log(e.statusText);
+                    console.log("failure")
+                }
+            });
         }
 
     })
