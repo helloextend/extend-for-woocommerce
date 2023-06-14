@@ -34,6 +34,8 @@ jQuery(document).ready(function() {
         console.log("price", price)
         console.log("extendPrice", extendPrice);
 
+
+
         // If the warranty is already in the cart or if Extend offers are disabled, stop processing this item.
         if(ExtendWooCommerce.warrantyAlreadyInCart(ref_id, window.ExtendCartIntegration.cart) || ExtendCartIntegration.extend_cart_offers_enabled === 'no'){
             return;
@@ -43,8 +45,13 @@ jQuery(document).ready(function() {
         Extend.buttons.renderSimpleOffer('.cart-extend-offer', {
             referenceId: ref_id,
             onAddToCart: function({ plan, product }) {
+
                 // On adding to the cart, if both plan and product exist:
                 if (plan && product) {
+                   // ExtendWooCommerce.extendAjaxLog('1 - OnAddToCart simple offer call with :', 'notice')
+                    ExtendWooCommerce.extendAjaxLog(plan, 'notice');
+                    ExtendWooCommerce.extendAjaxLog(product.toString(), 'notice');
+
                     // Create a copy of the plan, adding the reference ID of the covered product.
                     var planCopy = { ...plan, covered_product_id: ref_id }
 
@@ -60,6 +67,9 @@ jQuery(document).ready(function() {
                             jQuery("[name='update_cart']").removeAttr('disabled');
                             jQuery("[name='update_cart']").trigger("click");
                         })
+                }else{
+
+                    ExtendWooCommerce.extendAjaxLog('onAddToCart failed: plan or product missing', 'error');
                 }
             },
         });
@@ -85,6 +95,9 @@ jQuery(document.body).on('updated_cart_totals', function () {
         console.log("price", price)
         console.log("extendPrice", extendPrice);
 
+
+
+
         // Check if an Extend button instance exists for the current element
         if (Extend.buttons.instance('#' + val.id)) {
             Extend.buttons.instance('#' + val.id).destroy(); // Destroy the existing Extend button instance
@@ -105,7 +118,11 @@ jQuery(document.body).on('updated_cart_totals', function () {
                 Extend.buttons.renderSimpleOffer('.cart-extend-offer', {
                     referenceId: ref_id,
                     onAddToCart: function ({ plan, product }) {
+
                         if (plan && product) {
+                            ExtendWooCommerce.extendAjaxLog('2 - OnAddToCart simple offer call with :', 'notice')
+                            ExtendWooCommerce.extendAjaxLog(plan.toString(), 'notice');
+                            ExtendWooCommerce.extendAjaxLog(product.toString(), 'notice');
 
                             var planCopy = { ...plan, covered_product_id: ref_id }; // Create a copy of the plan object with the 'covered_product_id' property set to ref_id
 
@@ -125,5 +142,7 @@ jQuery(document.body).on('updated_cart_totals', function () {
                     },
                 });
             });
+
+
     });
 });
