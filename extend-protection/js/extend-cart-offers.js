@@ -2,7 +2,6 @@
 
 // Wait until the document is fully loaded before running the script.
 jQuery(document).ready(function() {
-
     // Check if necessary objects (ExtendWooCommerce and ExtendCartIntegration) exist.
     // If not, stop the execution of the script.
     if(!ExtendWooCommerce || !ExtendCartIntegration) {
@@ -28,17 +27,16 @@ jQuery(document).ready(function() {
         let ref_id =  val.dataset.covered;
         let qty = jQuery(val).parents('.cart_item').find('input.qty').val();
         let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,\.]/g, '')
-        let extendPrice = parseFloat(price) * 100
-
-
+        let extendPrice = parseFloat(price * 100)
 
         // If the warranty is already in the cart or if Extend offers are disabled, stop processing this item.
-        if(ExtendWooCommerce.warrantyAlreadyInCart(ref_id, window.ExtendCartIntegration.cart) || ExtendCartIntegration.extend_cart_offers_enabled === 'no'){
+        if(ExtendWooCommerce.warrantyAlreadyInCart(ref_id, window.ExtendCartIntegration.cart) || ExtendCartIntegration.extend_enable_cart_offers !== '1'){
             return;
         }
 
         Extend.buttons.renderSimpleOffer(val, {
             referenceId: ref_id,
+            price: extendPrice,
             onAddToCart: function({ plan, product }) {
 
                 // On adding to the cart, if both plan and product exist:
@@ -62,8 +60,7 @@ jQuery(document).ready(function() {
                             jQuery("[name='update_cart']").removeAttr('disabled');
                             jQuery("[name='update_cart']").trigger("click");
                         })
-                }else{
-
+                } else {
                     ExtendWooCommerce.extendAjaxLog('onAddToCart failed: plan or product missing', 'error');
                 }
             },
@@ -133,7 +130,5 @@ jQuery(document.body).on('updated_cart_totals', function () {
                     },
                 });
             });
-
-
     });
 });
