@@ -191,27 +191,48 @@ class Extend_Protection_Admin
             )
         );
 
-        add_settings_section(
-            'extend_setting_contract_section',
-            'Product Protection Contracts',
-            array($this, 'extend_setting_contract_section_info'),
-            'extend-protection-for-woocommerce-settings-admin',
-            array(
-                'before_section' => '<div style="margin-top:40px;">',
-                'after_section' => '</div>', //html for after the section
-            )
-        );
+        /* build sections. note after v6.1.0, add_settings_section allows for extra parameters */
 
-        add_settings_section(
-            'extend_setting_environment_section',
-            'Environment and Authentication',
-            array($this, 'extend_setting_environment_section_info'),
-            'extend-protection-for-woocommerce-settings-admin',
-            array(
-                'before_section' => '<div style="margin-top:40px;">',
-                'after_section' => '</div>', //html for after the section
-            )
-        );
+        global $wp_version;
+        if (version_compare($wp_version, '6.1.0') >= 0) {
+            add_settings_section(
+                'extend_setting_contract_section',
+                'Product Protection Contracts',
+                array($this, 'extend_setting_contract_section_info'),
+                'extend-protection-for-woocommerce-settings-admin',
+                array(
+                    'before_section' => '<div style="margin-top:40px;">',
+                    'after_section' => '</div>', //html for after the section
+                )
+            );
+
+            add_settings_section(
+                'extend_setting_environment_section',
+                'Environment and Authentication',
+                array($this, 'extend_setting_environment_section_info'),
+                'extend-protection-for-woocommerce-settings-admin',
+                array(
+                    'before_section' => '<div style="margin-top:40px;">',
+                    'after_section' => '</div>', //html for after the section
+                )
+            );
+        }else{
+            //older versions will not have margin-top
+            add_settings_section(
+                'extend_setting_contract_section',
+                'Product Protection Contracts',
+                array($this, 'extend_setting_contract_section_info'),
+                'extend-protection-for-woocommerce-settings-admin'
+            );
+
+            add_settings_section(
+                'extend_setting_environment_section',
+                'Environment and Authentication',
+                array($this, 'extend_setting_environment_section_info'),
+                'extend-protection-for-woocommerce-settings-admin'
+            );
+
+        }
 
         add_settings_field(
             'enable_extend', // id
