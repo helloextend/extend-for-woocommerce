@@ -182,9 +182,35 @@ class Extend_Protection_Admin
 
         add_settings_section(
             'extend_protection_for_woocommerce_settings_setting_section', // id
-            'Product Protection Settings', // title
+            'General Settings', // title
             array($this, 'extend_protection_for_woocommerce_settings_section_info'), // callback
-            'extend-protection-for-woocommerce-settings-admin' // page
+            'extend-protection-for-woocommerce-settings-admin', // page
+            array(
+                'before_section' => '<div style="margin-top:40px;">',
+                'after_section' => '</div>', //html for after the section
+            )
+        );
+
+        add_settings_section(
+            'extend_setting_contract_section',
+            'Product Protection Contracts',
+            array($this, 'extend_setting_contract_section_info'),
+            'extend-protection-for-woocommerce-settings-admin',
+            array(
+                'before_section' => '<div style="margin-top:40px;">',
+                'after_section' => '</div>', //html for after the section
+            )
+        );
+
+        add_settings_section(
+            'extend_setting_environment_section',
+            'Environment and Authentication',
+            array($this, 'extend_setting_environment_section_info'),
+            'extend-protection-for-woocommerce-settings-admin',
+            array(
+                'before_section' => '<div style="margin-top:40px;">',
+                'after_section' => '</div>', //html for after the section
+            )
         );
 
         add_settings_field(
@@ -244,11 +270,26 @@ class Extend_Protection_Admin
         );
 
         add_settings_field(
+            'extend_product_protection_contract_create', // id
+            'Create Contracts', // title
+            array($this, 'extend_product_protection_contract_create_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin', // page
+            'extend_setting_contract_section' // section
+        );
+
+        add_settings_field(
+            'extend_product_protection_contract_create_event', // id
+            'Contracts Event', // title
+            array($this, 'extend_product_protection_contract_create_event_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin', // page
+            'extend_setting_contract_section' // section
+        );
+        add_settings_field(
             'extend_environment', // id
             'Environment', // title
             array($this, 'extend_environment_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
+            'extend_setting_environment_section' // section
         );
 
         add_settings_field(
@@ -256,7 +297,7 @@ class Extend_Protection_Admin
             'Extend Sandbox Store Id', // title
             array($this, 'extend_sandbox_store_id_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
+            'extend_setting_environment_section' // section
         );
 
         add_settings_field(
@@ -264,7 +305,7 @@ class Extend_Protection_Admin
             'Extend Sandbox API Key', // title
             array($this, 'extend_sandbox_api_key_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
+            'extend_setting_environment_section' // section
         );
 
         add_settings_field(
@@ -272,7 +313,7 @@ class Extend_Protection_Admin
             'Extend Live Store Id', // title
             array($this, 'extend_live_store_id_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
+            'extend_setting_environment_section' // section
         );
 
         add_settings_field(
@@ -280,7 +321,7 @@ class Extend_Protection_Admin
             'Extend Live API Key', // title
             array($this, 'extend_live_api_key_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin', // page
-            'extend_protection_for_woocommerce_settings_setting_section' // section
+            'extend_setting_environment_section' // section
         );
 
         //once options have been registered, initialize values in the db:
@@ -329,6 +370,14 @@ class Extend_Protection_Admin
             $sanitary_values['extend_pdp_offer_location'] = $input['extend_pdp_offer_location'];
         }
 
+        if (isset($input['extend_product_protection_contract_create'])) {
+            $sanitary_values['extend_product_protection_contract_create'] = $input['extend_product_protection_contract_create'];
+        }
+
+        if (isset($input['extend_product_protection_contract_create_event'])) {
+            $sanitary_values['extend_product_protection_contract_create_event'] = $input['extend_product_protection_contract_create_event'];
+        }
+
         if (isset($input['extend_environment'])) {
             $sanitary_values['extend_environment'] = $input['extend_environment'];
         }
@@ -354,7 +403,7 @@ class Extend_Protection_Admin
 
     public function extend_protection_for_woocommerce_settings_section_info()
     {
-
+        echo "<hr>";
     }
 
     /* all callback functions for registering fields and displaying them with their saved values */
@@ -437,6 +486,25 @@ class Extend_Protection_Admin
         echo  '<label for="extend_automated_product_sync"><a href="?page=extend-docs#offer_placement">What\'s this ?</a></label>';
     }
 
+    public function extend_product_protection_contract_create_callback(){
+        // show checkbox to create contracts
+        printf(
+            '<input type="checkbox" name="extend_protection_for_woocommerce_settings[extend_product_protection_contract_create]" id="extend_product_protection_contract_create" value="1" %s> <label for="extend_product_protection_contract_create">Create Product Protection Contracts</label>' ,
+            (isset($this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create']) && $this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create'] === '1') ? 'checked' : ''
+        );
+    }
+
+    public function extend_product_protection_contract_create_event_callback(){
+        ?>
+        <select name="extend_protection_for_woocommerce_settings[extend_product_protection_contract_create_event]" id="extend_product_protection_contract_create_event">
+            <?php $selected = (isset($this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create_event']) && $this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create_event'] === 'Order Create') ? 'selected' : ''; ?>
+            <option value="Order Create" <?php echo $selected; ?>>Order Create</option>
+            <?php $selected = (isset($this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create_event']) && $this->extend_protection_for_woocommerce_settings_options['extend_product_protection_contract_create_event'] === 'Fulfillment') ? 'selected' : ''; ?>
+            <option value="Fulfillment" <?php echo $selected; ?>>Fulfillment</option>
+        </select>
+        <?php
+    }
+
     public function extend_environment_callback()
     {
         ?>
@@ -481,4 +549,12 @@ class Extend_Protection_Admin
         );
     }
 
+    function extend_setting_contract_section_info() {
+        echo "<hr>";
+    }
+
+
+    function extend_setting_environment_section_info() {
+        echo "<hr>";
+    }
 }
