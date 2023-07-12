@@ -99,6 +99,50 @@ class Extend_Protection_Global
         wp_die();
     }
 
+    /**
+     * Retrieves the Extend for WooCommerce settings.
+     * @since 1.0.0
+     * @return array The extended WooCommerce settings.
+     */
+    public static function get_extend_settings() {
+        static $settings;
+
+        $extend_protection_all_settings = get_option('extend_protection_for_woocommerce_settings');
+
+        $settings['enable_extend'] = array_key_exists('enable_extend', $extend_protection_all_settings) ? $extend_protection_all_settings['enable_extend'] : 0;
+        $settings['extend_enable_cart_offers'] = array_key_exists('extend_enable_cart_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_cart_offers'] : 0;
+        $settings['extend_enable_cart_balancing'] = array_key_exists('extend_enable_cart_balancing', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_cart_balancing'] : 0;
+        $settings['extend_enable_pdp_offers'] = array_key_exists('extend_enable_pdp_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_pdp_offers'] : 0;
+        $settings['extend_enable_modal_offers'] = array_key_exists('extend_enable_modal_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_modal_offers'] : 0;
+        $settings['extend_environment'] = $extend_protection_all_settings['extend_environment'];
+        $settings['extend_pdp_offer_location'] = array_key_exists('extend_pdp_offer_location', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_pdp_offer_location'] : 'woocommerce_before_add_to_cart_button';
+
+        /* Set variables depending on environment */
+        if ($settings['extend_environment'] == 'live') {
+            $settings['store_id'] = $extend_protection_all_settings['extend_live_store_id'];
+            $settings['api_host'] = 'https://api.helloextend.com';
+            $settings['api_key'] = $extend_protection_all_settings['extend_live_api_key'];
+        }
+        else {
+            $settings['store_id'] = $extend_protection_all_settings['extend_sandbox_store_id'];
+            $settings['api_host'] = 'https://api-sandbox.helloextend.com';
+            $settings['api_key'] = $extend_protection_all_settings['extend_sandbox_api_key'];
+        }
+
+        $settings['sdk_url'] = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
+
+        // TODO: This is still not working
+        // $settings['warranty_product_id'] = wc_get_product_id_by_sku('extend-product-protection');
+        $settings['warranty_product_id'] = 209;
+
+
+        if (empty($settings['warranty_product_id'])) {
+            extend_log_error("Error: Warranty product is not created.");
+        }
+
+        return $settings;
+    }
+
     public static function add_to_cart_extend(){
         $warranty_product_id = wc_get_product_id_by_sku( 'extend-product-protection' );
         $quantity = $_REQUEST['quantity'];

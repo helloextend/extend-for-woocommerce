@@ -28,7 +28,7 @@ class Extend_Protection_Cart_Offer {
      * @access   private
      * @var      string $extend_protection The ID of this plugin.
      */
-    private $extend_protection;
+    private string $extend_protection;
 
     /**
      * The version of this plugin.
@@ -37,17 +37,18 @@ class Extend_Protection_Cart_Offer {
      * @access   private
      * @var      string $version The current version of this plugin.
      */
-    private $version;
+    private string $version;
 
-    protected $warranty_product_id = null;
-    protected $products = [];
-    protected $updates = [];
+    protected string $warranty_product_id;
+    protected array $products = [];
+    protected array $updates = [];
+    private array $extend_protection_all_settings;
 
     public function __construct() {
         $this->hooks();
-        // TODO: Move this to global class
-//         $this->warranty_product_id = wc_get_product_id_by_sku('extend-product-protection');
-         $this->warranty_product_id = 209;
+
+        $this->extend_protection_all_settings = Extend_Protection_Global::get_extend_settings();
+
     }
 
     /**
@@ -65,7 +66,6 @@ class Extend_Protection_Cart_Offer {
 
         //run normalization on check
         add_action('woocommerce_check_cart_items', [$this, 'normalize_cart']);
-        add_action('woocommerce_after_cart_item_quantity_update', [$this, 'normalize_cart']);
 
     }
 
@@ -77,12 +77,8 @@ class Extend_Protection_Cart_Offer {
 
         foreach($cart_contents as $line){
 
-            extend_log_notice('intval($line[\'product_id\']): ' . intval($line['product_id']));
-            extend_log_notice('intval($this->warranty_product_id): ' . intval($this->warranty_product_id));
-            extend_log_notice('isset($line[\'extendData\'])', isset($line['extendData']));
-
             //if we're on a warranty item
-            if(intval($line['product_id']) === intval($this->warranty_product_id) && isset($line['extendData'])){
+            if(intval($line['product_id']) === intval($this->extend_protection_all_settings['warranty_product_id']) && isset($line['extendData'])){
                 //Grab reference id
                 $product_reference_id =
                     $line['extendData']['covered_product_id'];
@@ -148,8 +144,6 @@ class Extend_Protection_Cart_Offer {
 
         //if there's updates return updates
         if(isset($updates)){
-            extend_log_notice("Updated found");
-            extend_log_notice(print_r($updates, true));
             return $updates;
         }
     }
@@ -157,13 +151,10 @@ class Extend_Protection_Cart_Offer {
     // normalize_cart()
     // grabs & applies cart updates
     public function normalize_cart(){
-        extend_log_notice("normalize_cart invoked");
 
-        // TODO: Not returning any updates
         $newUpdates = $this->get_cart_updates();
 
         if(isset($newUpdates)){
-            extend_log_notice( $newUpdates );
             $cart = WC()->cart->get_cart_contents();
             foreach($cart as $line){
 
@@ -173,7 +164,6 @@ class Extend_Protection_Cart_Offer {
                     }
                 }
             }
-            extend_log_notice($cart);
         }
 
         return WC()->cart;
@@ -198,21 +188,20 @@ class Extend_Protection_Cart_Offer {
     public function cart_offers()
     {
         // get Extend options
-        $extend_all_options = get_option('extend_protection_for_woocommerce_settings');
-        //  $extend_cart_offers = $extend_all_options['extend_cart_offers'];
+        $enable_extend = trim($this->extend_protection_all_settings['enable_extend']);
+        $extend_enable_cart_offers = $this->extend_protection_all_settings['extend_enable_cart_offers'];
 
-        // For TESTING purposes only
         $cart = WC()->cart;
-        $extend_cart_offers_enabled = true;
 
-
-        // TODO: Check if extend cart offers are enabled
-        // if ($extend_cart_offers == '1') {
-        wp_enqueue_script('extend_script');
-        wp_enqueue_script('extend_cart_integration_script');
-        $ajaxurl = admin_url( 'admin-ajax.php' );
-        wp_localize_script('extend_cart_integration_script', 'ExtendCartIntegration', compact('cart', 'extend_cart_offers_enabled'));
-        // }
+        if($enable_extend === '1') {
+            wp_enqueue_script('extend_script');
+            wp_enqueue_script('extend_cart_integration_script');
+            $ajaxurl = admin_url( 'admin-ajax.php' );
+            wp_localize_script('extend_cart_integration_script', 'ExtendCartIntegration', compact('cart', 'extend_enable_cart_offers'));
+        }
+        else {
+            extend_log_error("Cart Offers Class: Extend is not enabled");
+        }
 
     }
 

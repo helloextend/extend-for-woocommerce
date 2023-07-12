@@ -35,14 +35,11 @@
         }
 
         function warrantyAlreadyInCart (variantId, cart) {
-            console.log("warrantyAlreadyInCart cart", cart)
-            console.log("cart_contents", cart['cart_contents'])
             let cartContents = cart['cart_contents'];
             if (!cartContents) {
                 cartContents = cart;
             }
             const cartItems = Object.values(cartContents);
-            console.log("Final cartContents", cartContents)
             const extendWarranties = cartItems.filter(function (lineItem) {
                 //filter through the customAttributes and grab the referenceId
                 let extendData = lineItem.extendData;
@@ -75,8 +72,7 @@
                     return null;
                 },
                 error: function(e) {
-                    console.log(e.statusText);
-                    console.log("failure")
+                    console.error("extendAjaxLog error: ", e.statusText)
                 }
             });
         }
