@@ -93,6 +93,8 @@ class Extend_Protection
      * @since  1.0.0
      */
     protected $path = '';
+    private Extend_Protection_Cart_Offer $cart_offer;
+    private Extend_Protection_Orders $orders;
 
     /**
      * Define the core functionality of the plugin.
@@ -122,6 +124,7 @@ class Extend_Protection
         $this->define_global_hooks();
         $this->define_pdp_offer_hooks();
         $this->define_cart_offer_hooks();
+        $this->define_orders_hooks();
     }
 
     /**
@@ -179,12 +182,16 @@ class Extend_Protection
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-cart-offer.php';
 
         /**
+         * The class responsible for handling the Extend Orders API
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-orders.php';
+
+        /**
          * The class responsible for loading the global class and enqueing the JS
          * to add extend offers to the cart
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-global.php';
-
-
+        
         $this->loader = new Extend_Protection_Loader();
 
     }
@@ -252,7 +259,7 @@ class Extend_Protection
     }
 
     /**
-     * Register all of the hooks related to the cart offers functionality
+     * Register all the hooks related to the cart offers functionality
      * of the plugin.
      *
      * @since    1.0.0
@@ -261,6 +268,18 @@ class Extend_Protection
     private function define_cart_offer_hooks()
     {
         $this->cart_offer = new Extend_Protection_Cart_Offer($this->get_extend_protection(), $this->get_version());
+    }
+    
+    /**
+     * Register all the hooks related to the Extend Orders API
+     * of the plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_orders_hooks()
+    {
+        $this->orders = new Extend_Protection_Orders($this->get_extend_protection(), $this->get_version());
     }
 
     /**
