@@ -114,6 +114,7 @@ class Extend_Protection_Orders {
 
             // Add relevant data to the line_items array
             // if product id is 209, do not add it to extend_line_items array
+            // TODO: Change product ID number wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);
             if ($product_id != 209) {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
@@ -127,6 +128,9 @@ class Extend_Protection_Orders {
                     ),
                     'quantity' => $item->get_quantity(),
                     'fulfilledQuantity' => $item->get_quantity(),
+
+                    //TODO: Pass line item status
+
                 );
 
                 // if $plan is not empty, add the plan to the current line item
