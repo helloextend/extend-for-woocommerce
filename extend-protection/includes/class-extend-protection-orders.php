@@ -94,8 +94,6 @@ class Extend_Protection_Orders {
             }
         }
 
-        // extend_log_notice("Extend Plans: " . print_r(json_encode($extend_plans, JSON_PRETTY_PRINT), true));
-
         // Loop through the order items and add them to the line_items array
         $extend_line_items = array();
         foreach( $order->get_items() as $item_id => $item ){
@@ -114,7 +112,9 @@ class Extend_Protection_Orders {
 
             // Add relevant data to the line_items array
             // if product id is 209, do not add it to extend_line_items array
-            if ($product_id != 209) {
+            $extend_product_id = Extend_Protection_Global::get_extend_product_protection_id(EXTEND_PRODUCT_PROTECTION_SKU);
+
+            if ($product_id != $extend_product_id) {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product' => array(
@@ -127,6 +127,9 @@ class Extend_Protection_Orders {
                     ),
                     'quantity' => $item->get_quantity(),
                     'fulfilledQuantity' => $item->get_quantity(),
+
+                    //TODO: Pass line item status
+
                 );
 
                 // if $plan is not empty, add the plan to the current line item
@@ -169,7 +172,7 @@ class Extend_Protection_Orders {
             'transactionId' => $order_id
         );
 
-        // extend_log_notice("Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
+        extend_log_notice("Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
 
         $request_args = array(
             'method' => 'PUT',

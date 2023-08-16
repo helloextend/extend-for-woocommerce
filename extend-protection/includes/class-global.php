@@ -99,6 +99,12 @@ class Extend_Protection_Global
         wp_die();
     }
 
+    public static function get_extend_product_protection_id($sku) {
+        global  $wpdb;
+        $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1",  $sku) );
+        return $product_id;
+    }
+
     /**
      * Retrieves the Extend for WooCommerce settings.
      * @since 1.0.0
@@ -133,7 +139,9 @@ class Extend_Protection_Global
 
         // TODO: This is still not working
         // $settings['warranty_product_id'] = wc_get_product_id_by_sku('extend-product-protection');
-        $settings['warranty_product_id'] = 209;
+
+        global  $wpdb;
+        $settings['warranty_product_id'] = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1",  'extend-product-protection') );
 
 
         if (empty($settings['warranty_product_id'])) {
