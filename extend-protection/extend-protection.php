@@ -92,6 +92,16 @@ function run_extend_protection()
 
 }
 
+function custom_get_product_id_by_sku($sku)
+{
+    if (function_exists('wc_get_product_id_by_sku')) {
+        return wc_get_product_id_by_sku($sku);
+    }
+
+    return null;
+}
+
+
 function extend_render_settings_page()
 {
     if (!is_woocommerce_activated()) {
@@ -154,7 +164,7 @@ function extend_render_documentation_page()
 
 
 
-echo '
+    echo '
     <div class="accordion">
     <div>
         <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
