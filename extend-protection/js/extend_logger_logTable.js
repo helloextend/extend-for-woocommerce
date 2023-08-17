@@ -29,18 +29,14 @@ function extend_loggerDeleteSingle() {
     $( '.extend_logger-delete-button' ).on( 'click', function() {
 
         /* Get log type... */
-        console.log( 'yay' );
-
         if( $( this ).parent().parent().hasClass( 'extend_logger-error' ) ) {
-
             log_type = 'error';
-
         }
-
+        else if( $( this ).parent().parent().hasClass( 'extend_logger-debug' ) ) {
+            log_type = 'debug';
+        }
         else {
-
             log_type = 'notice';
-
         }
 
         /* Delete the error visibily from the error log table... */
@@ -119,9 +115,7 @@ function extend_loggerDeleteAll() {
 
             },
             error: function( MLHttpRequest, textStatus, errorThrown ) {
-
-                alert( errorThrown );
-
+                alert( 'error: ' +errorThrown );
             }
 
         });

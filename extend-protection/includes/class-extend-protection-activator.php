@@ -8,18 +8,10 @@
  *
  * @package    Extend_Protection
  * @subpackage Extend_Protection/includes
+ * @author     support@extend.com
  */
 
-/**
- * Fired during plugin activation.
- *
- * This class defines all code necessary to run during the plugin's activation.
- *
- * @since      1.0.0
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
- * @author     Your Name <email@example.com>
- */
+
 class Extend_Protection_Activator {
 
 	/**
@@ -31,9 +23,10 @@ class Extend_Protection_Activator {
 	 */
 	public static function activate() {
 
-        /* Extend  Logging : On activation create two fields in the wp_options table to store our errors and notices. */
+        /* Extend  Logging : On activation create two fields in the wp_options table to store our errors, debugs and notices. */
         add_option( 'custom_error_log' );
         add_option( 'custom_notice_log' );
+        add_option( 'custom_debug_log' );
         add_option( 'extend_logger_new_logs' );
         add_option( 'extend_logger_ab_show', true );
 	}

@@ -11,21 +11,7 @@
  *
  * @package    Extend_Protection
  * @subpackage Extend_Protection/includes
- */
-
-/**
- * The core plugin class.
- *
- * This is used to define internationalization, admin-specific hooks, and
- * public-facing site hooks.
- *
- * Also maintains the unique identifier of this plugin as well as the current
- * version of the plugin.
- *
- * @since      1.0.0
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
- * @author     Your Name <email@example.com>
+ * @author     support@extend.com
  */
 class Extend_Protection
 {
@@ -95,6 +81,8 @@ class Extend_Protection
     protected $path = '';
     private Extend_Protection_Cart_Offer $cart_offer;
     private Extend_Protection_Orders $orders;
+    private Extend_Protection_Shipping $shipping_protection;
+
 
     /**
      * Define the core functionality of the plugin.
@@ -114,7 +102,7 @@ class Extend_Protection
         }
         $this->extend_protection = 'extend-protection';
 
-        $this->url  = plugin_dir_url( __FILE__ );
+        $this->url      = plugin_dir_url( __FILE__ );
         $this->path     = plugin_dir_path( __FILE__ );
 
         $this->load_dependencies();
@@ -125,6 +113,7 @@ class Extend_Protection
         $this->define_pdp_offer_hooks();
         $this->define_cart_offer_hooks();
         $this->define_orders_hooks();
+        $this->define_shipping_protection_offer_hooks();
     }
 
     /**
@@ -191,7 +180,17 @@ class Extend_Protection
          * to add extend offers to the cart
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-global.php';
-        
+
+        /**
+         * The class responsible for handling the Logs
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-logger.php';
+
+        /**
+         * The class responsible for handling the Shipping Protection
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-shipping.php';
+
         $this->loader = new Extend_Protection_Loader();
 
     }
@@ -242,6 +241,7 @@ class Extend_Protection
         wp_register_script('extend_global_script', $this->url . '../js/global.js', ['jquery', 'extend_script'], '1.0.0', true);
         wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_global_script'], '1.0.0', true);
         wp_register_script('extend_cart_integration_script', $this->url . '../js/extend-cart-offers.js', ['jquery', 'extend_script'], '1.0.0', true);
+        wp_register_script('extend_shipping_integration_script', $this->url . '../js/extend-shipping-offers.js', ['jquery', 'extend_script'], '1.0.0', true);
 
         $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
     }
@@ -269,7 +269,19 @@ class Extend_Protection
     {
         $this->cart_offer = new Extend_Protection_Cart_Offer($this->get_extend_protection(), $this->get_version());
     }
-    
+
+    /**
+     * Register all the hooks related to the shipping protection offers functionality
+     * of the plugin.
+     *
+     * @since    1.0.0
+     * @access   private
+     */
+    private function define_shipping_protection_offer_hooks()
+    {
+        $this->shipping_protection_offer = new Extend_Protection_Shipping($this->get_extend_protection(), $this->get_version());
+    }
+
     /**
      * Register all the hooks related to the Extend Orders API
      * of the plugin.

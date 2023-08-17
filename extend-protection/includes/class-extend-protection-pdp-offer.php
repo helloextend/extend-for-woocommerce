@@ -41,14 +41,12 @@ class Extend_Protection_PDP_Offer
      */
     private $version;
 
-    /**
-     * The settings of this plugin.
-     *
-     * @since    1.0.0
-     * @access   private
-     * @var      string $extend_protection_all_settings The current options of this plugin.
-     */
-    private $extend_protection_all_settings;
+
+
+    private string $basename;
+    private string $url;
+    private string $path;
+    private array $settings;
 
     /**
      * Initialize the class and set its properties.
@@ -68,11 +66,10 @@ class Extend_Protection_PDP_Offer
         $this->path     = plugin_dir_path( __FILE__ );
 
         /* retrieve environment variables */
-        $this->extend_protection_all_settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = Extend_Protection_Global::get_extend_settings();
 
         /* Initializes product_offer on the PDP Offer Location selected in wp-admin > Extend */
-        add_action($this->extend_protection_all_settings['extend_pdp_offer_location'], [$this, 'product_offer']);
-
+        add_action($this->settings['extend_pdp_offer_location'], [$this, 'product_offer']);
     }
 
     /**
@@ -85,21 +82,22 @@ class Extend_Protection_PDP_Offer
         global $product;
 
         // Variables that are passed to the PDP JS Script
-        $id = $product->get_id();
-        $sku = $product->get_sku();
-        $categories = get_the_terms( $id, 'product_cat' );
-        $first_category = $categories[0]->name;
-        $price = $product->get_price() * 100;
-        $type = $product->get_type();
-        $env = $this->extend_protection_all_settings['extend_environment'];
-        $extend_pdp_offers_enabled = $this->extend_protection_all_settings['extend_enable_pdp_offers'];
-        $extend_modal_offers_enabled = $this->extend_protection_all_settings['extend_enable_modal_offers'];
-        $extend_enabled = $this->extend_protection_all_settings['enable_extend'];
+        $id                         = $product->get_id();
+        $sku                        = $product->get_sku();
+        $categories                 = get_the_terms($id, 'product_cat');
+        $first_category             = $categories[0]->name;
+        $price                      = $product->get_price() * 100;
+        $type                       = $product->get_type();
+        $env                        = $this->settings['extend_environment'];
+        $extend_pdp_offers_enabled  = $this->settings['extend_enable_pdp_offers'];
+        $extend_modal_offers_enabled = $this->settings['extend_enable_modal_offers'];
+        $extend_enabled             = $this->settings['enable_extend'];
 
         if($extend_enabled === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_product_integration_script');
-            wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration', compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
+            wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration',
+                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
             echo "<div class='extend-offer' data-extend='pdpOfferContainer'></div>";
         }
     }

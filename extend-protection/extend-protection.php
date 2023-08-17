@@ -92,20 +92,10 @@ function run_extend_protection()
 
 }
 
-function custom_get_product_id_by_sku($sku)
-{
-    if (function_exists('wc_get_product_id_by_sku')) {
-        return wc_get_product_id_by_sku($sku);
-    }
-
-    return null;
-}
-
-
 function extend_render_settings_page()
 {
     if (!is_woocommerce_activated()) {
-        extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
+        Extend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
         echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
 
@@ -117,34 +107,37 @@ function extend_render_settings_page()
 
 
     settings_errors(); ?>
+<!-- begin tabs -->
 
-    <form id="extend-settings" method="post" action="options.php">
-        <?php
-        settings_fields('extend_protection_for_woocommerce_settings_option_group');
-        do_settings_sections('extend-protection-for-woocommerce-settings-admin');
-        submit_button();
-        ?>
-    </form>
+    <div class="wrap">
+    <h2>Extend Protection Settings</h2>
+    <h2 class="nav-tab-wrapper">
+        <a href="?page=extend&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
+        <a href="?page=extend&tab=product_protection" class="nav-tab <?php echo ($_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
+        <a href="?page=extend&tab=shipping_protection" class="nav-tab <?php echo ($_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+    </h2>
+        <div class="tab-content">
+            <?php
+            $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
+
+            switch ($current_tab) {
+                case 'product_protection':
+                    include_once('tabs/product-protection.php');
+                    break;
+                case 'shipping_protection':
+                    include_once('tabs/shipping-protection.php');
+                    break;
+                default:
+                    include_once('tabs/general-settings.php');
+            }
+            ?>
+        </div>
+    </div>
+
+    <!-- end tabs -->
     <?php
 
-    //Extend Product Protection Item  Management
-    if (is_woocommerce_activated()) {
-        $post_id = null;
 
-        echo "<span class='settings-product-protection-item'>Extend Product Protection Item <em>(sku : " . EXTEND_PRODUCT_PROTECTION_SKU . ")</em> ";
-        $post_id = wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);
-
-        if (!$post_id) {
-            extend_log_error('Extend Product Protection item is missing. Please use the create item button in the Extend Settings page');
-
-            echo "... is missing <br/> ";
-            echo '<form method="post"  action=""><input type="submit" name="extend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
-
-        } else {
-            echo " exists! (ID: " . $post_id . ") &#9989;";
-        }
-        echo "</span>";
-    }
 }
 
 
@@ -164,7 +157,7 @@ function extend_render_documentation_page()
 
 
 
-    echo '
+echo '
     <div class="accordion">
     <div>
         <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
@@ -245,12 +238,12 @@ function extend_product_protection_create()
     if (isset($_POST['extend-product-protection-create'])) {
 
         // delete if sku exists first
-        $deleteproduct =   wc_get_product(wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU));
-        if (empty($product)){
-            extend_log_notice( 'Create Extend product protection item product function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' did not exist prior' );
+        $deleteProduct =  wc_get_product(extend_product_protection_id());
+        if (empty($deleteProduct)){
+            Extend_Protection_Logger::extend_log_notice( 'Create Extend product protection item product function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' did not exist prior' );
         }else{
-            extend_log_notice( 'Create Extend product protection item function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' existed prior' );
-            $deleteproduct->delete();
+            Extend_Protection_Logger::extend_log_notice( 'Create Extend product protection item function was called, and product with sku '.EXTEND_PRODUCT_PROTECTION_SKU.' existed prior' );
+            $deleteProduct->delete();
         }
 
         try {
@@ -266,7 +259,7 @@ function extend_product_protection_create()
             $product->save();
         }
         catch (\Exception $e){
-            extend_log_error($e->getMessage());
+            Extend_Protection_Logger::extend_log_error($e->getMessage());
         }
 
         //upload image and associate to product
@@ -278,7 +271,7 @@ function extend_product_protection_create()
             $product->save();
         }
         catch (\Exception $e){
-            extend_log_error($e->getMessage());
+            Extend_Protection_Logger::extend_log_error($e->getMessage());
         }
     }
 }
@@ -293,13 +286,23 @@ function extend_logger_constants(){
 }
 
 function extend_logger_includes(){
-    /* Include main functions file, this does all the hard work. */
-    require_once( EXTEND_LOGGER_DIR . 'includes/extend_logger_functions.php');
-
     /* Include main admin file, this sets up the plugin's admin area */
     require_once( EXTEND_LOGGER_DIR . 'admin/extend_logger_admin.php');
- //   require_once( EXTEND_LOGGER_DIR . 'admin/extend_logger_admin-bar.php');
 }
 
+function extend_product_protection_id(): ?int
+{
+    global $wpdb;
+
+    $product_id = $wpdb->get_var(
+        $wpdb->prepare("SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' ORDER BY meta_id DESC LIMIT 1",
+            EXTEND_PRODUCT_PROTECTION_SKU)
+    );
+
+    if ($product_id)
+        return $product_id;
+
+    return null;
+}
 
 run_extend_protection();

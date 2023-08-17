@@ -60,6 +60,17 @@ h2.extend_logger-title {
     content: "\f159";
 }
 
+.extend_logger-type-debug {
+    width: 20px;
+    padding-left: 10px;
+    color: #000000;
+}
+
+.extend_logger-type-debug:before {
+    font-family: "dashicons";
+    content: "\f159";
+}
+
 .extend_logger-table .extend_logger-date {
     padding-left: 10px;
     width: 90px;
