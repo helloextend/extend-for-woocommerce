@@ -426,27 +426,33 @@ class Extend_Protection_Admin
 
          if (get_option('extend_protection_for_woocommerce_general_settings') == null ){
              $settings = [
-                 'extend_enable_debug' => '0'
+                 'extend_enable_debug'      => '0',
+                 'extend_environment'       => 'sandbox',
+                 'extend_sandbox_store_id'  => '',
+                 'extend_live_store_id'     => '',
+                 'extend_sandbox_api_key'   => '',
+                 'extend_live_api_key'      => ''
+
              ];
              update_option('extend_protection_for_woocommerce_general_settings', $settings);
          }
 
         if (get_option('extend_protection_for_woocommerce_product_protection_settings') == null ){
             $settingsPP = [
-                'enable_extend' => '1',
-                'extend_enable_cart_offers' => '1',
-                'extend_enable_modal_offers' => '1',
-                'extend_enable_cart_balancing' => '1',
-                'extend_enable_pdp_offers'=> '1',
-                'extend_pdp_offer_location' => 'woocommerce_before_add_to_cart_button'
+                'enable_extend'                 => '1',
+                'extend_enable_cart_offers'     => '1',
+                'extend_enable_modal_offers'    => '1',
+                'extend_enable_cart_balancing'  => '1',
+                'extend_enable_pdp_offers'      => '1',
+                'extend_pdp_offer_location'     => 'woocommerce_before_add_to_cart_button'
             ];
             update_option('extend_protection_for_woocommerce_product_protection_settings', $settingsPP);
         }
 
         if (get_option('extend_protection_for_woocommerce_shipping_protection_settings') == null ){
             $settingsSP = [
-                'enable_extend_sp' => '1',
-                'enable_sp_offer_location' => 'woocommerce_review_order_before_payment'
+                'enable_extend_sp'          => '1',
+                'enable_sp_offer_location'  => 'woocommerce_review_order_before_payment'
             ];
             update_option('extend_protection_for_woocommerce_shipping_protection_settings', $settingsSP);
         }
