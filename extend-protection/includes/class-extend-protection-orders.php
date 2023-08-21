@@ -42,9 +42,10 @@ class Extend_Protection_Orders {
      *
      * @since    1.0.0
      * @access   private
-     * @var      string $extend_protection_all_settings The current options of this plugin.
+     * @var      string|array $settings The current options of this plugin.
      */
-    private $extend_protection_all_settings;
+
+    private array $settings;
 
     /**
      * Initialize the class and set its properties.
@@ -58,11 +59,10 @@ class Extend_Protection_Orders {
         $this->extend_protection = $extend_protection;
         $this->version = $version;
         /* retrieve environment variables */
-        $this->extend_protection_all_settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = Extend_Protection_Global::get_extend_settings();
 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'create_update_order' ], 10, 1 );
-
     }
 
     /**
@@ -84,7 +84,7 @@ class Extend_Protection_Orders {
         foreach( $order->get_items() as $item_id => $item ){
             $extend_meta_data = (array)$item->get_meta('_extend_data');
 
-            // if  item id is 209 gram $extend_meta_data and push it to the plans array
+            // if  item id is for extend-product-protection gram $extend_meta_data and push it to the plans array
             if ($extend_meta_data['planId']) {
                 $extend_plans[] = array(
                     'id' => $extend_meta_data['planId'],
@@ -111,10 +111,8 @@ class Extend_Protection_Orders {
             }
 
             // Add relevant data to the line_items array
-            // if product id is 209, do not add it to extend_line_items array
-            $extend_product_id = Extend_Protection_Global::get_extend_product_protection_id(EXTEND_PRODUCT_PROTECTION_SKU);
-
-            if ($product_id != $extend_product_id) {
+            // if product id for extend-product-protection, do not add it to extend_line_items array
+            if ($product_id != extend_product_protection_id()) {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product' => array(
@@ -127,9 +125,6 @@ class Extend_Protection_Orders {
                     ),
                     'quantity' => $item->get_quantity(),
                     'fulfilledQuantity' => $item->get_quantity(),
-
-                    //TODO: Pass line item status
-
                 );
 
                 // if $plan is not empty, add the plan to the current line item
@@ -168,35 +163,45 @@ class Extend_Protection_Orders {
                 )
             ),
             'lineItems' => $extend_line_items,
-            'storeId' => '6caaf44e-0410-4529-9674-4dc6a4e0e800',
+            'storeId' => $this->settings['store_id'],
             'transactionId' => $order_id
         );
 
-        extend_log_notice("Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
+        if ($this->settings['enable_extend_debug'] == 1){
+            Extend_Protection_Logger::extend_log_debug("Debug: Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
+        }
 
         $request_args = array(
             'method' => 'PUT',
             'headers' => array(
                 'Content-Type' => 'application/json',
                 'Accept' => 'application/json; version=latest',
-                'X-Extend-Access-Token' => $this->extend_protection_all_settings['api_key'],
+                'X-Extend-Access-Token' => $this->settings['api_key'],
             ),
             'body' => json_encode($extend_order_data),
         );
 
-        $response = wp_remote_request('https://api.helloextend.com/orders', $request_args);
+        $response = wp_remote_request($this->settings['api_host'].'/orders', $request_args);
 
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
-            extend_log_error("PUT request failed: " . $error_message);
+            Extend_Protection_Logger::extend_log_error("PUT request failed: " . $error_message);
         } else {
             $response_code = wp_remote_retrieve_response_code($response);
+
             // New order will return 201, existing order will return 200
             if ($response_code === 201 || $response_code === 200) {
-                // TODO: Only log if "debug mode" is enabled
-                extend_log_notice("Order PUT request successful: " . wp_remote_retrieve_body($response));
+                // Only log if "Enable debugging Log" is enabled
+                if ($this->settings['enable_extend_debug'] == 1){
+                    Extend_Protection_Logger::extend_log_debug("Order PUT request successful: " . wp_remote_retrieve_body($response));
+                }
             } else {
-                extend_log_error("Order PUT request failed with status code " . $response_code . ": " . wp_remote_retrieve_body($response));
+                if ($this->settings['enable_extend_debug'] == 1){
+                    Extend_Protection_Logger::extend_log_debug('Order PUT request failed with status code ' . $response_code) ;
+                    Extend_Protection_Logger::extend_log_debug('Body response: '. wp_remote_retrieve_body($response));
+                }else{
+                    Extend_Protection_Logger::extend_log_error('Order PUT request failed with status code ' . $response_code );
+                }
             }
         }
     }

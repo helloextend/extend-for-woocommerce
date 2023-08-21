@@ -7,7 +7,7 @@
 This file holds the output for the admin error log under the 'Tools' menu.
 */
 
-$logs = extend_logger_get_all_logs();
+$logs = Extend_Protection_Logger::extend_logger_get_all_logs();
 
 ?>
 
@@ -26,7 +26,7 @@ $logs = extend_logger_get_all_logs();
         $nonce = wp_create_nonce( 'extend_logger_nonce' );
 
         /* If there are both notices and errors output filter buttons... */
-        if( $logs['have_both'] == true ) { ?>
+        if( $logs['have_both'] == true || $logs['have_many'] == true ) { ?>
 
             <a class="extend_logger-log-filter" filter="all" nonce="<?php echo $nonce; ?>">
 
@@ -43,6 +43,12 @@ $logs = extend_logger_get_all_logs();
             <a class="extend_logger-log-filter" filter="notice" nonce="<?php echo $nonce; ?>">
 
                 <?php _e( 'Notices', 'custom-error-log' ); ?>
+
+            </a> |
+
+            <a class="extend_logger-log-filter" filter="debug" nonce="<?php echo $nonce; ?>">
+
+                <?php _e( 'Debugs', 'custom-error-log' ); ?>
 
             </a>
 
@@ -75,7 +81,7 @@ $logs = extend_logger_get_all_logs();
             <?php
 
             /* Output all logs into the table... */
-            echo extend_logger_format_logs( $logs, $nonce );
+            echo Extend_Protection_Logger::extend_logger_format_logs( $logs, $nonce );
 
             ?>
 

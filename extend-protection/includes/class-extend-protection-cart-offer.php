@@ -42,13 +42,11 @@ class Extend_Protection_Cart_Offer {
     protected string $warranty_product_id;
     protected array $products = [];
     protected array $updates = [];
-    private array $extend_protection_all_settings;
+    private array $settings;
 
     public function __construct() {
         $this->hooks();
-
-        $this->extend_protection_all_settings = Extend_Protection_Global::get_extend_settings();
-
+        $this->settings = Extend_Protection_Global::get_extend_settings();
     }
 
     /**
@@ -78,10 +76,9 @@ class Extend_Protection_Cart_Offer {
         foreach($cart_contents as $line){
 
             //if we're on a warranty item
-            if(intval($line['product_id']) === intval($this->extend_protection_all_settings['warranty_product_id']) && isset($line['extendData'])){
+            if(intval($line['product_id']) === intval($this->settings['warranty_product_id']) && isset($line['extendData'])){
                 //Grab reference id
-                $product_reference_id =
-                    $line['extendData']['covered_product_id'];
+                $product_reference_id = $line['extendData']['covered_product_id'];
 
                 //If this product doesn't exist, create it with the warranty quantity and warranty added, else add to warranty quantity, and add warranty to warranty list
                 if(!isset($products[$product_reference_id])) {
@@ -101,8 +98,7 @@ class Extend_Protection_Cart_Offer {
             }
         }
 
-        // TODO: Made the variable below work from the settings value
-         $cart_balancing = 'yes';
+        $cart_balancing = $this->settings['extend_enable_cart_balancing'] == 1 ? true : false;
 
         //if we have products, go through each and check for updates
         if(isset($products)){
@@ -121,21 +117,18 @@ class Extend_Protection_Cart_Offer {
                     if($diff!==0){
                         if($diff>0){
                             foreach($product['warranties'] as $warranty){
-                                $new_quantity_diff = max([0, $diff - $warranty['quantity']]);
-
-                                $removed_quantity = $diff - $new_quantity_diff;
-                                $updates[$warranty['key']] = ['quantity'=>$warranty['quantity']-$removed_quantity];
-                                $diff=$new_quantity_diff;
+                                $new_quantity_diff          = max([0, $diff - $warranty['quantity']]);
+                                $removed_quantity           = $diff - $new_quantity_diff;
+                                $updates[$warranty['key']]  = ['quantity'=>$warranty['quantity']-$removed_quantity];
+                                $diff                       = $new_quantity_diff;
                             }
-                        } elseif($cart_balancing == 'yes' && $diff<0){
+                        } elseif($cart_balancing && $diff<0){
                             foreach($product['warranties'] as $warranty){
-                                $new_quantity_diff = max([0, $diff - $warranty['quantity']]);
-
-                                $new_quantity = $warranty['quantity'] - $diff;
-                                $updates[$warranty['key']] = ['quantity'=>$new_quantity];
-                                $diff=$new_quantity_diff;
+                                $new_quantity_diff          = max([0, $diff - $warranty['quantity']]);
+                                $new_quantity               = $warranty['quantity'] - $diff;
+                                $updates[$warranty['key']]  = ['quantity'=>$new_quantity];
+                                $diff                       = $new_quantity_diff;
                             }
-
                         }
                     }
                 }
@@ -188,21 +181,20 @@ class Extend_Protection_Cart_Offer {
     public function cart_offers()
     {
         // get Extend options
-        $enable_extend = trim($this->extend_protection_all_settings['enable_extend']);
-        $extend_enable_cart_offers = $this->extend_protection_all_settings['extend_enable_cart_offers'];
-
-        $cart = WC()->cart;
+        $enable_extend              = trim($this->settings['enable_extend']);
+        $extend_enable_cart_offers  = $this->settings['extend_enable_cart_offers'];
+        $cart                       = WC()->cart;
 
         if($enable_extend === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_cart_integration_script');
             $ajaxurl = admin_url( 'admin-ajax.php' );
-            wp_localize_script('extend_cart_integration_script', 'ExtendCartIntegration', compact('cart', 'extend_enable_cart_offers'));
+            wp_localize_script('extend_cart_integration_script', 'ExtendCartIntegration',
+                compact('cart', 'extend_enable_cart_offers'));
         }
         else {
-            extend_log_error("Cart Offers Class: Extend is not enabled");
+            Extend_Protection_Logger::extend_log_error("Cart Offers Class: Extend is not enabled");
         }
-
     }
 
 }

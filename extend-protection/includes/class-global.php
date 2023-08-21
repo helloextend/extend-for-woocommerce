@@ -99,12 +99,6 @@ class Extend_Protection_Global
         wp_die();
     }
 
-    public static function get_extend_product_protection_id($sku) {
-        global  $wpdb;
-        $product_id = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1",  $sku) );
-        return $product_id;
-    }
-
     /**
      * Retrieves the Extend for WooCommerce settings.
      * @since 1.0.0
@@ -113,39 +107,57 @@ class Extend_Protection_Global
     public static function get_extend_settings() {
         static $settings;
 
-        $extend_protection_all_settings = get_option('extend_protection_for_woocommerce_settings');
+        $extend_protection_general_settings             = get_option('extend_protection_for_woocommerce_general_settings');
+        $extend_protection_product_protection_settings  = get_option('extend_protection_for_woocommerce_product_protection_settings');
+        $extend_protection_shipping_protection_settings = get_option('extend_protection_for_woocommerce_shipping_protection_settings');
 
-        $settings['enable_extend'] = array_key_exists('enable_extend', $extend_protection_all_settings) ? $extend_protection_all_settings['enable_extend'] : 0;
-        $settings['extend_enable_cart_offers'] = array_key_exists('extend_enable_cart_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_cart_offers'] : 0;
-        $settings['extend_enable_cart_balancing'] = array_key_exists('extend_enable_cart_balancing', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_cart_balancing'] : 0;
-        $settings['extend_enable_pdp_offers'] = array_key_exists('extend_enable_pdp_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_pdp_offers'] : 0;
-        $settings['extend_enable_modal_offers'] = array_key_exists('extend_enable_modal_offers', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_enable_modal_offers'] : 0;
-        $settings['extend_environment'] = $extend_protection_all_settings['extend_environment'];
-        $settings['extend_pdp_offer_location'] = array_key_exists('extend_pdp_offer_location', $extend_protection_all_settings) ? $extend_protection_all_settings['extend_pdp_offer_location'] : 'woocommerce_before_add_to_cart_button';
+        $settings['enable_extend']              = array_key_exists('enable_extend', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['enable_extend'] : 0;
+
+        $settings['extend_enable_cart_offers']  = array_key_exists('extend_enable_cart_offers', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['extend_enable_cart_offers'] : 0;
+
+        $settings['extend_enable_cart_balancing'] = array_key_exists('extend_enable_cart_balancing', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['extend_enable_cart_balancing'] : 0;
+
+        $settings['extend_enable_pdp_offers']   = array_key_exists('extend_enable_pdp_offers', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['extend_enable_pdp_offers'] : 0;
+
+        $settings['extend_enable_modal_offers'] = array_key_exists('extend_enable_modal_offers', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['extend_enable_modal_offers'] : 0;
+
+        $settings['extend_pdp_offer_location']  = array_key_exists('extend_pdp_offer_location', $extend_protection_product_protection_settings)
+                                                ? $extend_protection_product_protection_settings['extend_pdp_offer_location'] : 'woocommerce_before_add_to_cart_button';
+
+        $settings['extend_environment']         = $extend_protection_general_settings['extend_environment'];
+
+        $settings['enable_extend_debug']         = $extend_protection_general_settings['enable_extend_debug'];
+
+        if ($extend_protection_shipping_protection_settings){
+            $settings['enable_extend_sp']       = array_key_exists('enable_extend_sp', $extend_protection_shipping_protection_settings)
+                                                ? $extend_protection_shipping_protection_settings['enable_extend_sp'] : 0;
+
+            $settings['extend_sp_offer_location'] = array_key_exists('extend_sp_offer_location', $extend_protection_shipping_protection_settings)
+                                                ? $extend_protection_shipping_protection_settings['extend_sp_offer_location'] : 'woocommerce_review_order_after_shipping';
+        }
 
         /* Set variables depending on environment */
         if ($settings['extend_environment'] == 'live') {
-            $settings['store_id'] = $extend_protection_all_settings['extend_live_store_id'];
-            $settings['api_host'] = 'https://api.helloextend.com';
-            $settings['api_key'] = $extend_protection_all_settings['extend_live_api_key'];
+            $settings['store_id']   = $extend_protection_general_settings['extend_live_store_id'];
+            $settings['api_host']   = 'https://api.helloextend.com';
+            $settings['api_key']    = $extend_protection_general_settings['extend_live_api_key'];
         }
         else {
-            $settings['store_id'] = $extend_protection_all_settings['extend_sandbox_store_id'];
-            $settings['api_host'] = 'https://api-sandbox.helloextend.com';
-            $settings['api_key'] = $extend_protection_all_settings['extend_sandbox_api_key'];
+            $settings['store_id']   = $extend_protection_general_settings['extend_sandbox_store_id'];
+            $settings['api_host']   = 'https://api-demo.helloextend.com';
+            $settings['api_key']    = $extend_protection_general_settings['extend_sandbox_api_key'];
         }
 
         $settings['sdk_url'] = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
-
-        // TODO: This is still not working
-        // $settings['warranty_product_id'] = wc_get_product_id_by_sku('extend-product-protection');
-
-        global  $wpdb;
-        $settings['warranty_product_id'] = $wpdb->get_var( $wpdb->prepare( "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' LIMIT 1",  'extend-product-protection') );
-
+        $settings['warranty_product_id'] = extend_product_protection_id();
 
         if (empty($settings['warranty_product_id'])) {
-            extend_log_error("Error: Warranty product is not created.");
+            Extend_Protection_Logger::extend_log_error("Error: Warranty product is not created.");
         }
 
         return $settings;
@@ -229,12 +241,12 @@ class Extend_Protection_Global
         if(isset($cart_item['extendData'])){
             $item->add_meta_data('_extend_data', $cart_item['extendData']);
 
-            $covered_id = $cart_item['extendData']['covered_product_id'];
-            $term = $cart_item['extendData']['term'];
-            $title = $cart_item['extendData']['title'];
-            $covered = wc_get_product($covered_id);
-            $sku = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
+            $covered_id     = $cart_item['extendData']['covered_product_id'];
+            $term           = $cart_item['extendData']['term'];
+            $title          = $cart_item['extendData']['title'];
+            $covered        = wc_get_product($covered_id);
+            $sku            = $cart_item['extendData']['planId'];
+            $covered_title  = $covered->get_title();
 
             $item->add_meta_data('Warranty', $title);
             $item->add_meta_data('Warranty Term', $term . ' Months');
@@ -255,16 +267,16 @@ class Extend_Protection_Global
         }
 
         if(isset($cart_item['extendData'])){
-            $covered_id = $cart_item['extendData']['covered_product_id'];
-            $term = $cart_item['extendData']['term'];
-            $covered = wc_get_product($covered_id);
-            $sku = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
-            $data[] =[
+            $covered_id     = $cart_item['extendData']['covered_product_id'];
+            $term           = $cart_item['extendData']['term'];
+            $covered        = wc_get_product($covered_id);
+            $sku            = $cart_item['extendData']['planId'];
+            $covered_title  = $covered->get_title();
+            $data[] = [
                 'key'=>'Product',
                 'value'=>$covered_title
             ];
-            $data[] =[
+            $data[] = [
                 'key'=>'Term',
                 'value'=>$term . ' Months'
             ];
@@ -278,25 +290,21 @@ class Extend_Protection_Global
     public function init_global_extend() {
         if ( is_admin() ) { return; }
 
-        $extend_all_options = get_option('extend_protection_for_woocommerce_settings');
-        $environment = $extend_all_options['extend_environment'];
+        $settings       = self::get_extend_settings();
+        $environment    = $settings['extend_environment'];
+        $store_id       = $settings['store_id'];
+        $environment    = ($environment == 'live') ? $environment : 'demo';
+        $extend_enabled = array_key_exists('enable_extend', $settings) ? $settings['enable_extend'] : 0;
+        $ajaxurl        = admin_url('admin-ajax.php');
 
-        if ($environment == 'live') {
-            $store_id = $extend_all_options['extend_live_store_id'];
-        } else {
-            $store_id = $extend_all_options['extend_sandbox_store_id'];
-        }
 
-        $environment = ($environment == 'live') ? $environment : 'demo';
-
-        $extend_enabled = array_key_exists('enable_extend', $extend_all_options) ? $extend_all_options['enable_extend'] : 0;
-
-        $ajaxurl = admin_url( 'admin-ajax.php' );
-
-        if($store_id && ($extend_enabled === '1')){
+        if ($store_id && ($extend_enabled === '1')){
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_global_script');
             wp_localize_script('extend_global_script', 'ExtendWooCommerce', compact('store_id' , 'ajaxurl', 'environment'));
+        }
+        else{
+            Extend_Protection_Logger::extend_log_error('Store Id missing or Extend Product Protection is disabled');
         }
     }
 }
