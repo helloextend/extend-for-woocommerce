@@ -107,9 +107,9 @@ class Extend_Protection_Global
     public static function get_extend_settings() {
         static $settings;
 
-        $extend_protection_general_settings             = get_option('extend_protection_for_woocommerce_general_settings');
-        $extend_protection_product_protection_settings  = get_option('extend_protection_for_woocommerce_product_protection_settings');
-        $extend_protection_shipping_protection_settings = get_option('extend_protection_for_woocommerce_shipping_protection_settings');
+        $extend_protection_general_settings             = (array) get_option('extend_protection_for_woocommerce_general_settings');
+        $extend_protection_product_protection_settings  = (array) get_option('extend_protection_for_woocommerce_product_protection_settings');
+        $extend_protection_shipping_protection_settings = (array) get_option('extend_protection_for_woocommerce_shipping_protection_settings');
 
         $settings['enable_extend']              = array_key_exists('enable_extend', $extend_protection_product_protection_settings)
                                                 ? $extend_protection_product_protection_settings['enable_extend'] : 0;

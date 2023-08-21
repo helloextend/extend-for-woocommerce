@@ -424,15 +424,32 @@ class Extend_Protection_Admin
 
          //once options have been registered, initialize values in the db:
 
-         if (get_option('extend_protection_for_woocommerce_settings') == null ){
+         if (get_option('extend_protection_for_woocommerce_general_settings') == null ){
              $settings = [
-                 'extend_enable_pdp_offers' => '1',
-                 'extend_enable_cart_offers' => '1',
-                 'extend_enable_modal_offers' => '1',
-                 'extend_enable_cart_balancing' => '1'
+                 'extend_enable_debug' => '0'
              ];
-             update_option('extend_protection_for_woocommerce_settings', $settings);
+             update_option('extend_protection_for_woocommerce_general_settings', $settings);
          }
+
+        if (get_option('extend_protection_for_woocommerce_product_protection_settings') == null ){
+            $settingsPP = [
+                'enable_extend' => '1',
+                'extend_enable_cart_offers' => '1',
+                'extend_enable_modal_offers' => '1',
+                'extend_enable_cart_balancing' => '1',
+                'extend_enable_pdp_offers'=> '1',
+                'extend_pdp_offer_location' => 'woocommerce_before_add_to_cart_button'
+            ];
+            update_option('extend_protection_for_woocommerce_product_protection_settings', $settingsPP);
+        }
+
+        if (get_option('extend_protection_for_woocommerce_shipping_protection_settings') == null ){
+            $settingsSP = [
+                'enable_extend_sp' => '1',
+                'enable_sp_offer_location' => 'woocommerce_review_order_before_payment'
+            ];
+            update_option('extend_protection_for_woocommerce_shipping_protection_settings', $settingsSP);
+        }
      }
 
          /* sanitize all the fields before saving */
