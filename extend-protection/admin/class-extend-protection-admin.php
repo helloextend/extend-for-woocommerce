@@ -426,7 +426,7 @@ class Extend_Protection_Admin
 
          if (get_option('extend_protection_for_woocommerce_general_settings') == null ){
              $settings = [
-                 'extend_enable_debug'      => '0',
+                 'enable_extend_debug'      => '0',
                  'extend_environment'       => 'sandbox',
                  'extend_sandbox_store_id'  => '',
                  'extend_live_store_id'     => '',

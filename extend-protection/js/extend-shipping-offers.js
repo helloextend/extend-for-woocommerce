@@ -5,7 +5,7 @@
         if(!ExtendWooCommerce || !ExtendShippingIntegration) return;
 
         // Deconstructs ExtendProductIntegration variables
-        const { env, items, enable_extend_sp } = ExtendShippingIntegration;
+        const { env, items, enable_extend_sp, ajax_url } = ExtendShippingIntegration;
         let items_array = eval(items);
 
         // If Extend shipping protection offers are not enabled, hide Extend offer div
@@ -26,16 +26,32 @@
                     items: items_array,
                    // isShippingProtectionInCart: false,
                     onEnable: function (quote) {
-                        console.log('call back to add SP plan to cart ' +quote.premium, quote);
+                        console.log('call back to add SP plan to cart , quote.premium = ' +quote.premium);
                         // Add a custom fee line to the total
-                        // var feeAmount = formatPrice(quote.premium/100) ; // Set your desired fee amount here
+                        // var feeAmount = formatPrice(quote.premium/100) ;
                         // var feeLabel = 'Shipping Protection';
                         // $('.woocommerce-cart-totals .woocommerce-table__footer').before('<tr class="fee"><th>' + feeLabel + '</th><td data-title="' + feeLabel + '">' + feeAmount + '</td></tr>');
-
+                       // console.log('call back to add SP plan to cart , amount: ' + feeAmount +', label: '+feeLabel);
 
                         // Update totals and trigger WooCommerce cart calculations
+                        $.ajax({
+                            type: 'POST',
+                            url: ajax_url,
+                            data: {
+                                action: 'add_shipping_protection_fee',
+                                fee_amount: quote.premium,
+                                fee_label: 'Shipping Protection'
+                            },
+                            success: function() {
+                                console.log('updating cart after success ajax call');
+                                //$('body').trigger('update_checkout', [true, { fee: { label: 'Shipping Protection', amount: 10 }}]);
+                                $('body').trigger('update_checkout');
+                            }
+                        });
                         // JM : to fix
-                        $('body').trigger('update_checkout', [ true, { fee: quote.premium, fee_label: 'Shipping Protection' } ]);
+                        // console.log('updating cart after fee');
+
+                        //$('body').trigger('update_checkout', [ true, { fee: 30 } ]);
 
                     },
                     onDisable: function (quote) {
@@ -47,7 +63,7 @@
                     onUpdate: function (quote) {
                         console.log('call back to update sp plan in cart', quote);
                         // Update totals and trigger WooCommerce cart calculations
-                        $('body').trigger('update_checkout');
+                        $('body').trigger('update_checkout', [true, { fee: { label: 'Shipping Protection', amount: 10 }}]);
 
                         // var feeAmount = formatPrice(quote.premium/100) ; // Set your desired fee amount here
                         // var feeLabel = 'Shipping Protection';
@@ -60,7 +76,10 @@
     });
 // Format price
     function formatPrice(price) {
-        var currencySymbol = wc_cart_fragments_params.currency_symbol;
-        return currencySymbol + price.toFixed(2);
+        //console.log('fragment : ', wc_cart_fragments_params);
+
+        //var currencySymbol = wc_cart_fragments_params.currency_symbol;
+       // var currencySymbol = $('.woocommerce-Price-currencySymbol').text();
+        return  price.toFixed(2);
     }
 })( jQuery );

@@ -13,10 +13,9 @@ class Extend_Protection_Logger
     {
 
         /* Get error logs from the wp_options table... */
-        $error_log = get_option('custom_error_log', true);
+        $error_log = get_option('custom_error_log');
 
         if (!$error_log) {
-
             $error_log = array(
 
                 'errors' => array(),
@@ -517,7 +516,7 @@ class Extend_Protection_Logger
     */
     public static function extend_logger_add_to_new_logs($id, $type)
     {
-        $new_logs = get_option('extend_logger_new_logs', true);
+        $new_logs = get_option('extend_logger_new_logs');
         if (!$new_logs) {
             $new_logs = array(
                 'errors' => array(),
