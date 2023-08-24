@@ -61,12 +61,24 @@ function deactivate_extend_protection()
 register_activation_hook(__FILE__, 'activate_extend_protection');
 register_deactivation_hook(__FILE__, 'deactivate_extend_protection');
 
+/* Actions */
+
 /* extend logger */
-/* Set the constants needed by the extend logger. */
 add_action( 'plugins_loaded',  'extend_logger_constants' );
-/* Load the functions files. */
 add_action( 'plugins_loaded', 'extend_logger_includes' );
-/* end extend logger*/
+
+/* item create */
+add_action('init', 'extend_product_protection_create');
+
+/* shipping protection fee management */
+add_action('wp_ajax_add_shipping_protection_fee', 'add_shipping_protection_fee');
+add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'add_shipping_protection_fee');
+add_action('wp_ajax_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
+add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
+add_action( 'woocommerce_cart_calculate_fees', 'set_shipping_fee' );
+add_action( 'woocommerce_checkout_update_order_meta', 'save_shipping_protection_quote_id', 10, 2 );
+
+/* end add_action */
 
 
 /**
@@ -112,9 +124,9 @@ function extend_render_settings_page()
     <div class="wrap">
     <h2>Extend Protection Settings</h2>
     <h2 class="nav-tab-wrapper">
-        <a href="?page=extend&tab=general" class="nav-tab <?php echo (!isset($_GET['tab']) || empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
+        <a href="?page=extend&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
         <a href="?page=extend&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
-        <a href="?page=extend&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+        <a href="?page=extend&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
     </h2>
         <div class="tab-content">
             <?php
@@ -229,13 +241,6 @@ if ( ! function_exists('write_log')) {
 /* local bypass of curl error ssl */
 add_filter('https_ssl_verify', '__return_false');
 
-/* item create */
-add_action('init', 'extend_product_protection_create');
-
-/* shipping protection fee management */
-add_action('wp_ajax_add_shipping_protection_fee', 'add_shipping_protection_fee');
-add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'add_shipping_protection_fee');
-
 
 function extend_product_protection_create()
 {
@@ -311,18 +316,72 @@ function extend_product_protection_id(): ?int
 
 function add_shipping_protection_fee()
 {
-    if (  ! defined( 'DOING_AJAX' ) || ! $_POST )  return;
+    if (  !defined( 'DOING_AJAX' ) || ! $_POST )  return;
 
-    $fee_amount = floatval(number_format($_POST['fee_amount']/100, 2));
-    $fee_label  = $_POST['fee_label'];
+    if (isset($_POST['fee_amount']) && isset($_POST['fee_label']))
+    {
+        $fee_amount = floatval(number_format($_POST['fee_amount']/100, 2));
+        $fee_label  = sanitize_text_field($_POST['fee_label']);
 
-    if ($fee_amount && $fee_label){
-        echo "... addimg fee... ".$fee_amount;
-        WC()->cart->add_fee( $fee_label, $fee_amount );
-        echo  $fee_label . ' fee added : '.$fee_amount."\n";
-    }else{
-        echo " No shipping protection fee added because of an error ";
+        if ($fee_amount && $fee_label){
+            WC()->session->set('shipping_fee',   true   );
+            WC()->session->set('shipping_fee_value',   $fee_amount   );
+            WC()->session->set('shipping_quote_id',    $_POST['shipping_quote_id']);
+        }else{
+            echo " No shipping protection fee added because of an error ";
+        }
     }
-    die();
+    wp_die();
 }
+
+function remove_shipping_protection_fee()
+{
+    if (  !defined( 'DOING_AJAX' ) || ! $_POST )  return;
+
+        WC()->session->set('shipping_fee_remove',   true);
+        WC()->session->set('shipping_fee',          false);
+        WC()->session->set('shipping_fee_value',    null);
+        WC()->session->set('shipping_quote_id',     null);
+
+    wp_die();
+}
+
+function set_shipping_fee(){
+    if ( is_admin() && ! defined('DOING_AJAX') || ! is_checkout() )
+        return;
+
+    if ( 1 == WC()->session->get('shipping_fee') ) {
+
+        $fee_label   =  "Shipping Protection" ;
+        $fee_amount  = WC()->session->get('shipping_fee_value');
+
+        WC()->cart->add_fee( $fee_label, $fee_amount );
+    }
+    else if (1 == WC()->session->get('shipping_fee_remove'))
+    {
+        $fees = WC()->cart->get_fees();
+        foreach ($fees as $key => $fee) {
+            if($fees[$key]->name === __( "Shipping Protection")) {
+                unset($fees[$key]);
+            }
+        }
+        WC()->cart->fees_api()->set_fees($fees);
+        WC()->session->set('shipping_fee_remove',   false   );
+    }
+}
+
+
+function save_shipping_protection_quote_id( $order_id ) {
+    $settings =  get_option('extend_protection_for_woocommerce_general_settings');
+
+    if ($settings['enable_extend_debug'] == 1) {
+        Extend_Protection_Logger::extend_log_debug('Adding metadata for order id ' . $order_id . ' -> shipping_quote_id : ' . WC()->session->get('shipping_quote_id'));
+    }
+
+    if(WC()->session->get('shipping_quote_id') !== null) {
+        update_post_meta( $order_id, '_shipping_protection_quote_id', sanitize_text_field( WC()->session->get('shipping_quote_id')));
+    }
+}
+
+
 run_extend_protection();

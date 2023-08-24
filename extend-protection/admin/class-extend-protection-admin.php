@@ -452,7 +452,8 @@ class Extend_Protection_Admin
         if (get_option('extend_protection_for_woocommerce_shipping_protection_settings') == null ){
             $settingsSP = [
                 'enable_extend_sp'          => '1',
-                'enable_sp_offer_location'  => 'woocommerce_review_order_before_payment'
+                'enable_sp_offer_location'  => 'woocommerce_review_order_before_payment',
+                'enable_sp_offer_location_other'  => ''
             ];
             update_option('extend_protection_for_woocommerce_shipping_protection_settings', $settingsSP);
         }
@@ -499,8 +500,16 @@ class Extend_Protection_Admin
             $sanitary_values['extend_pdp_offer_location'] = $input['extend_pdp_offer_location'];
         }
 
+        if (isset($input['extend_pdp_offer_location_other'])) {
+            $sanitary_values['extend_pdp_offer_location_other'] = $input['extend_pdp_offer_location_other'];
+        }
+
         if (isset($input['extend_sp_offer_location'])) {
             $sanitary_values['extend_sp_offer_location'] = $input['extend_sp_offer_location'];
+        }
+
+        if (isset($input['extend_sp_offer_location_other'])) {
+            $sanitary_values['extend_sp_offer_location_other'] = $input['extend_sp_offer_location_other'];
         }
 
         if (isset($input['extend_product_protection_contract_create'])) {
@@ -605,7 +614,7 @@ class Extend_Protection_Admin
             'woocommerce_before_add_to_cart_button', 'woocommerce_before_single_variation', 'woocommerce_single_variation',
             'woocommerce_before_add_to_cart_quantity', 'woocommerce_after_add_to_cart_quantity', 'woocommerce_after_single_variation',
             'woocommerce_after_add_to_cart_button', 'woocommerce_after_variations_form', 'woocommerce_after_add_to_cart_form',
-            'woocommerce_product_meta_start', 'woocommerce_product_meta_end', 'woocommerce_share');
+            'woocommerce_product_meta_start', 'woocommerce_product_meta_end', 'woocommerce_share', 'other');
 
         ?>
         <select name="extend_protection_for_woocommerce_product_protection_settings[extend_pdp_offer_location]" id="extend_pdp_offer_location">
@@ -619,26 +628,47 @@ class Extend_Protection_Admin
             foreach($extend_pdp_offer_dropdown_values as $extend_pdp_hooks){
                 $selected = (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'])
                     && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'] === $extend_pdp_hooks ) ? 'selected' : '';
-                echo '<option value="'.$extend_pdp_hooks. '" '.$selected.'>'.$extend_pdp_hooks.'</option>';
+                if ($extend_pdp_hooks == 'woocommerce_before_add_to_cart_button'){
+                    echo '<option value="' . $extend_pdp_hooks . '" ' . $selected . '>' . $extend_pdp_hooks . ' (default)</option>';
+                }
+                else {
+                    echo '<option value="' . $extend_pdp_hooks . '" ' . $selected . '>' . $extend_pdp_hooks . '</option>';
+                }
             }
             ?>
         </select>
         <?php
         //show information in a popup
+        echo  '<label for="extend_pdp_offer_location"><a href="?page=extend-docs#offer_placement">What\'s this ?</a></label>';
 
-        echo  '<label for="extend_automated_product_sync"><a href="?page=extend-docs#offer_placement">What\'s this ?</a></label>';
+        // logic for "other" option selected
+        if ($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'] === 'other') {
+            $current_value = get_option('extend_protection_for_woocommerce_product_protection_settings');
+            $extend_pdp_offer_location_other = $current_value['extend_pdp_offer_location_other'];
+            add_settings_field(
+                'extend_pdp_offer_location_other', // id
+                'Offer Location', // title
+                array($this, 'extend_pdp_offer_location_callback'), // callback
+                'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+                'extend_setting_product_protection_section' // section
+            );
+            echo '<br /><input type = "text" class = "extend_pdp_offer_location_other" id = "extend_pdp_offer_location_other" 
+                        name = "extend_protection_for_woocommerce_product_protection_settings[extend_pdp_offer_location_other]" 
+                        value = "' . esc_attr($extend_pdp_offer_location_other) . '" placeholder = "Enter your custom value" />';
+            echo  '<label for = "extend_pdp_offer_location_other"> Please enter a valid PDP layout hook</label>';
+        }
     }
 
     public function extend_sp_offer_location_callback()
     {
         $extend_sp_offer_dropdown_values = array('woocommerce_review_order_before_shipping', 'woocommerce_review_order_after_shipping',
-            'woocommerce_review_order_before_order_total', 'woocommerce_review_order_after_order_total', 'woocommerce_review_order_before_payment', 'woocommerce_review_order_before_submit');
-
+            'woocommerce_review_order_before_order_total', 'woocommerce_review_order_after_order_total', 'woocommerce_review_order_before_payment', 'woocommerce_review_order_before_submit', 'other');
         ?>
         <select name="extend_protection_for_woocommerce_shipping_protection_settings[extend_sp_offer_location]" id="extend_sp_offer_location">
             <?php
             //set default value if option is not set yet
-            if (!isset($this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'])){
+            if (!isset($this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location']))
+            {
                 $this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'] = 'woocommerce_review_order_before_payment';
             }
 
@@ -646,7 +676,14 @@ class Extend_Protection_Admin
             foreach($extend_sp_offer_dropdown_values as $extend_sp_hooks){
                 $selected = (isset($this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'])
                     && $this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'] === $extend_sp_hooks ) ? 'selected' : '';
-                echo '<option value="'.$extend_sp_hooks. '" '.$selected.'>'.$extend_sp_hooks.'</option>';
+
+                if ($extend_sp_hooks == 'woocommerce_review_order_before_payment'){
+                    echo '<option value="' . $extend_sp_hooks . '" ' . $selected . '>' . $extend_sp_hooks . ' (default)</option>';
+                }
+                else {
+                    echo '<option value="' . $extend_sp_hooks . '" ' . $selected . '>' . $extend_sp_hooks . '</option>';
+                }
+
             }
             ?>
         </select>
@@ -654,6 +691,24 @@ class Extend_Protection_Admin
         <?php
         //show information in a popup
         echo  '<label for="extend_sp_offer_location"><a href="?page=extend-docs#sp_offer_placement">What\'s this ?</a></label>';
+
+        // logic for "other" option selected
+        if ($this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'] === 'other') {
+            $current_value = get_option('extend_protection_for_woocommerce_shipping_protection_settings');
+            $extend_sp_offer_location_other = array_key_exists('extend_sp_offer_location_other', $current_value) ? $current_value['extend_sp_offer_location_other'] : '';
+
+            add_settings_field(
+                'extend_sp_offer_location_other', // id
+                'Offer Location', // title
+                array($this, 'extend_sp_offer_location_callback'), // callback
+                'extend-protection-for-woocommerce-settings-admin-shipping-protection', // page
+                'extend_setting_shipping_protection_section' // section
+            );
+            echo '<br /><input type = "text" class = "extend_sp_offer_location_other" id = "extend_sp_offer_location_other" 
+                        name = "extend_protection_for_woocommerce_shipping_protection_settings[extend_sp_offer_location_other]" 
+                        value = "' . esc_attr($extend_sp_offer_location_other) . '" placeholder = "Enter your custom value" />';
+            echo '<label for = "extend_sp_offer_location_other"> Please enter a valid checkout layout hook</label>';
+        }
     }
 
 

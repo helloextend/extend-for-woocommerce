@@ -56,39 +56,8 @@ class Extend_Protection_Shipping {
         //checkout offer element - default should be woocommerce_review_order_before_payment
         add_action($this->settings['extend_sp_offer_location'], [$this, 'shipping_protection_block'], 10, 2);
 
-        //on cart calculate fees
-        //add_action('woocommerce_cart_calculate_fees', [$this, 'add_shipping_protection']);
-
     }
 
-
-    // add_shipping_protection()
-    // renders shipping protection offers
-    public function add_shipping_protection()
-    {
-        // get Extend options
-        $enable_extend_sp = trim($this->settings['enable_extend_sp']);
-//        $extend_sp_offer_location = $this->settings['extend_sp_offer_location'];
-
-        $cart = WC()->cart;
-        if($enable_extend_sp === '1') {
-            $fee_amount = 114.00; // Set your desired fee amount here
-            $fee_label = 'Shipping Protection';
-
-            // Add the fee
-            WC()->cart->add_fee( $fee_label, $fee_amount );
-
-        }
-//        if($enable_extend_sp === '1') {
-//            wp_enqueue_script('extend_script');
-//            wp_enqueue_script('extend_checkout_integration_script');
-//            $ajaxurl = admin_url( 'admin-ajax.php' );
-//            wp_localize_script('extend_checkout_integration_script', 'ExtendCheckoutIntegration',
-//                                compact('cart', 'extend_sp_offer_location'));
-//        }
-    }
-
-    // shipping_protection_block()
     // echos the offer element to the checkout page
     public function shipping_protection_block()
     {
@@ -97,6 +66,8 @@ class Extend_Protection_Shipping {
         $enable_extend_sp   = $this->settings['enable_extend_sp'] ;
         $env                = $this->settings['extend_environment'];
         $cart_items         = WC()->cart->get_cart();
+        $ajax_url           = admin_url( 'admin-ajax.php' );
+        $update_order_review_nonce = wp_create_nonce('update_order_review');
 
         $items = array();
         foreach ( $cart_items as $cart_item_key => $cart_item ) {
@@ -120,8 +91,15 @@ class Extend_Protection_Shipping {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_shipping_integration_script');
             wp_localize_script('extend_shipping_integration_script', 'ExtendShippingIntegration',
-                    compact( 'env', 'items', 'enable_extend_sp'));
+                    compact( 'env', 'items', 'enable_extend_sp', 'ajax_url', 'update_order_review_nonce'));
             echo '<div id="extend-shipping-offer"></div>';
+        }else
+        {
+          //make sure to remove any SP session value
+            WC()->session->set('shipping_fee_remove',   true);
+            WC()->session->set('shipping_fee',          false);
+            WC()->session->set('shipping_fee_value',    null);
+            WC()->session->set('shipping_quote_id',    null);
         }
     }
 }

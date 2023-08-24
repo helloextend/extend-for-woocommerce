@@ -5,7 +5,7 @@
 
 #extend-settings .form-table th {
     padding:5px 10px 5px 0;
-    vertical-align: middle;
+    vertical-align: top;
 
 }
 
@@ -13,6 +13,11 @@
     font-size: 0.8em;
     font-style: italic;
 }
+
+#extend-settings input.extend_sp_offer_location_other, input.extend_pdp_offer_location_other {
+    margin-top : 10px;
+}
+
 
 .extend_linkedin{
     background-image: url('../../images/linkedin.png');
