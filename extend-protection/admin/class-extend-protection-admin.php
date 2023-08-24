@@ -657,7 +657,7 @@ class Extend_Protection_Admin
 
     public function extend_sp_offer_location_callback()
     {
-        $extend_sp_offer_dropdown_values = array(
+        $extend_sp_offer_dropdown_values = array('woocommerce_before_checkout_billing_form', 'woocommerce_after_checkout_billing_form',
             'woocommerce_review_order_before_shipping', 'woocommerce_review_order_after_shipping',
             'woocommerce_review_order_before_order_total', 'woocommerce_review_order_after_order_total', 'woocommerce_review_order_before_payment', 'woocommerce_review_order_before_submit', 'other'
         );
