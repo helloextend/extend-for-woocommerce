@@ -75,8 +75,11 @@ add_action('wp_ajax_add_shipping_protection_fee', 'add_shipping_protection_fee')
 add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'add_shipping_protection_fee');
 add_action('wp_ajax_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
 add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
-add_action( 'woocommerce_cart_calculate_fees', 'set_shipping_fee' );
-add_action( 'woocommerce_checkout_update_order_meta', 'save_shipping_protection_quote_id', 10, 2 );
+add_action('woocommerce_cart_calculate_fees', 'set_shipping_fee' );
+add_action('woocommerce_checkout_update_order_meta', 'save_shipping_protection_quote_id', 10, 2 );
+
+// Hook into WooCommerce order details display on admin screen
+add_action('woocommerce_after_order_itemmeta', 'add_extend_protection_contract', 10, 2 );
 
 /* end add_action */
 
@@ -352,7 +355,7 @@ function set_shipping_fee(){
 
     if ( 1 == WC()->session->get('shipping_fee') ) {
 
-        $fee_label   =  "Shipping Protection" ;
+        $fee_label   =  "Extend Shipping Protection" ;
         $fee_amount  = WC()->session->get('shipping_fee_value');
 
         WC()->cart->add_fee( $fee_label, $fee_amount );
@@ -361,7 +364,7 @@ function set_shipping_fee(){
     {
         $fees = WC()->cart->get_fees();
         foreach ($fees as $key => $fee) {
-            if($fees[$key]->name === __( "Shipping Protection")) {
+            if($fees[$key]->name === __( "Extend Shipping Protection")) {
                 unset($fees[$key]);
             }
         }
@@ -382,6 +385,48 @@ function save_shipping_protection_quote_id( $order_id ) {
         update_post_meta( $order_id, '_shipping_protection_quote_id', sanitize_text_field( WC()->session->get('shipping_quote_id')));
     }
 }
+
+/*
+ *  display the contract information for relevant items in the admin order
+*/
+
+function add_extend_protection_contract($item_id, $item) {
+    // Get the order object && the contracts meta if any
+    $order                  = $item->get_order();
+    $contracts              = get_post_meta($order->get_id(), '_product_protection_contracts', true);
+    $extend_meta_data       = (array)$item->get_meta('_extend_data');
+
+    if (is_array($contracts)){
+        $settings           = get_option('extend_protection_for_woocommerce_general_settings');
+        $env                = $settings['extend_environment'] ?? 'sandbox';
+
+        if ($env == 'sandbox'){
+            $url            = 'https://customers.demo.extend.com/en-US/warranty_terms';
+            $accessToken    = $settings['extend_sandbox_api_key'];
+        }else {
+            $url            = 'https://customers.extend.com/en-US/warranty_terms';
+            $accessToken    = $settings['extend_live_api_key'];
+        }
+
+        // Get product object
+        if (method_exists($item, 'get_product')){
+            $product        = $item->get_product();
+
+            // Check if the product SKU matches product protection
+                if ($product->get_sku() === 'extend-product-protection') {
+                echo '<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>';
+
+               foreach ($contracts as $product_covered => $contract_id){
+                   if ($extend_meta_data['covered_product_id'] == $product_covered){
+                        echo '<tr><td><a href="'.$url.'?contractId='.$contract_id.'&accessToken='.$accessToken.'">'.$contract_id.'</a></td></tr>';
+                   }
+               }
+               echo '</tbody></table>';
+            }
+        }
+    }
+}
+
 
 
 run_extend_protection();

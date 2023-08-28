@@ -74,7 +74,7 @@ class Extend_Protection_Shipping {
             $product = $cart_item['data'];
             if (!$product->is_virtual()) {
                 $items[] = array(
-                    'referenceId'   => $product->get_id(),
+                    'referenceId'   => $product->get_sku(),
                     'quantity'      => $cart_item['quantity'],
                     'purchasePrice' => ($product->get_price() * $cart_item['quantity'])*100,
                     'productName'   => $product->get_name(),

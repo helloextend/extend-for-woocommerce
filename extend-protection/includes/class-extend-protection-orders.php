@@ -116,14 +116,14 @@ class Extend_Protection_Orders {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product' => array(
-                        'id' => $product->get_id(),
-                        'title' => $product->get_name(),
-                        'category' => 'Electronics',
-                        'listPrice' => $product->get_regular_price() * 100,
+                        'id'            => $product->get_id(),
+                        'title'         => $product->get_name(),
+                        'category'      => 'Electronics',
+                        'listPrice'     => $product->get_regular_price() * 100,
                         'purchasePrice' => $product->get_price() * 100,
-                        'purchaseDate' => $order_data['date_created']->getTimestamp() * 1000,
+                        'purchaseDate'  => $order_data['date_created']->getTimestamp() * 1000,
                     ),
-                    'quantity' => $item->get_quantity(),
+                    'quantity'          => $item->get_quantity(),
                     'fulfilledQuantity' => $item->get_quantity(),
                 );
 
@@ -131,9 +131,7 @@ class Extend_Protection_Orders {
                 if (!empty($plan)) {
                     $extend_line_items[count($extend_line_items) - 1]['plan'] = $plan;
                 }
-
             }
-
         }
 
         // extend_log_notice("Extend Line Items: " . print_r(json_encode($extend_line_items, JSON_PRETTY_PRINT), true));
@@ -167,6 +165,14 @@ class Extend_Protection_Orders {
             'transactionId' => $order_id
         );
 
+        if ( get_post_meta( $order->get_id(), '_shipping_protection_quote_id', true )){
+            //shipping protection node
+            $extend_order_data[] = array(
+                "quoteId"               => get_post_meta($order->get_id(), '_shipping_protection_quote_id', true),
+                "shipmentInfo"          => array()
+            );
+        }
+
         if ($this->settings['enable_extend_debug'] == 1){
             Extend_Protection_Logger::extend_log_debug("Debug: Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
         }
@@ -185,7 +191,7 @@ class Extend_Protection_Orders {
 
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
-            Extend_Protection_Logger::extend_log_error("PUT request failed: " . $error_message);
+            Extend_Protection_Logger::extend_log_error(" Order ID ".$order->get_id()." : PUT request failed: " . $error_message);
         } else {
             $response_code = wp_remote_retrieve_response_code($response);
 
@@ -193,16 +199,39 @@ class Extend_Protection_Orders {
             if ($response_code === 201 || $response_code === 200) {
                 // Only log if "Enable debugging Log" is enabled
                 if ($this->settings['enable_extend_debug'] == 1){
-                    Extend_Protection_Logger::extend_log_debug("Order PUT request successful: " . wp_remote_retrieve_body($response));
+                    Extend_Protection_Logger::extend_log_debug("Order ID ".$order->get_id()." : PUT request successful: " . wp_remote_retrieve_body($response));
                 }
+                //if put was successful and if there is a contract ID in the response, write it back to the order metadata at the lineitem level
+                $data       = json_decode(wp_remote_retrieve_body($response));
+                $contracts  = array();
+
+                if (isset($data->lineItems) && is_array($data->lineItems)) {
+                    foreach ($data->lineItems as $lineItem) {
+                        if (isset($lineItem->contractId) && isset($lineItem->product->name)) {
+                            $contractId                         = $lineItem->contractId;
+                            $lineItemTransactionId              = $lineItem->lineItemTransactionId;
+                            $contracts[$lineItemTransactionId]  = $contractId;
+                        }
+                    }
+
+                    //add the contracts array at the order level
+                    update_post_meta($order->get_id(), '_product_protection_contracts', $contracts);
+                }
+
             } else {
                 if ($this->settings['enable_extend_debug'] == 1){
-                    Extend_Protection_Logger::extend_log_debug('Order PUT request failed with status code ' . $response_code) ;
+                    Extend_Protection_Logger::extend_log_debug('Order  ID '.$order->get_id().' : PUT request failed with status code ' . $response_code) ;
                     Extend_Protection_Logger::extend_log_debug('Body response: '. wp_remote_retrieve_body($response));
                 }else{
-                    Extend_Protection_Logger::extend_log_error('Order PUT request failed with status code ' . $response_code );
+                    Extend_Protection_Logger::extend_log_error('Order  ID '.$order->get_id().' : PUT request failed with status code ' . $response_code );
                 }
             }
         }
+
+        //make sure to remove any SP session value
+        WC()->session->set('shipping_fee_remove',   true);
+        WC()->session->set('shipping_fee',          false);
+        WC()->session->set('shipping_fee_value',    null);
+        WC()->session->set('shipping_quote_id',    null);
     }
 }
