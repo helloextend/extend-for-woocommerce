@@ -130,6 +130,7 @@ function extend_render_settings_page()
         <a href="?page=extend&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
         <a href="?page=extend&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
         <a href="?page=extend&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+        <a href="?page=extend&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
     </h2>
         <div class="tab-content">
             <?php
@@ -141,6 +142,9 @@ function extend_render_settings_page()
                     break;
                 case 'shipping_protection':
                     include_once('tabs/shipping-protection.php');
+                    break;
+                case 'catalog_sync':
+                    include_once('tabs/catalog-sync.php');
                     break;
                 default:
                     include_once('tabs/general-settings.php');
@@ -426,7 +430,5 @@ function add_extend_protection_contract($item_id, $item) {
         }
     }
 }
-
-
 
 run_extend_protection();

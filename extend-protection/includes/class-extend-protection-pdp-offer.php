@@ -82,6 +82,7 @@ class Extend_Protection_PDP_Offer
         global $product;
 
         // Variables that are passed to the PDP JS Script
+        $extend_use_skus            = $this->settings['extend_use_skus'];
         $id                         = $product->get_id();
         $sku                        = $product->get_sku();
         $categories                 = get_the_terms($id, 'product_cat');
@@ -92,7 +93,7 @@ class Extend_Protection_PDP_Offer
         $extend_pdp_offers_enabled  = $this->settings['extend_enable_pdp_offers'];
         $extend_modal_offers_enabled = $this->settings['extend_enable_modal_offers'];
         $extend_enabled             = $this->settings['enable_extend'];
-        $extend_use_skus            = $this->settings['extend_use_skus'];
+
 
         if($extend_enabled === '1') {
             wp_enqueue_script('extend_script');
