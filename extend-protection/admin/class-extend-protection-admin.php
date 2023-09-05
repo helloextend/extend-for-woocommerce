@@ -346,7 +346,16 @@ class Extend_Protection_Admin
              'extend_setting_contract_section' // section
          );
 
-         /* general settings */
+        add_settings_field(
+            'extend_use_sku', // id
+            'Use SKUs', // title
+            array($this, 'extend_use_sku_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
+
+
+        /* general settings */
 
          add_settings_field(
              'extend_environment', // id
@@ -444,6 +453,7 @@ class Extend_Protection_Admin
                 'extend_enable_modal_offers'    => '1',
                 'extend_enable_cart_balancing'  => '1',
                 'extend_enable_pdp_offers'      => '1',
+                'extend_use_sku'                => '1',
                 'extend_pdp_offer_location'     => 'woocommerce_before_add_to_cart_button'
             ];
             update_option('extend_protection_for_woocommerce_product_protection_settings', $settingsPP);
@@ -541,6 +551,10 @@ class Extend_Protection_Admin
             $sanitary_values['extend_live_api_key'] = sanitize_textarea_field($input['extend_live_api_key']);
         }
 
+        if (isset($input['extend_use_sku'])) {
+            $sanitary_values['extend_use_sku'] = sanitize_textarea_field($input['extend_use_sku']);
+        }
+
         return $sanitary_values;
     }
 
@@ -566,6 +580,16 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_shipping_protection_settings[enable_extend_sp]" id="enable_extend_sp" value="1" %s>',
             (isset($this->extend_protection_for_woocommerce_settings_shipping_protection_options['enable_extend_sp'])
                     && $this->extend_protection_for_woocommerce_settings_shipping_protection_options['enable_extend_sp'] === '1') ? 'checked' : ''
+        );
+    }
+
+    public function extend_use_sku_callback()
+    {
+        printf(
+            '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_use_sku]" 
+                           id="extend_use_sku" value="1" %s> <label for="extend_use_sku">All my products have SKUs (if not, we\'ll use IDs instead)</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_use_sku'])
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_use_sku'] === '1') ? 'checked' : ''
         );
     }
 

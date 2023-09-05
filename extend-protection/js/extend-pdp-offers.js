@@ -6,9 +6,10 @@
         if(!ExtendWooCommerce || !ExtendProductIntegration) return;
 
         // Deconstructs ExtendProductIntegration variables
-        const { type: product_type, id: product_id, sku, first_category, price, env, extend_enabled, extend_pdp_offers_enabled, extend_modal_offers_enabled } = ExtendProductIntegration;
+        const { type: product_type, id: product_id, sku, first_category, price, env, extend_enabled, extend_pdp_offers_enabled, extend_modal_offers_enabled, extend_use_skus } = ExtendProductIntegration;
 
         let supportedProductType = true;
+        let reference_id = '';
 
         // If PDP offers are not enabled, hide Extend offer div
         if(extend_pdp_offers_enabled === '0'){
@@ -16,24 +17,30 @@
             extendOffer.style.display = 'none';
         }
 
+        if (extend_use_skus == '1') {
+            reference_id = sku;
+        }else{
+            reference_id = product_id;
+        }
+
         // If Extend PDP is enabled, render offers
         if (extend_pdp_offers_enabled === '1') {
             if(product_type ==='simple'){
                 Extend.buttons.render('.extend-offer', {
-                    referenceId: product_id,
+                    referenceId: reference_id,
                     price: price,
                     category: first_category
                 })
             } else if (product_type === 'variable') {
                 Extend.buttons.render('.extend-offer', {
-                    referenceId: product_id,
+                    referenceId: reference_id,
                     price: price,
                     category: first_category
                 });
 
                 setTimeout(function(){
                     let variation_id = jQuery('[name="variation_id"]').val();
-                    console.log("variation_id: ", variation_id);
+                    //console.log("variation_id: ", variation_id);
                     if(variation_id ) {
                         Extend.setActiveProduct('.extend-offer', {
                                 referenceId: variation_id,
@@ -61,9 +68,9 @@
                     }
                 });
             } else if (product_type === 'composite') {
-                console.log("composite product: ", price);
+                //console.log("composite product: ", price);
                 Extend.buttons.render('.extend-offer', {
-                    referenceId: product_id,
+                    referenceId: reference_id,
                     price: price,
                     category: first_category
                 });
@@ -78,7 +85,7 @@
                     console.log("first_category: ", first_category);
                     if (compositeProductOptionsSelector && priceSelector) {
                         Extend.setActiveProduct('.extend-offer', {
-                            referenceId: product_id,
+                            referenceId: reference_id,
                             price: compositeProductPrice,
                             category: first_category
                         });
@@ -108,7 +115,7 @@
                     const product = component.getActiveProduct();
 
                     if (plan) {
-                        var planCopy = { ...plan, covered_product_id: product.id }
+                        var planCopy = { ...plan, covered_product_id: reference_id }
                         var data = {
                             quantity: 1,
                             plan: planCopy,
@@ -121,10 +128,10 @@
                     } else {
                         if(extend_modal_offers_enabled === '1') {
                             Extend.modal.open({
-                                referenceId: product.id,
+                                referenceId: reference_id,
                                 onClose: function(plan, product) {
                                     if (plan && product) {
-                                        var planCopy = { ...plan, covered_product_id: product.id }
+                                        var planCopy = { ...plan, covered_product_id: reference_id }
                                         var data = {
                                             quantity: 1,
                                             plan: planCopy,
