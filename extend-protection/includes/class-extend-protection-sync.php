@@ -10,6 +10,7 @@
  * @subpackage Extend_Protection/admin
  */
 
+
 use Magento\Store\Model\ScopeInterface;
 
 /**
@@ -77,6 +78,7 @@ class Extend_Protection_Sync {
         wp_die();
     }
 
+
     /*
      * Run the product catalog sync in batches
      */
@@ -92,6 +94,7 @@ class Extend_Protection_Sync {
          *  order by product name and if there is a last sync date,
          *  filter out any product not updated since
         */
+
         $args = array(
             'post_type' => 'product',
             'meta_query' => array(

@@ -646,6 +646,19 @@ class Extend_Protection_Admin
             $sanitary_values['extend_sync_batch']                               = sanitize_text_field($input['extend_sync_batch']);
         }
 
+        if (isset($input['extend_use_skus'])) {
+            $sanitary_values['extend_use_skus'] = sanitize_text_field($input['extend_use_skus']);
+        }
+
+        if (isset($input['extend_use_special_price'])) {
+            $sanitary_values['extend_use_special_price'] = sanitize_text_field($input['extend_use_special_price']);
+        }
+
+        if (isset($input['extend_last_product_sync'])) {
+            $sanitary_values['extend_last_product_sync'] = sanitize_text_field($input['extend_last_product_sync']);
+        }
+
+
         return $sanitary_values;
     }
 
@@ -1009,7 +1022,8 @@ class Extend_Protection_Admin
         echo "<hr>";
     }
 
-
-
-
+    function extend_setting_catalog_sync_section_info() 
+    {
+        echo "<hr>";
+    }
 }
