@@ -11,8 +11,6 @@
  */
 
 
-use Magento\Store\Model\ScopeInterface;
-
 /**
  * The Product Sync functionality of the plugin.
  *
