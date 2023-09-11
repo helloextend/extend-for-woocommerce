@@ -98,9 +98,9 @@ class Extend_Protection_Shipping {
         }else
         {
           //make sure to remove any SP session value
-            WC()->session->set('shipping_fee_remove',   true);
-            WC()->session->set('shipping_fee',          false);
-            WC()->session->set('shipping_fee_value',    null);
+            WC()->session->set('shipping_fee_remove',  true);
+            WC()->session->set('shipping_fee',         false);
+            WC()->session->set('shipping_fee_value',   null);
             WC()->session->set('shipping_quote_id',    null);
         }
     }

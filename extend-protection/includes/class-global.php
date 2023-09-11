@@ -210,6 +210,9 @@ class Extend_Protection_Global
         $settings ['extend_use_special_price']      = array_key_exists('extend_use_special_price', $extend_protection_catalog_sync_settings)
                                                     ? $extend_protection_catalog_sync_settings['extend_use_special_price'] : 0;
 
+        $settings ['extend_sync_batch']             = array_key_exists('extend_sync_batch', $extend_protection_catalog_sync_settings)
+                                                    ? $extend_protection_catalog_sync_settings['extend_sync_batch'] : 100;
+
         return $settings;
     }
 

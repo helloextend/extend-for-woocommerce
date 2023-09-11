@@ -156,10 +156,11 @@ class Extend_Protection_Admin
         $environment    = ($environment == 'live') ? $environment : 'demo';
         $ajaxurl        = admin_url('admin-ajax.php');
         $nonce          = wp_create_nonce('extend_sync_nonce');
+        $extend_sync_batch  = $this->settings['extend_sync_batch'];
 
         wp_enqueue_script('extend_script');
         wp_enqueue_script('extend_sync_script');
-        wp_localize_script('extend_sync_script', 'ExtendWooCommerce', compact('store_id' , 'ajaxurl', 'environment', 'nonce'));
+        wp_localize_script('extend_sync_script', 'ExtendWooCommerce', compact('store_id' , 'ajaxurl', 'environment', 'nonce', 'extend_sync_batch'));
 
         /* end for sync */
 
@@ -488,6 +489,14 @@ class Extend_Protection_Admin
             'extend_setting_catalog_sync_section' // section
         );
 
+        add_settings_field(
+            'extend_sync_batch', // id
+            'Sync Batch Size', // title
+            array($this, 'extend_sync_batch_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-catalog-sync', // page
+            'extend_setting_catalog_sync_section' // section
+        );
+
 
          //once options have been registered, initialize values in the db:
 
@@ -531,7 +540,8 @@ class Extend_Protection_Admin
                     'extend_last_product_sync'      => '',
                     'extend_automated_product_sync' => '0',
                     'extend_use_skus'               => '0',
-                    'extend_use_special_prices'     => '0'
+                    'extend_use_special_prices'     => '0',
+                    'extend_sync_batch'             => '100'
             ];
             update_option('extend_protection_for_woocommerce_catalog_sync_settings', $settingsSync);
         }
@@ -544,55 +554,55 @@ class Extend_Protection_Admin
     {
         $sanitary_values = array();
         if (isset($input['enable_extend'])) {
-            $sanitary_values['enable_extend'] = $input['enable_extend'];
+            $sanitary_values['enable_extend']                                   = $input['enable_extend'];
         }
 
         if (isset($input['enable_extend_sp'])) {
-            $sanitary_values['enable_extend_sp'] = $input['enable_extend_sp'];
+            $sanitary_values['enable_extend_sp']                                = $input['enable_extend_sp'];
         }
 
         if (isset($input['enable_extend_debug'])) {
-            $sanitary_values['enable_extend_debug'] = $input['enable_extend_debug'];
+            $sanitary_values['enable_extend_debug']                             = $input['enable_extend_debug'];
         }
 
         if (isset($input['extend_enable_cart_offers'])) {
-            $sanitary_values['extend_enable_cart_offers'] = $input['extend_enable_cart_offers'];
+            $sanitary_values['extend_enable_cart_offers']                       = $input['extend_enable_cart_offers'];
         }
 
         if (isset($input['extend_enable_cart_balancing'])) {
-            $sanitary_values['extend_enable_cart_balancing'] = $input['extend_enable_cart_balancing'];
+            $sanitary_values['extend_enable_cart_balancing']                    = $input['extend_enable_cart_balancing'];
         }
 
         if (isset($input['extend_enable_pdp_offers'])) {
-            $sanitary_values['extend_enable_pdp_offers'] = $input['extend_enable_pdp_offers'];
+            $sanitary_values['extend_enable_pdp_offers']                        = $input['extend_enable_pdp_offers'];
         }
 
         if (isset($input['extend_enable_modal_offers'])) {
-            $sanitary_values['extend_enable_modal_offers'] = $input['extend_enable_modal_offers'];
+            $sanitary_values['extend_enable_modal_offers']                      = $input['extend_enable_modal_offers'];
         }
 
         if (isset($input['extend_automated_product_sync'])) {
-            $sanitary_values['extend_automated_product_sync'] = $input['extend_automated_product_sync'];
+            $sanitary_values['extend_automated_product_sync']                   = $input['extend_automated_product_sync'];
         }
 
         if (isset($input['extend_pdp_offer_location'])) {
-            $sanitary_values['extend_pdp_offer_location'] = $input['extend_pdp_offer_location'];
+            $sanitary_values['extend_pdp_offer_location']                       = $input['extend_pdp_offer_location'];
         }
 
         if (isset($input['extend_pdp_offer_location_other'])) {
-            $sanitary_values['extend_pdp_offer_location_other'] = $input['extend_pdp_offer_location_other'];
+            $sanitary_values['extend_pdp_offer_location_other']                 = $input['extend_pdp_offer_location_other'];
         }
 
         if (isset($input['extend_sp_offer_location'])) {
-            $sanitary_values['extend_sp_offer_location'] = $input['extend_sp_offer_location'];
+            $sanitary_values['extend_sp_offer_location']                        = $input['extend_sp_offer_location'];
         }
 
         if (isset($input['extend_sp_offer_location_other'])) {
-            $sanitary_values['extend_sp_offer_location_other'] = $input['extend_sp_offer_location_other'];
+            $sanitary_values['extend_sp_offer_location_other']                  = $input['extend_sp_offer_location_other'];
         }
 
         if (isset($input['extend_product_protection_contract_create'])) {
-            $sanitary_values['extend_product_protection_contract_create'] = $input['extend_product_protection_contract_create'];
+            $sanitary_values['extend_product_protection_contract_create']       = $input['extend_product_protection_contract_create'];
         }
 
         if (isset($input['extend_product_protection_contract_create_event'])) {
@@ -600,24 +610,40 @@ class Extend_Protection_Admin
         }
 
         if (isset($input['extend_environment'])) {
-            $sanitary_values['extend_environment'] = $input['extend_environment'];
+            $sanitary_values['extend_environment']                              = $input['extend_environment'];
         }
 
         if (isset($input['extend_sandbox_store_id'])) {
-            $sanitary_values['extend_sandbox_store_id'] = sanitize_text_field($input['extend_sandbox_store_id']);
+            $sanitary_values['extend_sandbox_store_id']                         = sanitize_text_field($input['extend_sandbox_store_id']);
         }
 
         if (isset($input['extend_sandbox_api_key']))
         {
-            $sanitary_values['extend_sandbox_api_key'] = sanitize_textarea_field($input['extend_sandbox_api_key']);
+            $sanitary_values['extend_sandbox_api_key']                          = sanitize_textarea_field($input['extend_sandbox_api_key']);
         }
 
         if (isset($input['extend_live_store_id'])) {
-            $sanitary_values['extend_live_store_id'] = sanitize_text_field($input['extend_live_store_id']);
+            $sanitary_values['extend_live_store_id']                            = sanitize_text_field($input['extend_live_store_id']);
         }
 
         if (isset($input['extend_live_api_key'])) {
-            $sanitary_values['extend_live_api_key'] = sanitize_textarea_field($input['extend_live_api_key']);
+            $sanitary_values['extend_live_api_key']                             = sanitize_textarea_field($input['extend_live_api_key']);
+        }
+
+        if (isset($input['extend_use_skus'])) {
+            $sanitary_values['extend_use_skus']                                 = sanitize_text_field($input['extend_use_skus']);
+        }
+
+        if (isset($input['extend_use_special_price'])) {
+            $sanitary_values['extend_use_special_price']                        = sanitize_text_field($input['extend_use_special_price']);
+        }
+
+        if (isset($input['extend_last_product_sync'])) {
+            $sanitary_values['extend_last_product_sync']                        = sanitize_text_field($input['extend_last_product_sync']);
+        }
+
+        if (isset($input['extend_sync_batch'])) {
+            $sanitary_values['extend_sync_batch']                               = sanitize_text_field($input['extend_sync_batch']);
         }
 
         if (isset($input['extend_use_skus'])) {
@@ -828,7 +854,8 @@ class Extend_Protection_Admin
     }
 
 
-    public function extend_product_protection_contract_create_callback(){
+    public function extend_product_protection_contract_create_callback()
+    {
         // show checkbox to create contracts
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_product_protection_contract_create]" 
@@ -839,7 +866,8 @@ class Extend_Protection_Admin
         );
     }
 
-    public function extend_product_protection_contract_create_event_callback(){
+    public function extend_product_protection_contract_create_event_callback()
+    {
         ?>
         <select name="extend_protection_for_woocommerce_product_protection_settings[extend_product_protection_contract_create_event]"
                 id="extend_product_protection_contract_create_event">
@@ -916,7 +944,8 @@ class Extend_Protection_Admin
         );
     }
 
-    public function extend_use_special_price_callback(){
+    public function extend_use_special_price_callback()
+    {
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_catalog_sync_settings[extend_use_special_price]" id="extend_use_special_price" value="1" %s>
                     <label for="extend_use_special_price">If present, use special price, otherwise use base price</label>',
@@ -925,7 +954,8 @@ class Extend_Protection_Admin
         );
     }
 
-    public function extend_last_product_sync_callback(){
+    public function extend_last_product_sync_callback()
+    {
         if (array_key_exists('extend_last_product_sync', $this->extend_protection_for_woocommerce_settings_catalog_sync_options)
             &&  $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_last_product_sync'] <> 'Never'
             &&  $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_last_product_sync'] <> ''
@@ -943,23 +973,57 @@ class Extend_Protection_Admin
                 ? $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_last_product_sync'] : 'Never');
     }
 
-    function extend_setting_contract_section_info() {
+    function extend_sync_batch_callback()
+    {
+        $extend_sync_batch_dropdown_values = array('20', '50', '100', '200', '300', '400', '500');
+        ?>
+        <select name="extend_protection_for_woocommerce_settings_catalog_sync_options[extend_sync_batch]" id="extend_sync_batch">
+            <?php
+            //set default value if option is not set yet
+            if (!isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'])){
+                $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch']='100';
+            }
+
+            //build dropdown from array of possible batches
+            foreach($extend_sync_batch_dropdown_values as $batch_sync){
+                $selected = (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'])
+                    && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'] === $batch_sync ) ? 'selected' : '';
+
+                if ($batch_sync == '100'){
+                    echo '<option value="' . $batch_sync . '" ' . $selected . '>' . $batch_sync . ' (default)</option>';
+                }
+                else {
+                    echo '<option value="' . $batch_sync . '" ' . $selected . '>' . $batch_sync . '</option>';
+                }
+            }
+            ?>
+        </select>
+        <?php
+    }
+
+
+    function extend_setting_contract_section_info()
+    {
         echo "<hr>";
     }
 
-    function extend_setting_environment_section_info() {
+    function extend_setting_environment_section_info()
+    {
         echo "<hr>";
     }
 
-    function extend_setting_shipping_protection_section_info() {
+    function extend_setting_shipping_protection_section_info()
+    {
         echo "<hr>";
     }
 
-    function extend_setting_catalog_sync_section_info() {
+    function extend_setting_catalog_sync_section_info()
+    {
         echo "<hr>";
     }
 
-
-
-
+    function extend_setting_catalog_sync_section_info() 
+    {
+        echo "<hr>";
+    }
 }
