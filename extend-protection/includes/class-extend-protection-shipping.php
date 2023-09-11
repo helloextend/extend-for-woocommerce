@@ -69,12 +69,14 @@ class Extend_Protection_Shipping {
         $ajax_url           = admin_url( 'admin-ajax.php' );
         $update_order_review_nonce = wp_create_nonce('update_order_review');
 
+
         $items = array();
         foreach ( $cart_items as $cart_item_key => $cart_item ) {
             $product = $cart_item['data'];
             if (!$product->is_virtual()) {
+                $referenceId        = ($this->settings['extend_use_skus'] == 1) ? $product->get_sku() : $product->get_id();
                 $items[] = array(
-                    'referenceId'   => $product->get_sku() ?? $product->get_id(),
+                    'referenceId'   => $referenceId,
                     'quantity'      => $cart_item['quantity'],
                     'purchasePrice' => ($product->get_price() * $cart_item['quantity'])*100,
                     'productName'   => $product->get_name(),
@@ -96,9 +98,9 @@ class Extend_Protection_Shipping {
         }else
         {
           //make sure to remove any SP session value
-            WC()->session->set('shipping_fee_remove',   true);
-            WC()->session->set('shipping_fee',          false);
-            WC()->session->set('shipping_fee_value',    null);
+            WC()->session->set('shipping_fee_remove',  true);
+            WC()->session->set('shipping_fee',         false);
+            WC()->session->set('shipping_fee_value',   null);
             WC()->session->set('shipping_quote_id',    null);
         }
     }

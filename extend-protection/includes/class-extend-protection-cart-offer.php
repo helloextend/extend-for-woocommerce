@@ -171,8 +171,10 @@ class Extend_Protection_Cart_Offer {
     {
         // if it's not a warranty, add offer element
         if(!isset($cart_item['extendData'])){
-            $item_id = $cart_item['variation_id']?$cart_item['variation_id']:$cart_item['product_id'];
-            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$item_id'></div>";
+            $item_id  = $cart_item['variation_id']?$cart_item['variation_id']:$cart_item['product_id'];
+            $item_sku = $cart_item['data']->sku ? $cart_item['data']->sku : '';
+
+            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$item_id' data-covered-sku='$item_sku'></div>";
         }
     }
 

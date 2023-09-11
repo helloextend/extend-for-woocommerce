@@ -82,6 +82,7 @@ class Extend_Protection
     private Extend_Protection_Cart_Offer $cart_offer;
     private Extend_Protection_Orders $orders;
     private Extend_Protection_Shipping $shipping_protection;
+    private Extend_Protection_Sync $sync;
 
 
     /**
@@ -191,6 +192,11 @@ class Extend_Protection
          */
         require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-shipping.php';
 
+        /**
+         * The class responsible for handling the Product Sync
+         */
+        require_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-sync.php';
+
         $this->loader = new Extend_Protection_Loader();
 
     }
@@ -223,7 +229,8 @@ class Extend_Protection
     private function define_admin_hooks()
     {
 
-        $plugin_admin = new Extend_Protection_Admin($this->get_extend_protection(), $this->get_version());
+        $plugin_admin   = new Extend_Protection_Admin($this->get_extend_protection(), $this->get_version());
+        $this->sync     = new Extend_Protection_Sync($this->get_extend_protection(), $this->get_version());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -242,6 +249,7 @@ class Extend_Protection
         wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', ['jquery', 'extend_global_script'], '1.0.0', true);
         wp_register_script('extend_cart_integration_script', $this->url . '../js/extend-cart-offers.js', ['jquery', 'extend_script'], '1.0.0', true);
         wp_register_script('extend_shipping_integration_script', $this->url . '../js/extend-shipping-offers.js', ['jquery', 'extend_script'], '1.0.0', true);
+        wp_register_script('extend_sync_script', $this->url . '../js/extend-sync.js', ['jquery', 'extend_script'], '1.0.0', true);
 
         $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
     }

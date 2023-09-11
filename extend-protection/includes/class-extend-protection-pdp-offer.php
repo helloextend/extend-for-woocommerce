@@ -82,6 +82,7 @@ class Extend_Protection_PDP_Offer
         global $product;
 
         // Variables that are passed to the PDP JS Script
+        $extend_use_skus            = $this->settings['extend_use_skus'];
         $id                         = $product->get_id();
         $sku                        = $product->get_sku();
         $categories                 = get_the_terms($id, 'product_cat');
@@ -93,11 +94,12 @@ class Extend_Protection_PDP_Offer
         $extend_modal_offers_enabled = $this->settings['extend_enable_modal_offers'];
         $extend_enabled             = $this->settings['enable_extend'];
 
+
         if($extend_enabled === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_product_integration_script');
             wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration',
-                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled'));
+                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled', 'extend_use_skus'));
             echo "<div class='extend-offer' data-extend='pdpOfferContainer'></div>";
         }
     }

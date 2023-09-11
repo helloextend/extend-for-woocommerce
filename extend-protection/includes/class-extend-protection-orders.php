@@ -112,6 +112,7 @@ class Extend_Protection_Orders {
 
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to extend_line_items array
+            // TODO: id = reference id = sku ?
             if ($product_id != extend_product_protection_id()) {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
@@ -167,10 +168,8 @@ class Extend_Protection_Orders {
 
         if ( get_post_meta( $order->get_id(), '_shipping_protection_quote_id', true )){
             //shipping protection node
-            $extend_order_data[] = array(
-                "quoteId"               => get_post_meta($order->get_id(), '_shipping_protection_quote_id', true),
-                "shipmentInfo"          => array()
-            );
+            $extend_order_data["quoteId"]       =   get_post_meta($order->get_id(), '_shipping_protection_quote_id', true);
+            $extend_order_data["shipmentInfo"]  =   array();
         }
 
         if ($this->settings['enable_extend_debug'] == 1){
