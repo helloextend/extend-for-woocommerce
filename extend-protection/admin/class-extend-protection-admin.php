@@ -156,7 +156,7 @@ class Extend_Protection_Admin
         $environment    = ($environment == 'live') ? $environment : 'demo';
         $ajaxurl        = admin_url('admin-ajax.php');
         $nonce          = wp_create_nonce('extend_sync_nonce');
-        $extend_sync_batch  = $this->settings['extend_sync_batch'];
+        $extend_sync_batch  = $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'];
 
         wp_enqueue_script('extend_script');
         wp_enqueue_script('extend_sync_script');
