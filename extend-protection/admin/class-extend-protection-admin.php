@@ -1022,8 +1022,4 @@ class Extend_Protection_Admin
         echo "<hr>";
     }
 
-    function extend_setting_catalog_sync_section_info() 
-    {
-        echo "<hr>";
-    }
 }
