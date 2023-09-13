@@ -63,23 +63,22 @@ class Extend_Protection_Orders {
 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action( 'woocommerce_checkout_order_processed', [ $this, 'create_update_order' ], 10, 1 );
+
+        // Hook the callback function to the order completed action
+        add_action( 'woocommerce_order_status_completed', [ $this, 'create_update_order' ], 10, 1 );
+
     }
 
     /**
-     * Create/Update Orders in Extend
-     *
-     * @param string $order_id The ID of the order.
-     * @since    1.0.0
+     * get_extend_plans_and_products($order_items)
+     * - builds line items array that will be put in order payload
+     * @param $order
+     * @param bool $fulfill_now
+     * @return array
+     * @since 1.0.0
      */
-    public function create_update_order(string $order_id, array $order = null)
-    {
-        if($order === null){
-            $order = wc_get_order($order_id);
-        }
-        $order_data = $order->get_data();
-        $order_items = $order->get_items();
+    public function get_extend_plans_and_products($order, $fulfill_now = false) {
 
-        // Loop through the order items and find any items with plan data
         $extend_plans = array();
         foreach( $order->get_items() as $item_id => $item ){
             $extend_meta_data = (array)$item->get_meta('_extend_data');
@@ -96,7 +95,7 @@ class Extend_Protection_Orders {
 
         // Loop through the order items and add them to the line_items array
         $extend_line_items = array();
-        foreach( $order->get_items() as $item_id => $item ){
+        foreach( $order->get_items() as $item_id => $item ) {
 
             $line_id = $item->get_id();
             $product = $item->get_product();
@@ -104,6 +103,7 @@ class Extend_Protection_Orders {
 
             // if line_id matches any id in $extend_plans[], push the plan data into the covered product
             $plan = array();
+            // Loop through the order items and find any items with plan data
             foreach ($extend_plans as $extend_plan) {
                 if ($extend_plan['covered_product_id'] == $product_id) {
                     $plan = $extend_plan;
@@ -122,10 +122,10 @@ class Extend_Protection_Orders {
                         'category'      => 'Electronics',
                         'listPrice'     => $product->get_regular_price() * 100,
                         'purchasePrice' => $product->get_price() * 100,
-                        'purchaseDate'  => $order_data['date_created']->getTimestamp() * 1000,
+                        'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
                     ),
                     'quantity'          => $item->get_quantity(),
-                    'fulfilledQuantity' => $item->get_quantity(),
+                    'fulfilledQuantity' => ! $fulfill_now ? 0 : $item->get_quantity(), // Will only fulfill based on contract event
                 );
 
                 // if $plan is not empty, add the plan to the current line item
@@ -134,8 +134,69 @@ class Extend_Protection_Orders {
                 }
             }
         }
+        return $extend_line_items;
+    }
 
-        // extend_log_notice("Extend Line Items: " . print_r(json_encode($extend_line_items, JSON_PRETTY_PRINT), true));
+    /**
+     * Create/Update Orders in Extend
+     *
+     * @param string $order_id The ID of the order.
+     * @since    1.0.0
+     */
+    public function create_update_order(string $order_id, array $order = null)
+    {
+        // If contract creation is disabled, return
+        $contract_creation = $this->settings['extend_product_protection_contract_create'];
+        if ($contract_creation == 0) {
+            if ($this->settings['enable_extend_debug'] == 1){
+                Extend_Protection_Logger::extend_log_error('Contract creation is disabled. No contract will be created for this order.');
+            }
+            return;
+        }
+
+        if($order === null){
+            $order = wc_get_order($order_id);
+        }
+        $order_data = $order->get_data();
+
+        // if contract creation is set to order create, call get_extend_plans_and_products
+        $contract_creation_event = $this->settings['extend_product_protection_contract_create_event'];
+
+        $extend_line_items = array();
+
+        if ($contract_creation_event == 'Order Create') {
+            // Will pass fulfill as true to the line items array to fulfill the contract immediately
+            $extend_line_items = $this->get_extend_plans_and_products($order, true);
+        }
+        else {
+            // Check if the current action hook is woocommerce_order_status_completed
+            $called_action_hook = current_filter();
+            if ($called_action_hook == 'woocommerce_order_status_completed') {
+                $extend_line_items = $this->get_extend_plans_and_products($order, true);
+            }
+            else {
+                // Does not fulfill product protection line items
+                $extend_line_items = $this->get_extend_plans_and_products($order);
+            }
+        }
+
+        // Check if shipping protection meta exists and add it as a line item
+        $shipping_protection_quote_id = get_post_meta( $order_id, '_shipping_protection_quote_id', true );
+        // check if shipping protection meta exists
+        if ($shipping_protection_quote_id) {
+            Extend_Protection_Logger::extend_log_notice( 'Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true) );
+
+            // Push shipping protection line item into extend_line_items array
+            $extend_line_items[] = array(
+                'lineItemTransactionId' => $order_id . '-shipping',
+                'quoteId' => $shipping_protection_quote_id,
+                'shipmentInfo' => array(),
+            );
+        } else {
+            if ($this->settings['enable_extend_debug'] == 1){
+                Extend_Protection_Logger::extend_log_notice( 'Shipping Protection Meta Does Not Exist' );
+            }
+        }
 
         $extend_order_data = Array(
             'currency' => $order_data['currency'],
@@ -165,12 +226,6 @@ class Extend_Protection_Orders {
             'storeId' => $this->settings['store_id'],
             'transactionId' => $order_id
         );
-
-        if ( get_post_meta( $order->get_id(), '_shipping_protection_quote_id', true )){
-            //shipping protection node
-            $extend_order_data["quoteId"]       =   get_post_meta($order->get_id(), '_shipping_protection_quote_id', true);
-            $extend_order_data["shipmentInfo"]  =   array();
-        }
 
         if ($this->settings['enable_extend_debug'] == 1){
             Extend_Protection_Logger::extend_log_debug("Debug: Extend Order Data: " . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
@@ -228,9 +283,11 @@ class Extend_Protection_Orders {
         }
 
         //make sure to remove any SP session value
-        WC()->session->set('shipping_fee_remove',   true);
-        WC()->session->set('shipping_fee',          false);
-        WC()->session->set('shipping_fee_value',    null);
-        WC()->session->set('shipping_quote_id',    null);
+        if (isset(WC()->session) && WC()->session->has_session() ) {
+            WC()->session->set('shipping_fee_remove',   true);
+            WC()->session->set('shipping_fee',          false);
+            WC()->session->set('shipping_fee_value',    null);
+            WC()->session->set('shipping_quote_id',    null);
+        }
     }
 }
