@@ -497,6 +497,13 @@ class Extend_Protection_Admin
             'extend_setting_catalog_sync_section' // section
         );
 
+        add_settings_field(
+            'extend_sync_on_update', // id
+            'Sync Products on Update', // title
+            array($this, 'extend_sync_on_update_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-catalog-sync', // page
+            'extend_setting_catalog_sync_section' // section
+        );
 
          //once options have been registered, initialize values in the db:
 
@@ -541,7 +548,8 @@ class Extend_Protection_Admin
                     'extend_automated_product_sync' => '0',
                     'extend_use_skus'               => '0',
                     'extend_use_special_prices'     => '0',
-                    'extend_sync_batch'             => '100'
+                    'extend_sync_batch'             => '100',
+                    'extend_sync_on_update'         => '1'
             ];
             update_option('extend_protection_for_woocommerce_catalog_sync_settings', $settingsSync);
         }
@@ -646,16 +654,8 @@ class Extend_Protection_Admin
             $sanitary_values['extend_sync_batch']                               = sanitize_text_field($input['extend_sync_batch']);
         }
 
-        if (isset($input['extend_use_skus'])) {
-            $sanitary_values['extend_use_skus'] = sanitize_text_field($input['extend_use_skus']);
-        }
-
-        if (isset($input['extend_use_special_price'])) {
-            $sanitary_values['extend_use_special_price'] = sanitize_text_field($input['extend_use_special_price']);
-        }
-
-        if (isset($input['extend_last_product_sync'])) {
-            $sanitary_values['extend_last_product_sync'] = sanitize_text_field($input['extend_last_product_sync']);
+        if (isset($input['extend_sync_on_update'])) {
+            $sanitary_values['extend_sync_on_update']                           = sanitize_text_field($input['extend_sync_on_update']);
         }
 
 
@@ -1001,6 +1001,15 @@ class Extend_Protection_Admin
         <?php
     }
 
+    function extend_sync_on_update_callback()
+    {
+        printf(
+            '<input type="checkbox" name="extend_protection_for_woocommerce_catalog_sync_settings[extend_sync_on_update]" id="extend_sync_on_update" value="1" %s>
+                    <label for="extend_sync_on_update">Automatically sync products when they are updated</label>',
+            (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_on_update'])
+                && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_on_update'] === '1') ? 'checked' : ''
+        );
+    }
 
     function extend_setting_contract_section_info()
     {
@@ -1021,5 +1030,8 @@ class Extend_Protection_Admin
     {
         echo "<hr>";
     }
+
+
+
 
 }

@@ -10,7 +10,6 @@
  * @subpackage Extend_Protection/admin
  */
 
-
 /**
  * The Product Sync functionality of the plugin.
  *
@@ -61,6 +60,9 @@ class Extend_Protection_Sync {
         add_action('wp_ajax_nopriv_extend_catalog_sync_run',    [$this, 'extend_catalog_sync_run'], 10);
         add_action('wp_ajax_update_last_run_sync',              [$this, 'update_last_run_sync'], 10);
         add_action('wp_ajax_nopriv_update_last_run_sync',       [$this, 'update_last_run_sync'], 10);
+
+        /* 'save_post' action for WooCommerce products, start sync on save_post event. */
+        add_action('save_post',                                 [$this, 'sync_products_callback'], 10, 2);
     }
 
     /*
@@ -75,7 +77,6 @@ class Extend_Protection_Sync {
         update_option('extend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
         wp_die();
     }
-
 
     /*
      * Run the product catalog sync in batches
@@ -92,7 +93,6 @@ class Extend_Protection_Sync {
          *  order by product name and if there is a last sync date,
          *  filter out any product not updated since
         */
-
         $args = array(
             'post_type' => 'product',
             'meta_query' => array(
@@ -150,16 +150,8 @@ class Extend_Protection_Sync {
                 Extend_Protection_Logger::extend_log_debug('DEBUG: batchdata for batch #' . $batch_current . ' >>> ' . print_r($batch_data, true));
             }
             //batchdata is the payload we send to extend
-            $request_args = array(
-                'method' => 'POST',
-                'headers' => array(
-                    'Content-Type' => 'application/json',
-                    'Accept' => 'application/json; version=latest',
-                    'X-Extend-Access-Token' => $this->settings['api_key'],
-                ),
-                'body' => json_encode($batch_data),
-            );
-//
+            $request_args = $this->buildRequest($batch_data);
+
 //            Extend_Protection_Logger::extend_log_debug('DEBUG: batch #'.$batch_current. ' >>> request arg ='.print_r($request_args, true) );
 //            Extend_Protection_Logger::extend_log_debug('DEBUG: <strong>url : '.$this->settings['api_host'].'./stores/'.$this->settings['store_id'].'/products?batch=true</strong>');
 //
@@ -176,8 +168,8 @@ class Extend_Protection_Sync {
             } else {
                 $response_code = wp_remote_retrieve_response_code($response);
                 if ($response_code === 201 ){
-                    //success
-                    Extend_Protection_Logger::extend_log_notice('Catalog Sync Batch #'.$batch_current.' was successful');
+                    // success
+                    // Extend_Protection_Logger::extend_log_notice('Catalog Sync Batch #'.$batch_current.' was successful');
 
                     $data  = json_decode(wp_remote_retrieve_body($response));
                     if (isset($data->added) && is_array($data->added)) {
@@ -224,7 +216,9 @@ class Extend_Protection_Sync {
                                 break;
                         }
                         if ($batch_updated_count > 0){
-                            Extend_Protection_Logger::extend_log_notice('Catalog Sync Batch #' . $batch_current . ', '.$batch_updated_count .$items_updated. implode(',', $updated_item));
+                            if ($this->settings['enable_extend_debug'] == 1) {
+                                Extend_Protection_Logger::extend_log_debug('Catalog Sync Batch #' . $batch_current . ', ' . $batch_updated_count . $items_updated . implode(',', $updated_item));
+                            }
                         }
                     }
 
@@ -393,6 +387,10 @@ class Extend_Protection_Sync {
         $sync_options['extend_last_product_sync']   = $sync_time ;
 
         update_option('extend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
+        Extend_Protection_Logger::extend_log_notice("Catalog sync completed. 
+        Please refer to the log in <a href='".site_url()."wp-content/extend/sync/sync-".date('m-d-y').".log'>wp-content/extend/sync/sync-".date('m-d-y').".log</a>");
+
+        
         wp_send_json_success(array( 'time'=>date('Y-m-d h:i:s A',$sync_time), 'sync_unixtime' => $sync_time));
     }
 
@@ -418,5 +416,108 @@ class Extend_Protection_Sync {
             $ref_id =  $product->get_ID();
         }
         return $ref_id;
+    }
+
+    // Callback function to sync single products on update.
+    function sync_products_callback($post_id, $post) {
+        // run only if settings allow for automatic update
+        if ($this->settings['extend_sync_on_update'] == '1'){
+            // Check if the post being updated is a woocommerce product.
+            if ($post->post_type === 'product' ) {
+               $this->extend_sync_one_product($post_id);
+            }
+        }
+    }
+
+    /*
+    * Run the product sync for one single item
+    */
+    public function extend_sync_one_product($id)
+    {
+        /*
+         *  build WP Query to retrieve the product id
+        */
+            $args = array(
+                'post_type' => 'product',
+                'p' => $id,         // Specific product ID
+                'post_status' => 'publish',   // Ensure the product is published
+                'posts_per_page' => 1,           // Limit to one result
+                'meta_query' => array(
+                    array(
+                        'key' => '_virtual',
+                        'value' => 'yes',
+                        'compare' => '!='
+                    )
+                ),
+            );
+
+            $product_query = new WP_Query($args);
+            if ($product_query->have_posts()) {
+                while ($product_query->have_posts()) {
+                    $product_query->the_post();
+                    $product_id     = get_the_ID();
+
+                    // build the batch data from the product
+                    $batch_data[]   = $this->process_product_data($product_id);
+                    $request_args   = $this->buildRequest($batch_data);
+                    $response       = wp_remote_request($this->settings['api_host'].'/stores/'.$this->settings['store_id'].'/products?batch=true', $request_args);
+
+                    if ($this->settings['enable_extend_debug'] == 1) {
+                        Extend_Protection_Logger::extend_log_debug('DEBUG response: '.print_r($response,true));
+                    }
+
+                    if (is_wp_error($response)) {
+                        $error_message = $response->get_error_message();
+                        Extend_Protection_Logger::extend_log_error("Product Sync : POST request failed: " . $error_message);
+                    } else {
+                        $response_code = wp_remote_retrieve_response_code($response);
+                        if ($response_code === 201 ){
+                            // success
+                            $data  = json_decode(wp_remote_retrieve_body($response));
+                            if (isset($data->added) && is_array($data->added)) {
+                                $batch_added_count = count($data->added);
+                                if ($batch_added_count>0){
+                                    Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID '.$product_id.' added');
+                                }
+                            }
+
+                            if (isset($data->updated) && is_array($data->updated)) {
+                                $batch_updated_count = count($data->updated);
+                                if ($batch_updated_count > 0){
+                                    Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID '.$product_id.' updated');
+                                }
+                            }
+
+                            if (isset($data->errors) && is_array($data->errors)) {
+                                $batch_errors_count = count($data->errors);
+                                if ($batch_errors_count>0){
+                                    Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID' .$product_id.' returned an error');
+                                }
+                            }
+                        } //end response 201
+                    // restore the global post data after using WP_Query.
+                    wp_reset_postdata();
+                    }//end if is_wp_error
+                }//end while
+                $this->log_syncs($response, $batch_data, '1');
+            }else{
+                Extend_Protection_Logger::extend_log_error('No recently updated products found to sync.');
+            }
+    }
+
+    /*
+     * shared function
+    */
+    private function buildRequest($batch_data)
+    {
+        return array(
+            'method' => 'POST',
+            'headers' => array(
+                'Content-Type' => 'application/json',
+                'Accept' => 'application/json; version=latest',
+                'X-Extend-Access-Token' => $this->settings['api_key'],
+            ),
+            'body' => json_encode($batch_data),
+        );
     }
 }
