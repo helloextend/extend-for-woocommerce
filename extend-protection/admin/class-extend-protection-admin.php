@@ -977,7 +977,7 @@ class Extend_Protection_Admin
     {
         $extend_sync_batch_dropdown_values = array('20', '50', '100', '200', '300', '400', '500');
         ?>
-        <select name="extend_protection_for_woocommerce_settings_catalog_sync_options[extend_sync_batch]" id="extend_sync_batch">
+        <select name="extend_protection_for_woocommerce_catalog_sync_settings[extend_sync_batch]" id="extend_sync_batch">
             <?php
             //set default value if option is not set yet
             if (!isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'])){
