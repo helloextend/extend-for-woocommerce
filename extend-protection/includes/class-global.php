@@ -145,7 +145,7 @@ class Extend_Protection_Global
                                                     ? $extend_protection_general_settings['extend_environment'] : 'sandbox';
 
         $settings['enable_extend_debug']            = array_key_exists('enable_extend_debug', $extend_protection_general_settings)
-                                                    ? $extend_protection_general_settings['enable_extend_debug'] : '0';
+                                                    ? $extend_protection_general_settings['enable_extend_debug'] : 0;
 
         /* shipping protection */
         if ($extend_protection_shipping_protection_settings){
