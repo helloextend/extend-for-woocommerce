@@ -141,6 +141,13 @@ class Extend_Protection_Global
             $settings['extend_pdp_offer_location']  = 'woocommerce_before_add_to_cart_button';
         }
 
+        /* Contract Creation Settings */
+        $settings['extend_product_protection_contract_create'] = array_key_exists('extend_product_protection_contract_create', $extend_protection_product_protection_settings)
+            ? $extend_protection_product_protection_settings['extend_product_protection_contract_create'] : 0;
+
+        $settings['extend_product_protection_contract_create_event'] = array_key_exists('extend_product_protection_contract_create_event', $extend_protection_product_protection_settings)
+            ? $extend_protection_product_protection_settings['extend_product_protection_contract_create_event'] : 'Fulfillment';
+
         $settings['extend_environment']             = array_key_exists('extend_environment', $extend_protection_general_settings)
                                                     ? $extend_protection_general_settings['extend_environment'] : 'sandbox';
 
