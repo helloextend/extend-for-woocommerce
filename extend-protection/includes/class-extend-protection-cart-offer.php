@@ -170,11 +170,13 @@ class Extend_Protection_Cart_Offer {
     public function after_cart_item_name($cart_item, $key)
     {
         // if it's not a warranty, add offer element
-        if(!isset($cart_item['extendData'])){
-            $item_id  = $cart_item['variation_id']?$cart_item['variation_id']:$cart_item['product_id'];
-            $item_sku = $cart_item['data']->sku ? $cart_item['data']->sku : '';
+        if(!isset($cart_item['extendData'])) {
+            $item_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
+            $item_sku = $cart_item['data']->sku ? $cart_item['data']->sku : $item_id;
 
-            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$item_id' data-covered-sku='$item_sku'></div>";
+            $referenceId = $this->settings['extend_use_skus'] ? $item_sku : $item_id;
+
+            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$referenceId'></div>";
         }
     }
 
