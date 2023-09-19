@@ -689,12 +689,36 @@ class Extend_Protection_Admin
 
     public function extend_use_skus_callback()
     {
+        // Query to count total products
+        $total_product_count    = wp_count_posts('product');
+        $total_products         = $total_product_count->publish;
+
+        // Get the total count of products with a SKU.
+        $args = array(
+            'post_type'         => 'product',
+            'post_status'       => 'publish',
+            'posts_per_page'    => -1, // Retrieve all products
+            'meta_query'        => array(
+                array(
+                    'key'       => '_sku', // SKU custom field
+                    'compare'   => 'EXISTS', // Check if SKU exists
+                ),
+            ),
+        );
+
+        $products_with_sku          = new WP_Query($args);
+        $total_products_with_sku    = $products_with_sku->post_count;
+        $percentage_with_sku        = round(($total_products_with_sku / $total_products) * 100);
+
+        $note = "<em>Note: $percentage_with_sku% of your $total_products products have SKUs. </em>";
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_catalog_sync_settings[extend_use_skus]" 
-                           id="extend_use_skus" value="1" %s> <label for="extend_use_skus">All my products have SKUs (if not, we\'ll use IDs instead)</label>',
+                           id="extend_use_skus" value="1" %s> <label for="extend_use_skus">If SKUs are not present, we\'ll use IDs instead. (%s)</label>',
             (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_use_skus'])
-                && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_use_skus'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_use_skus'] === '1') ? 'checked' : '',
+            $note
         );
+
     }
 
     public function extend_enable_cart_offers_callback()
