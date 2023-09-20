@@ -409,7 +409,7 @@ class Extend_Protection_Sync {
 
     public function get_sku_or_id($product)
     {
-        if ($this->settings['extend_use_skus'] == 0){
+        if ($this->settings['extend_use_skus'] == 1){
             //return sku if present otherwise return product ID
             $ref_id = $product->get_sku() ?? $product->get_ID();
         }else{
