@@ -85,8 +85,6 @@ class Extend_Protection_Admin
 
         //add_action('admin_enqueue_scripts', 'extend_admin_enqueue_scripts');
 
-
-
         /* retrieve environment variables */
         $this->env          = $this->extend_protection_for_woocommerce_settings_general_options['extend_environment'] ?? 'sandbox';
         $this->sdk_url      = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
@@ -104,6 +102,8 @@ class Extend_Protection_Admin
         if($this->store_id){
             $this->api_host .= '/stores/' . $this->store_id ;
         }
+
+
     }
 
     /**
@@ -483,7 +483,7 @@ class Extend_Protection_Admin
 
         add_settings_field(
             'extend_automated_product_sync', // id
-            'Automated Product Sync', // title
+            'Sync Product on Schedule', // title
             array($this, 'extend_automated_product_sync_callback'), // callback
             'extend-protection-for-woocommerce-settings-admin-catalog-sync', // page
             'extend_setting_catalog_sync_section' // section
@@ -545,7 +545,7 @@ class Extend_Protection_Admin
         if (get_option('extend_protection_for_woocommerce_catalog_sync_settings') == null ){
             $settingsSync = [
                     'extend_last_product_sync'      => '',
-                    'extend_automated_product_sync' => '0',
+                    'extend_automated_product_sync' => 'never',
                     'extend_use_skus'               => '0',
                     'extend_use_special_prices'     => '0',
                     'extend_sync_batch'             => '100',
@@ -554,6 +554,50 @@ class Extend_Protection_Admin
             update_option('extend_protection_for_woocommerce_catalog_sync_settings', $settingsSync);
         }
 
+        //handle the scheduled jobs if the extend_product_sync settigns are being saved
+        if (isset($_REQUEST['page']) && isset($_REQUEST['tab']) && isset($_REQUEST['settings-updated'])){
+            if ($_REQUEST['page'] == 'extend' && $_REQUEST['tab'] == 'catalog_sync' && $_REQUEST['settings-updated'] == 'true'){
+
+                // check if extend_automated_product_sync = never : on save if schedule is set to never, reset the cron
+                $extend_automated_product_sync  = $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'];
+
+                switch ($extend_automated_product_sync){
+                     case 'never':
+                         // Remove scheduled events.
+                         wp_clear_scheduled_hook('sync_products_hourly');
+                         wp_clear_scheduled_hook('sync_products_daily');
+                         wp_clear_scheduled_hook('sync_products_weekly');
+                         break;
+
+                     case 'daily':
+                         wp_clear_scheduled_hook('sync_products_hourly');
+                         wp_clear_scheduled_hook('sync_products_weekly');
+                         if (!wp_next_scheduled('sync_products_daily')) {
+                             wp_schedule_event(time(), 'daily', 'sync_products_daily');
+                         }
+                         break;
+
+                     case 'hourly':
+                         wp_clear_scheduled_hook('sync_products_daily');
+                         wp_clear_scheduled_hook('sync_products_weekly');
+                         if (!wp_next_scheduled('sync_products_hourly')) {
+                             wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
+                         }
+                         break;
+
+                     case 'weekly':
+                         wp_clear_scheduled_hook('sync_products_hourly');
+                         wp_clear_scheduled_hook('sync_products_daily');
+                         if (!wp_next_scheduled('sync_products_weekly')) {
+                             wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
+                         }
+                         break;
+
+                     default:
+                         return;
+                 }
+            }
+        }
      }
 
          /* sanitize all the fields before saving */
@@ -763,12 +807,24 @@ class Extend_Protection_Admin
 
     public function extend_automated_product_sync_callback()
     {
-        printf(
-            '<input type="checkbox" name="extend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" 
-                           id="extend_automated_product_sync" value="1" %s> <label for="extend_automated_product_sync">Automatically sync your catalog with Extend (for warranty mapping)</label>',
-            (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
-                    && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === '1') ? 'checked' : ''
-        );
+        $extend_automated_sync_dropdown_values = array('never', 'hourly', 'daily', 'weekly');
+        ?>
+        <select name="extend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" id="extend_automated_product_sync">
+            <?php
+                //set default value if option is not set yet
+                if (!isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])){
+                    $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync']='never';
+                }
+
+                //build dropdown from array of possible batches
+                foreach($extend_automated_sync_dropdown_values as $auto_sync){
+                    $selected = (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
+                                 && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === $auto_sync ) ? 'selected' : '';
+                    echo '<option value="' . $auto_sync . '" ' . $selected . '>' . ucfirst($auto_sync) . '</option>';
+                }
+            ?>
+        </select>
+        <?php
     }
 
     public function extend_pdp_offer_location_callback()
