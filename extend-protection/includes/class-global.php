@@ -134,6 +134,9 @@ class Extend_Protection_Global
         $settings['extend_pdp_offer_location_other'] = array_key_exists('extend_pdp_offer_location_other', $extend_protection_product_protection_settings)
                                                      ? $extend_protection_product_protection_settings['extend_pdp_offer_location_other'] : '';
 
+        $settings['extend_atc_button_selector'] = array_key_exists('extend_atc_button_selector', $extend_protection_product_protection_settings)
+                                                    ? $extend_protection_product_protection_settings['extend_atc_button_selector'] : 'button.single_add_to_cart_button';
+
         //update pdp offer location if "other" is selected otherwise default
         if ($settings['extend_pdp_offer_location']  ==  'other' && $settings['extend_pdp_offer_location_other'] !== '' ){
             $settings['extend_pdp_offer_location']  = $settings['extend_pdp_offer_location_other'];

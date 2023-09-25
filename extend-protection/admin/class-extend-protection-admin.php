@@ -356,6 +356,14 @@ class Extend_Protection_Admin
              'extend_protection_for_woocommerce_settings_setting_section' // section
          );
 
+        add_settings_field(
+            'extend_atc_button_selector', // id
+            'Add to Cart Button Selector', // title
+            array($this, 'extend_atc_button_selector_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
+
          add_settings_field(
              'extend_enable_modal_offers', // id
              'Enable Modal Offers', // title
@@ -528,7 +536,8 @@ class Extend_Protection_Admin
                 'extend_enable_cart_balancing'      => '1',
                 'extend_enable_pdp_offers'          => '1',
                 'extend_use_skus'                   => '1',
-                'extend_pdp_offer_location'         => 'woocommerce_before_add_to_cart_button'
+                'extend_pdp_offer_location'         => 'woocommerce_before_add_to_cart_button',
+                'extend_atc_button_selector'        => 'button.single_add_to_cart_button',
             ];
             update_option('extend_protection_for_woocommerce_product_protection_settings', $settingsPP);
         }
@@ -599,6 +608,10 @@ class Extend_Protection_Admin
 
         if (isset($input['extend_pdp_offer_location_other'])) {
             $sanitary_values['extend_pdp_offer_location_other']                 = $input['extend_pdp_offer_location_other'];
+        }
+
+        if (isset($input['extend_atc_button_selector'])) {
+            $sanitary_values['extend_atc_button_selector']                      = sanitize_text_field($input['extend_atc_button_selector']);
         }
 
         if (isset($input['extend_sp_offer_location'])) {
@@ -769,6 +782,20 @@ class Extend_Protection_Admin
             (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
                     && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === '1') ? 'checked' : ''
         );
+    }
+
+    public function extend_atc_button_selector_callback()
+    {
+        $product_protection_settings                      = get_option('extend_protection_for_woocommerce_product_protection_settings');
+        $extend_atc_button_selector    = $product_protection_settings['extend_atc_button_selector'] ?? 'button.single_add_to_cart_button';
+        printf(
+            '<input class="regular-text" type="text" name="extend_protection_for_woocommerce_product_protection_settings[extend_atc_button_selector]" 
+                           id="extend_atc_button_selector" value="' . $extend_atc_button_selector . '">',
+            isset($this->extend_protection_for_woocommerce_product_protection_settings['extend_atc_button_selector'])
+                ? esc_attr($this->extend_protection_for_woocommerce_product_protection_settings['extend_atc_button_selector']) : ''
+        );
+        echo  '<label for="extend_atc_button_selector"> Default: <code>button.single_add_to_cart_button</code></label for="extend_atc_button_selector">';
+
     }
 
     public function extend_pdp_offer_location_callback()
