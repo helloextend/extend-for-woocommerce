@@ -78,7 +78,7 @@ class Extend_Protection_Shipping {
                 $items[] = array(
                     'referenceId'   => $referenceId,
                     'quantity'      => $cart_item['quantity'],
-                    'purchasePrice' => ($product->get_price() * $cart_item['quantity'])*100,
+                    'purchasePrice' => ($product->get_price())*100,
                     'productName'   => $product->get_name(),
                 );
             }
