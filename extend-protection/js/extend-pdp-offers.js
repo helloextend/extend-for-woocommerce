@@ -92,13 +92,28 @@
             }
 
             if (supportedProductType) {
-                jQuery(atc_button_selector).on('click', function extendHandler(e) {
+
+                // Clone ATC Button
+                const atc_button_clone = document.createElement('button')
+                atc_button_clone.textContent = document.querySelector(atc_button_selector).textContent;
+
+                // copy styles from original button to clone
+                const atc_button_styles = window.getComputedStyle(document.querySelector(atc_button_selector));
+                for (let i = 0; i < atc_button_styles.length; i++) {
+                    const prop = atc_button_styles[i];
+                    atc_button_clone.style.setProperty(prop, atc_button_styles.getPropertyValue(prop), atc_button_styles.getPropertyPriority(prop));
+                }
+
+                // Append clone button and hide original
+                jQuery(atc_button_selector).after(atc_button_clone);
+                jQuery(atc_button_selector).hide();
+
+                // Add click handler to clone button
+                atc_button_clone.addEventListener('click', function extendHandler(e) {
                     e.preventDefault()
 
                     function triggerAddToCart() {
-                        jQuery(atc_button_selector).off('click', extendHandler);
                         jQuery(atc_button_selector).trigger('click');
-                        jQuery(atc_button_selector).on('click', extendHandler);
                     }
 
                     // /** get the component instance rendered previously */
