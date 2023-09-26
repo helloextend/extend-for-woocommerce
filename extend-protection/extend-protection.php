@@ -76,7 +76,7 @@ add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'add_shipping_protectio
 add_action('wp_ajax_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
 add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
 add_action('woocommerce_cart_calculate_fees', 'set_shipping_fee' );
-add_action('woocommerce_checkout_update_order_meta', 'save_shipping_protection_quote_id', 10, 2 );
+add_action('woocommerce_checkout_order_processed', 'save_shipping_protection_quote_id', 5, 2 );
 
 // Hook into WooCommerce order details display on admin screen
 add_action('woocommerce_after_order_itemmeta', 'add_extend_protection_contract', 10, 2 );
