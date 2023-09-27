@@ -189,7 +189,7 @@ class Extend_Protection_Cart_Offer {
         $extend_enable_cart_offers  = $this->settings['extend_enable_cart_offers'];
         $cart                       = WC()->cart;
 
-        if($enable_extend === '1') {
+        if($extend_enable_cart_offers === '1' && $enable_extend === '1') {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_cart_integration_script');
             $ajaxurl = admin_url( 'admin-ajax.php' );
