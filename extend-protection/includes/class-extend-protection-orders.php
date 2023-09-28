@@ -121,7 +121,7 @@ class Extend_Protection_Orders {
                         'title'         => $product->get_name(),
                         'category'      => 'Electronics',
                         'listPrice'     => $product->get_regular_price() * 100,
-                        'purchasePrice' => $product->get_price() * 100,
+                        'purchasePrice' => (int)floatval($product->get_price() * 100),
                         'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
                     ),
                     'quantity'          => $item->get_quantity(),

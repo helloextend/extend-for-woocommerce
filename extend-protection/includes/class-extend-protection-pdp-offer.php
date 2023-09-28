@@ -87,7 +87,7 @@ class Extend_Protection_PDP_Offer
         $sku                        = $product->get_sku();
         $categories                 = get_the_terms($id, 'product_cat');
         $first_category             = $categories[0]->name;
-        $price                      = $product->get_price() * 100;
+        $price                      = (int)floatval($product->get_price() * 100);
         $type                       = $product->get_type();
         $env                        = $this->settings['extend_environment'];
         $extend_pdp_offers_enabled  = $this->settings['extend_enable_pdp_offers'];
