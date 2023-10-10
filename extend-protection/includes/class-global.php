@@ -310,7 +310,7 @@ class Extend_Protection_Global
             $covered_id     = $cart_item['extendData']['covered_product_id'];
             $term           = $cart_item['extendData']['term'];
             $title          = $cart_item['extendData']['title'];
-            $covered        = wc_get_product($covered_id);
+            $covered        = self::extend_get_product($covered_id);
             $sku            = $cart_item['extendData']['planId'];
             $covered_title  = $covered->get_title();
 
@@ -335,7 +335,7 @@ class Extend_Protection_Global
         if(isset($cart_item['extendData'])){
             $covered_id     = $cart_item['extendData']['covered_product_id'];
             $term           = $cart_item['extendData']['term'];
-            $covered        = wc_get_product($covered_id);
+            $covered        = self::extend_get_product($covered_id);
             $sku            = $cart_item['extendData']['planId'];
             $covered_title  = $covered->get_title();
             $data[] = [
@@ -372,5 +372,17 @@ class Extend_Protection_Global
         else{
             Extend_Protection_Logger::extend_log_error('Store Id missing or Extend Product Protection is disabled');
         }
+    }
+
+    /*
+     *  retrieve product based on id, depending on if identifier is sku or id
+    */
+    public function extend_get_product($product_identifier){
+        if(is_int($product_identifier)){
+            $get_product = wc_get_product($product_identifier);
+        }else{
+            $get_product = wc_get_product(wc_get_product_id_by_sku($product_identifier));
+        }
+        return $get_product;
     }
 }
