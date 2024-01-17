@@ -331,7 +331,7 @@
 
         }
 
-        public function get_product_price($product): float|int
+        public function get_product_price($product)
         {
             if ($this->settings['extend_use_special_price'] == '0') {
                 $price = $product->get_price();

@@ -4,59 +4,82 @@
 
         if(!ExtendWooCommerce || !ExtendShippingIntegration) return;
 
-        // Deconstructs ExtendProductIntegration variables
-        const { env, items, enable_extend_sp, ajax_url, update_order_review_nonce } = ExtendShippingIntegration;
-        let items_array = eval(items);
+        function initShippingOffers() {
+            // Deconstructs ExtendProductIntegration variables
+            const { env, items, enable_extend_sp, ajax_url, update_order_review_nonce } = ExtendShippingIntegration;
+            let items_array = eval(items);
 
-        // If Extend shipping protection offers are not enabled, hide Extend offer div
-        if(enable_extend_sp === '0'){
-            const extendShippingOffer = document.querySelector('#extend-shipping-offer')
-            extendShippingOffer.style.display = 'none';
-        }
-
-        //const isShippingProtectionInCart = ExtendShippingIntegration.shippingProtectionInCart(items);
-        const isShippingProtectionInCart = false;
-
-        //If Extend shipping  protection is enabled, render offers
-        if (enable_extend_sp === '1') {
-            Extend.shippingProtection.render(
-                {
-                    selector: '#extend-shipping-offer',
-                    items: items_array,
-                   // isShippingProtectionInCart: false,
-                    onEnable: function (quote) {
-                        // Update totals and trigger WooCommerce cart calculations
-                        $.ajax({
-                            type: 'POST',
-                            url: ajax_url,
-                            data: {
-                                action: 'add_shipping_protection_fee',
-                                fee_amount: quote.premium,
-                                fee_label: 'Shipping Protection',
-                                shipping_quote_id: quote.id
-                            },
-                            success: function () {
-                                $('body').trigger('update_checkout');
-                            }
-                        });
-                    },
-                    onDisable: function (quote) {
-                        // Update totals and trigger WooCommerce cart calculations
-                        $.ajax({
-                            type: 'POST',
-                            url: ajax_url,
-                            data: {
-                                action: 'remove_shipping_protection_fee',
-                            },
-                            success: function () {
-                                $('body').trigger('update_checkout');
-                            }
-                        });
-
-                    }
+            // If Extend shipping protection offers are not enabled, hide Extend offer div
+            if(enable_extend_sp === '0'){
+                const extendShippingOffer = document.querySelector('.extend-sp-offer')
+                if (extendShippingOffer) {
+                    extendShippingOffer.style.display = 'none';
                 }
-            );
+
+            }
+            //const isShippingProtectionInCart = ExtendShippingIntegration.shippingProtectionInCart(items);
+            const isShippingProtectionInCart = false;
+
+            //If Extend shipping  protection is enabled, render offers
+            if (enable_extend_sp === '1') {
+                Extend.shippingProtection.render(
+                    {
+                        selector: '#extend-shipping-offer',
+                        items: items_array,
+                        // isShippingProtectionInCart: false,
+                        onEnable: function (quote) {
+                            // Update totals and trigger WooCommerce cart calculations
+                            $.ajax({
+                                type: 'POST',
+                                url: ajax_url,
+                                data: {
+                                    action: 'add_shipping_protection_fee',
+                                    fee_amount: quote.premium,
+                                    fee_label: 'Shipping Protection',
+                                    shipping_quote_id: quote.id
+                                },
+                                success: function () {
+                                    $('body').trigger('update_checkout');
+                                }
+                            });
+                        },
+                        onDisable: function (quote) {
+                            // Update totals and trigger WooCommerce cart calculations
+                            $.ajax({
+                                type: 'POST',
+                                url: ajax_url,
+                                data: {
+                                    action: 'remove_shipping_protection_fee',
+                                },
+                                success: function () {
+                                    $('body').trigger('update_checkout');
+                                }
+                            });
+                        },
+                        onUpdate: function (quote) {
+
+                            // Update totals and trigger WooCommerce cart calculations
+                            $.ajax({
+                                type: 'POST',
+                                url: ajax_url,
+                                data: {
+                                    action: 'add_shipping_protection_fee',
+                                    fee_amount: quote.premium,
+                                    fee_label: 'Shipping Protection',
+                                    shipping_quote_id: quote.id
+                                },
+                                success: function () {
+                                    $('body').trigger('update_checkout');
+                                }
+                            });
+                        }
+                    }
+                );
+            }
         }
+
+        initShippingOffers();
+
     });
 
     function formatPrice(price) {

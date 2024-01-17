@@ -122,16 +122,16 @@ function extend_render_settings_page()
 
 
     settings_errors(); ?>
-<!-- begin tabs -->
+    <!-- begin tabs -->
 
     <div class="wrap">
-    <h2>Extend Protection Settings</h2>
-    <h2 class="nav-tab-wrapper">
-        <a href="?page=extend&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
-        <a href="?page=extend&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
-        <a href="?page=extend&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
-        <a href="?page=extend&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
-    </h2>
+        <h2>Extend Protection Settings</h2>
+        <h2 class="nav-tab-wrapper">
+            <a href="?page=extend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
+            <a href="?page=extend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
+            <a href="?page=extend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+            <a href="?page=extend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) &&$_GET['tab'] === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
+        </h2>
         <div class="tab-content">
             <?php
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
@@ -176,7 +176,7 @@ function extend_render_documentation_page()
 
 
 
-echo '
+    echo '
     <div class="accordion">
     <div>
         <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
@@ -345,10 +345,10 @@ function remove_shipping_protection_fee()
 {
     if (  !defined( 'DOING_AJAX' ) || ! $_POST )  return;
 
-        WC()->session->set('shipping_fee_remove',   true);
-        WC()->session->set('shipping_fee',          false);
-        WC()->session->set('shipping_fee_value',    null);
-        WC()->session->set('shipping_quote_id',     null);
+    WC()->session->set('shipping_fee_remove',   true);
+    WC()->session->set('shipping_fee',          false);
+    WC()->session->set('shipping_fee_value',    null);
+    WC()->session->set('shipping_quote_id',     null);
 
     wp_die();
 }
@@ -417,15 +417,15 @@ function add_extend_protection_contract($item_id, $item) {
             $product        = $item->get_product();
 
             // Check if the product SKU matches product protection
-                if ($product->get_sku() === 'extend-product-protection') {
+            if ($product->get_sku() === 'extend-product-protection') {
                 echo '<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>';
 
-               foreach ($contracts as $product_covered => $contract_id){
-                   if ($extend_meta_data['covered_product_id'] == $product_covered){
+                foreach ($contracts as $product_covered => $contract_id){
+                    if ($extend_meta_data['covered_product_id'] == $product_covered){
                         echo '<tr><td><a href="'.$url.'?contractId='.$contract_id.'&accessToken='.$accessToken.'">'.$contract_id.'</a></td></tr>';
-                   }
-               }
-               echo '</tbody></table>';
+                    }
+                }
+                echo '</tbody></table>';
             }
         }
     }

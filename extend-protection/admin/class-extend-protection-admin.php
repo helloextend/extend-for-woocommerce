@@ -179,11 +179,11 @@ class Extend_Protection_Admin
         //the extend menu has an icon defined here:
         $extend_icon = 'data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMjA2IiBoZWlnaHQ9IjE2MyIgdmlld0JveD0iMCAwIDIwNiAxNjMiIGZpbGw9Im5vbmUiIHhtbG5zPSJodHRwOi8vd3d3LnczLm9yZy8yMDAwL3N2ZyI+CjxwYXRoIGQ9Ik0xMTAuNzg5IDMyLjczNkwxMzYuMTczIC0zLjgxNDdlLTA2SDE5Ny44ODhMMTQxLjc2IDY5LjEwOTJMMTEwLjc4OSAzMi43MzZaIiBmaWxsPSIjMDBDOUZGIi8+CjxwYXRoIGQ9Ik0xMTAuNzg5IDMyLjczNkwxMzYuMTczIC0zLjgxNDdlLTA2SDE5Ny44ODhMMTQxLjc2IDY5LjEwOTJMMTEwLjc4OSAzMi43MzZaIiBzdHJva2U9IndoaXRlIi8+CjxwYXRoIGQ9Ik0yMDUuMzQ1IDE2Mi42MTFIMTQxLjU2OEMxNDEuNTY4IDE2Mi42MTEgMTAzLjI0NyAxMTcuMDI5IDEwMS4xODggMTE0LjI5MkM5MS42ODY4IDEyNi45NTkgNjIuODI2NCAxNjIuNjExIDYyLjgyNjQgMTYyLjYxMUgwTDY5LjgzMzkgNzguMDUzMUwzLjIwNjQ0IDAuMDYyNDczM0g2Ni42MjY4TDIwNS4zNDUgMTYyLjYxMVoiIGZpbGw9IiMwMzMyQ0MiLz4KPHBhdGggZD0iTTIwNS4zNDUgMTYyLjYxMUgxNDEuNTY4QzE0MS41NjggMTYyLjYxMSAxMDMuMjQ3IDExNy4wMjkgMTAxLjE4OCAxMTQuMjkyQzkxLjY4NjggMTI2Ljk1OSA2Mi44MjY0IDE2Mi42MTEgNjIuODI2NCAxNjIuNjExSDBMNjkuODMzOSA3OC4wNTMxTDMuMjA2NDQgMC4wNjI0NzMzSDY2LjYyNjhMMjA1LjM0NSAxNjIuNjExWiIgc3Ryb2tlPSJ3aGl0ZSIvPgo8L3N2Zz4K';
 
-        add_menu_page('Extend Protection', 'Extend', 'manage_options', 'extend', null, $extend_icon, '55.5');
-        add_submenu_page('extend', 'Settings', 'Settings', 'manage_options', 'extend', 'extend_render_settings_page');
-        add_submenu_page('extend', 'Documentation', 'Documentation', 'manage_options', 'extend-docs', 'extend_render_documentation_page');
-        add_submenu_page('extend', 'About', 'About', 'manage_options', 'extend-about', 'extend_render_about_page');
-        add_submenu_page('extend', 'Error Log', 'Error Log', 'manage_options', 'custom-error-log', 'extend_logger_admin', '50');
+        add_menu_page('Extend Protection', 'Extend', 'manage_options', 'extend-protection-settings', null, $extend_icon, '55.5');
+        add_submenu_page('extend-protection-settings', 'Settings', 'Settings', 'manage_options', 'extend-protection-settings', 'extend_render_settings_page');
+        add_submenu_page('extend-protection-settings', 'Documentation', 'Documentation', 'manage_options', 'extend-docs', 'extend_render_documentation_page');
+        add_submenu_page('extend-protection-settings', 'About', 'About', 'manage_options', 'extend-about', 'extend_render_about_page');
+        add_submenu_page('extend-protection-settings', 'Error Log', 'Error Log', 'manage_options', 'custom-error-log', 'extend_logger_admin', '50');
 
     }
 
@@ -316,45 +316,45 @@ class Extend_Protection_Admin
 
         /* product protection */
 
-         add_settings_field(
-             'enable_extend', // id
-             'Enable Product Protection', // title
-             array($this, 'enable_extend_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'enable_extend', // id
+            'Enable Product Protection', // title
+            array($this, 'enable_extend_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
-         add_settings_field(
-             'extend_enable_cart_offers', // id
-             'Enable Cart Offers', // title
-             array($this, 'extend_enable_cart_offers_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'extend_enable_cart_offers', // id
+            'Enable Cart Offers', // title
+            array($this, 'extend_enable_cart_offers_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
-         add_settings_field(
-             'extend_enable_cart_balancing', // id
-             'Enable Cart Balancing	', // title
-             array($this, 'extend_enable_cart_balancing_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'extend_enable_cart_balancing', // id
+            'Enable Cart Balancing	', // title
+            array($this, 'extend_enable_cart_balancing_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
-         add_settings_field(
-             'extend_enable_pdp_offers', // id
-             'Enable PDP Offers	', // title
-             array($this, 'extend_enable_pdp_offers_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'extend_enable_pdp_offers', // id
+            'Enable PDP Offers	', // title
+            array($this, 'extend_enable_pdp_offers_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
-         add_settings_field(
-             'extend_pdp_offer_location', // id
-             'PDP Offer Location', // title
-             array($this, 'extend_pdp_offer_location_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'extend_pdp_offer_location', // id
+            'PDP Offer Location', // title
+            array($this, 'extend_pdp_offer_location_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
         add_settings_field(
             'extend_atc_button_selector', // id
@@ -364,71 +364,71 @@ class Extend_Protection_Admin
             'extend_protection_for_woocommerce_settings_setting_section' // section
         );
 
-         add_settings_field(
-             'extend_enable_modal_offers', // id
-             'Enable Modal Offers', // title
-             array($this, 'extend_enable_modal_offers_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_protection_for_woocommerce_settings_setting_section' // section
-         );
+        add_settings_field(
+            'extend_enable_modal_offers', // id
+            'Enable Modal Offers', // title
+            array($this, 'extend_enable_modal_offers_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_protection_for_woocommerce_settings_setting_section' // section
+        );
 
-         add_settings_field(
-             'extend_product_protection_contract_create', // id
-             'Create Contracts', // title
-             array($this, 'extend_product_protection_contract_create_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_setting_contract_section' // section
-         );
+        add_settings_field(
+            'extend_product_protection_contract_create', // id
+            'Create Contracts', // title
+            array($this, 'extend_product_protection_contract_create_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_setting_contract_section' // section
+        );
 
-         add_settings_field(
-             'extend_product_protection_contract_create_event', // id
-             'Contracts Event', // title
-             array($this, 'extend_product_protection_contract_create_event_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-product-protection', // page
-             'extend_setting_contract_section' // section
-         );
+        add_settings_field(
+            'extend_product_protection_contract_create_event', // id
+            'Contracts Event', // title
+            array($this, 'extend_product_protection_contract_create_event_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'extend_setting_contract_section' // section
+        );
 
         /* general settings */
 
-         add_settings_field(
-             'extend_environment', // id
-             'Environment', // title
-             array($this, 'extend_environment_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-general', // page
-             'extend_setting_environment_section' // section
-         );
+        add_settings_field(
+            'extend_environment', // id
+            'Environment', // title
+            array($this, 'extend_environment_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-general', // page
+            'extend_setting_environment_section' // section
+        );
 
-         add_settings_field(
-             'extend_sandbox_store_id', // id
-             'Extend Sandbox Store Id', // title
-             array($this, 'extend_sandbox_store_id_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-general', // page
-             'extend_setting_environment_section' // section
-         );
+        add_settings_field(
+            'extend_sandbox_store_id', // id
+            'Extend Sandbox Store Id', // title
+            array($this, 'extend_sandbox_store_id_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-general', // page
+            'extend_setting_environment_section' // section
+        );
 
-         add_settings_field(
-             'extend_sandbox_api_key', // id
-             'Extend Sandbox API Key', // title
-             array($this, 'extend_sandbox_api_key_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-general', // page
-             'extend_setting_environment_section' // section
-         );
+        add_settings_field(
+            'extend_sandbox_api_key', // id
+            'Extend Sandbox API Key', // title
+            array($this, 'extend_sandbox_api_key_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-general', // page
+            'extend_setting_environment_section' // section
+        );
 
-         add_settings_field(
-             'extend_live_store_id', // id
-             'Extend Live Store Id', // title
-             array($this, 'extend_live_store_id_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-general', // page
-             'extend_setting_environment_section' // section
-         );
+        add_settings_field(
+            'extend_live_store_id', // id
+            'Extend Live Store Id', // title
+            array($this, 'extend_live_store_id_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-general', // page
+            'extend_setting_environment_section' // section
+        );
 
-         add_settings_field(
-             'extend_live_api_key', // id
-             'Extend Live API Key', // title
-             array($this, 'extend_live_api_key_callback'), // callback
-             'extend-protection-for-woocommerce-settings-admin-general', // page
-             'extend_setting_environment_section' // section
-         );
+        add_settings_field(
+            'extend_live_api_key', // id
+            'Extend Live API Key', // title
+            array($this, 'extend_live_api_key_callback'), // callback
+            'extend-protection-for-woocommerce-settings-admin-general', // page
+            'extend_setting_environment_section' // section
+        );
 
         add_settings_field(
             'enable_extend_debug', // id
@@ -513,20 +513,20 @@ class Extend_Protection_Admin
             'extend_setting_catalog_sync_section' // section
         );
 
-         //once options have been registered, initialize values in the db:
+        //once options have been registered, initialize values in the db:
 
-         if (get_option('extend_protection_for_woocommerce_general_settings') == null ){
-             $settings = [
-                 'enable_extend_debug'              => '0',
-                 'extend_environment'               => 'sandbox',
-                 'extend_sandbox_store_id'          => '',
-                 'extend_live_store_id'             => '',
-                 'extend_sandbox_api_key'           => '',
-                 'extend_live_api_key'              => ''
+        if (get_option('extend_protection_for_woocommerce_general_settings') == null ){
+            $settings = [
+                'enable_extend_debug'              => '0',
+                'extend_environment'               => 'sandbox',
+                'extend_sandbox_store_id'          => '',
+                'extend_live_store_id'             => '',
+                'extend_sandbox_api_key'           => '',
+                'extend_live_api_key'              => ''
 
-             ];
-             update_option('extend_protection_for_woocommerce_general_settings', $settings);
-         }
+            ];
+            update_option('extend_protection_for_woocommerce_general_settings', $settings);
+        }
 
         if (get_option('extend_protection_for_woocommerce_product_protection_settings') == null ){
             $settingsPP = [
@@ -553,12 +553,12 @@ class Extend_Protection_Admin
 
         if (get_option('extend_protection_for_woocommerce_catalog_sync_settings') == null ){
             $settingsSync = [
-                    'extend_last_product_sync'      => '',
-                    'extend_automated_product_sync' => 'never',
-                    'extend_use_skus'               => '0',
-                    'extend_use_special_prices'     => '0',
-                    'extend_sync_batch'             => '100',
-                    'extend_sync_on_update'         => '1'
+                'extend_last_product_sync'      => '',
+                'extend_automated_product_sync' => 'never',
+                'extend_use_skus'               => '0',
+                'extend_use_special_prices'     => '0',
+                'extend_sync_batch'             => '100',
+                'extend_sync_on_update'         => '1'
             ];
             update_option('extend_protection_for_woocommerce_catalog_sync_settings', $settingsSync);
         }
@@ -571,45 +571,45 @@ class Extend_Protection_Admin
                 $extend_automated_product_sync  = $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'];
 
                 switch ($extend_automated_product_sync){
-                     case 'never':
-                         // Remove scheduled events.
-                         wp_clear_scheduled_hook('sync_products_hourly');
-                         wp_clear_scheduled_hook('sync_products_daily');
-                         wp_clear_scheduled_hook('sync_products_weekly');
-                         break;
+                    case 'never':
+                        // Remove scheduled events.
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        break;
 
-                     case 'daily':
-                         wp_clear_scheduled_hook('sync_products_hourly');
-                         wp_clear_scheduled_hook('sync_products_weekly');
-                         if (!wp_next_scheduled('sync_products_daily')) {
-                             wp_schedule_event(time(), 'daily', 'sync_products_daily');
-                         }
-                         break;
+                    case 'daily':
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        if (!wp_next_scheduled('sync_products_daily')) {
+                            wp_schedule_event(time(), 'daily', 'sync_products_daily');
+                        }
+                        break;
 
-                     case 'hourly':
-                         wp_clear_scheduled_hook('sync_products_daily');
-                         wp_clear_scheduled_hook('sync_products_weekly');
-                         if (!wp_next_scheduled('sync_products_hourly')) {
-                             wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
-                         }
-                         break;
+                    case 'hourly':
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        if (!wp_next_scheduled('sync_products_hourly')) {
+                            wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
+                        }
+                        break;
 
-                     case 'weekly':
-                         wp_clear_scheduled_hook('sync_products_hourly');
-                         wp_clear_scheduled_hook('sync_products_daily');
-                         if (!wp_next_scheduled('sync_products_weekly')) {
-                             wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
-                         }
-                         break;
+                    case 'weekly':
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        if (!wp_next_scheduled('sync_products_weekly')) {
+                            wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
+                        }
+                        break;
 
-                     default:
-                         return;
-                 }
+                    default:
+                        return;
+                }
             }
         }
-     }
+    }
 
-         /* sanitize all the fields before saving */
+    /* sanitize all the fields before saving */
 
     public function extend_protection_for_woocommerce_settings_sanitize($input)
     {
@@ -731,7 +731,7 @@ class Extend_Protection_Admin
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[enable_extend]" id="enable_extend" value="1" %s>',
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['enable_extend'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['enable_extend'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['enable_extend'] === '1') ? 'checked' : ''
         );
     }
 
@@ -740,7 +740,7 @@ class Extend_Protection_Admin
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_shipping_protection_settings[enable_extend_sp]" id="enable_extend_sp" value="1" %s>',
             (isset($this->extend_protection_for_woocommerce_settings_shipping_protection_options['enable_extend_sp'])
-                    && $this->extend_protection_for_woocommerce_settings_shipping_protection_options['enable_extend_sp'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_shipping_protection_options['enable_extend_sp'] === '1') ? 'checked' : ''
         );
     }
 
@@ -784,7 +784,7 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_enable_cart_offers]" 
                            id="extend_enable_cart_offers" value="1" %s> <label for="extend_enable_cart_offers">Display protection offers in the cart</label>',
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_offers'])
-                     && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_offers'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_offers'] === '1') ? 'checked' : ''
         );
     }
 
@@ -794,7 +794,7 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_enable_cart_balancing]" 
                            id="extend_enable_cart_balancing" value="1" %s> <label for="extend_enable_cart_balancing">Automatically adjust quantities</label>',
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_balancing'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_balancing'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_cart_balancing'] === '1') ? 'checked' : ''
         );
     }
 
@@ -804,7 +804,7 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_enable_pdp_offers]" 
                            id="extend_enable_pdp_offers" value="1" %s> <label for="extend_enable_pdp_offers">Display offers on product page</label>',
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_pdp_offers'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_pdp_offers'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_pdp_offers'] === '1') ? 'checked' : ''
         );
     }
 
@@ -814,7 +814,7 @@ class Extend_Protection_Admin
             '<input type="checkbox" name="extend_protection_for_woocommerce_product_protection_settings[extend_enable_modal_offers]" 
                            id="extend_enable_modal_offers" value="1" %s> <label for="extend_enable_modal_offers">Display offers in a modal (PDP and cart)</label>' ,
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_modal_offers'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_modal_offers'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_enable_modal_offers'] === '1') ? 'checked' : ''
         );
     }
 
@@ -824,17 +824,17 @@ class Extend_Protection_Admin
         ?>
         <select name="extend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" id="extend_automated_product_sync">
             <?php
-                //set default value if option is not set yet
-                if (!isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])){
-                    $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync']='never';
-                }
+            //set default value if option is not set yet
+            if (!isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])){
+                $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync']='never';
+            }
 
-                //build dropdown from array of possible batches
-                foreach($extend_automated_sync_dropdown_values as $auto_sync){
-                    $selected = (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
-                                 && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === $auto_sync ) ? 'selected' : '';
-                    echo '<option value="' . $auto_sync . '" ' . $selected . '>' . ucfirst($auto_sync) . '</option>';
-                }
+            //build dropdown from array of possible batches
+            foreach($extend_automated_sync_dropdown_values as $auto_sync){
+                $selected = (isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
+                    && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === $auto_sync ) ? 'selected' : '';
+                echo '<option value="' . $auto_sync . '" ' . $selected . '>' . ucfirst($auto_sync) . '</option>';
+            }
             ?>
         </select>
         <?php
@@ -873,7 +873,7 @@ class Extend_Protection_Admin
             //build dropdown from array of possible hooks
             foreach($extend_pdp_offer_dropdown_values as $extend_pdp_hooks){
                 $selected = (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'])
-                            && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'] === $extend_pdp_hooks ) ? 'selected' : '';
+                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'] === $extend_pdp_hooks ) ? 'selected' : '';
 
                 if ($extend_pdp_hooks == 'woocommerce_before_add_to_cart_button'){
                     echo '<option value="' . $extend_pdp_hooks . '" ' . $selected . '>' . $extend_pdp_hooks . ' (default)</option>';
@@ -969,7 +969,7 @@ class Extend_Protection_Admin
                            id="extend_product_protection_contract_create" value="1" %s> 
                     <label for="extend_product_protection_contract_create">Create Product Protection Contracts</label>' ,
             (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create'] === '1') ? 'checked' : ''
         );
     }
 
@@ -979,10 +979,10 @@ class Extend_Protection_Admin
         <select name="extend_protection_for_woocommerce_product_protection_settings[extend_product_protection_contract_create_event]"
                 id="extend_product_protection_contract_create_event">
             <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Order Create') ? 'selected' : ''; ?>
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Order Create') ? 'selected' : ''; ?>
             <option value="Order Create" <?php echo $selected; ?>>Order Create</option>
             <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
-                    && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Fulfillment') ? 'selected' : ''; ?>
+                && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Fulfillment') ? 'selected' : ''; ?>
             <option value="Fulfillment" <?php echo $selected; ?>>Fulfillment</option>
         </select>
         <?php
@@ -992,13 +992,13 @@ class Extend_Protection_Admin
     {
         ?>
         <select name="extend_protection_for_woocommerce_general_settings[extend_environment]" id="extend_environment">
-        <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
+            <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
                 && $this->extend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'sandbox') ? 'selected' : ''; ?>
-        <option value="sandbox" <?php echo $selected; ?>>Sandbox</option>
-        <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
+            <option value="sandbox" <?php echo $selected; ?>>Sandbox</option>
+            <?php   $selected = (isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
                 && $this->extend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'live') ? 'selected' : ''; ?>
-        <option value="live" <?php echo $selected; ?>>Live</option>
-    </select>
+            <option value="live" <?php echo $selected; ?>>Live</option>
+        </select>
         <?php
     }
 
@@ -1008,7 +1008,7 @@ class Extend_Protection_Admin
             '<input class="regular-text" type="text" name="extend_protection_for_woocommerce_general_settings[extend_sandbox_store_id]" 
                            id="extend_sandbox_store_id" value="%s">',
             isset($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_store_id'])
-                    ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_store_id']) : ''
+                ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_store_id']) : ''
         );
     }
 
@@ -1018,7 +1018,7 @@ class Extend_Protection_Admin
             '<textarea class="regular-text" rows="5" name="extend_protection_for_woocommerce_general_settings[extend_sandbox_api_key]" 
                               id="extend_sandbox_api_key" >%s</textarea>',
             isset($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_api_key'])
-                    ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_api_key']) : ''
+                ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_sandbox_api_key']) : ''
         );
     }
 
@@ -1028,7 +1028,7 @@ class Extend_Protection_Admin
             '<input class="regular-text" type="text" name="extend_protection_for_woocommerce_general_settings[extend_live_store_id]" 
                            id="extend_live_store_id" value="%s">',
             isset($this->extend_protection_for_woocommerce_settings_general_options['extend_live_store_id'])
-                    ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_live_store_id']) : ''
+                ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_live_store_id']) : ''
         );
     }
 
@@ -1038,7 +1038,7 @@ class Extend_Protection_Admin
             '<textarea class="regular-text" rows="5" name="extend_protection_for_woocommerce_general_settings[extend_live_api_key]" 
                               id="extend_live_api_key" >%s</textarea>',
             isset($this->extend_protection_for_woocommerce_settings_general_options['extend_live_api_key'])
-                    ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_live_api_key']) : ''
+                ? esc_attr($this->extend_protection_for_woocommerce_settings_general_options['extend_live_api_key']) : ''
         );
     }
 
@@ -1047,7 +1047,7 @@ class Extend_Protection_Admin
         printf(
             '<input type="checkbox" name="extend_protection_for_woocommerce_general_settings[enable_extend_debug]" id="enable_extend_debug" value="1" %s>',
             (isset($this->extend_protection_for_woocommerce_settings_general_options['enable_extend_debug'])
-                    && $this->extend_protection_for_woocommerce_settings_general_options['enable_extend_debug'] === '1') ? 'checked' : ''
+                && $this->extend_protection_for_woocommerce_settings_general_options['enable_extend_debug'] === '1') ? 'checked' : ''
         );
     }
 

@@ -21,6 +21,10 @@
  */
 
 class Extend_Protection_Shipping {
+
+    const EXTEND_SP_LABEL = 'Extend Shipping Protection';
+    const EXTEND_SP_PROTECTION_SKU = 'EXTEND_SP_SKU';
+
     /**
      * The ID of this plugin.
      *
@@ -56,6 +60,37 @@ class Extend_Protection_Shipping {
         //checkout offer element - default should be woocommerce_review_order_before_payment
         add_action($this->settings['extend_sp_offer_location'], [$this, 'shipping_protection_block'], 10, 2);
 
+        add_action('woocommerce_shipstation_export_order_xml', [$this, 'extend_sp_add_sku_to_shipstation'], 10, 1);
+
+    }
+
+    /**
+     * This method adds to xml export an SKU tag in order to identify
+     * Route Protection to ShipStation integration
+     *
+     * @param $order_xml
+     * @return mixed
+     */
+    public function extend_sp_add_sku_to_shipstation($order_xml){
+
+        if ($order_xml instanceof DOMElement){
+
+            $items = $order_xml->getElementsByTagName('Items');
+
+            foreach ($items as $itemNode) {
+                foreach ($itemNode->getElementsByTagName('Item') as $item) {
+                    foreach ($item->getElementsByTagName('Name') as $name) {
+                        if (trim($name->nodeValue) === self::EXTEND_SP_LABEL)
+                        {
+                            $this->xml_append($item, 'SKU', self::EXTEND_SP_PROTECTION_SKU);
+                        }
+                    }
+                }
+            }
+
+        }
+
+        return $order_xml;
     }
 
     // echos the offer element to the checkout page
@@ -93,11 +128,11 @@ class Extend_Protection_Shipping {
             wp_enqueue_script('extend_script');
             wp_enqueue_script('extend_shipping_integration_script');
             wp_localize_script('extend_shipping_integration_script', 'ExtendShippingIntegration',
-                    compact( 'env', 'items', 'enable_extend_sp', 'ajax_url', 'update_order_review_nonce'));
-            echo '<div id="extend-shipping-offer"></div>';
+                compact( 'env', 'items', 'enable_extend_sp', 'ajax_url', 'update_order_review_nonce'));
+            echo '<tr><td colspan="2"><div id="extend-shipping-offer"></div></td></tr>';
         }else
         {
-          //make sure to remove any SP session value
+            //make sure to remove any SP session value
             WC()->session->set('shipping_fee_remove',  true);
             WC()->session->set('shipping_fee',         false);
             WC()->session->set('shipping_fee_value',   null);
