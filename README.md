@@ -1,5 +1,5 @@
 # extend-for-woocommerce
-Internal development of Extend Warranty for Woocommerce
+Product and Shipping Protection plugin for WooCommerce. Generate additional revenue for your e-commerce store by allowing your customers to protect the products they love!
 
 ## How to install
 - pull the code in your wp-content/plugins directory so you end up with wp-conten/plugins/extend-protection
