@@ -138,6 +138,8 @@
                         if(extend_modal_offers_enabled === '1') {
                             Extend.modal.open({
                                 referenceId: reference_id,
+                                price: price,
+                                category: first_category,
                                 onClose: function(plan, product) {
                                     if (plan && product) {
                                         var planCopy = { ...plan, covered_product_id: reference_id }
