@@ -113,6 +113,7 @@ class Extend_Protection_Shipping {
                 $items[] = array(
                     'referenceId'   => $referenceId,
                     'quantity'      => $cart_item['quantity'],
+                    'category'      => get_the_terms($product->get_id(), 'product_cat')[0]->name,
                     'purchasePrice' => (int)floatval($product->get_price() * 100),
                     'productName'   => $product->get_name(),
                 );
