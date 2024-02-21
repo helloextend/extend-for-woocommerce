@@ -87,7 +87,7 @@ class Extend_Protection_Orders {
             if ($extend_meta_data['planId']) {
                 $extend_plans[] = array(
                     'id' => $extend_meta_data['planId'],
-                    'purchasePrice' => $extend_meta_data['price'] * 100,
+                    'purchasePrice' => $extend_meta_data['price'],
                     'covered_product_id' => $extend_meta_data['covered_product_id'],
                 );
             }
