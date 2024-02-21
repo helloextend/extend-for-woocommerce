@@ -173,10 +173,11 @@ class Extend_Protection_Cart_Offer {
         if(!isset($cart_item['extendData'])) {
             $item_id = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
             $item_sku = $cart_item['data']->sku ? $cart_item['data']->sku : $item_id;
-
             $referenceId = $this->settings['extend_use_skus'] ? $item_sku : $item_id;
+            $categories = get_the_terms($item_id, 'product_cat');
+            $category = $categories[0]->name;
 
-            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$referenceId'></div>";
+            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$referenceId' data-category='$category'></div>";
         }
     }
 
