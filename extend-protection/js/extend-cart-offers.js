@@ -81,12 +81,10 @@ jQuery(document.body).on('updated_cart_totals', function () {
     // Iterate over each element with class 'cart-extend-offer'
     jQuery('.cart-extend-offer').each(function (ix, val) {
         let ref_id = jQuery(val).data('covered'); // Get the 'covered' data attribute value
+        let category = val.dataset.category; // Get the 'category' data attribute value
         let qty = jQuery(val).parents('.cart_item').find('input.qty').val(); // Get the quantity value from the corresponding input field
         let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,\.]/g, '')
-        let extendPrice = parseFloat(price) * 100
-
-
-
+        let extendPrice = parseFloat(price)
 
         // Check if an Extend button instance exists for the current element
         if (Extend.buttons.instance('#' + val.id)) {
@@ -107,6 +105,8 @@ jQuery(document.body).on('updated_cart_totals', function () {
                 // Render a simple offer using Extend.buttons.renderSimpleOffer()
                 Extend.buttons.renderSimpleOffer(val, {
                     referenceId: ref_id,
+                    price: extendPrice,
+                    category: category,
                     onAddToCart: function ({ plan, product }) {
 
                         if (plan && product) {
