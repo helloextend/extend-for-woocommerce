@@ -13,15 +13,15 @@
  * @package           Extend_Protection
  *
  * @wordpress-plugin
- * Plugin Name:       Extend Protection for Woocommerce
- * Plugin URI:        https://docs.extend.com/docs
- * Description:       Product Protection Done Right.
+ * Plugin Name:       Extend Protection For WooCommerce
+ * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
+ * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
  * Version:           1.0.0
- * Author:            Extend
+ * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       extend-protection
+ * Text Domain:       extend-protection-for-woocommerce
  * Domain Path:       /languages
  */
 
