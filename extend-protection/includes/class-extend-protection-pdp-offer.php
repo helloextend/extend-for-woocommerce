@@ -101,7 +101,7 @@ class Extend_Protection_PDP_Offer
             wp_enqueue_script('extend_product_integration_script');
             wp_localize_script('extend_product_integration_script', 'ExtendProductIntegration',
                 compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled', 'extend_use_skus', 'atc_button_selector'));
-            echo "<div class='extend-offer' data-extend='pdpOfferContainer'></div>";
+            echo "<div class='extend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }
     }
 }
