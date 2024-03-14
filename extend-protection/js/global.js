@@ -1,84 +1,101 @@
-(function( $ ) {
+(function ( $ ) {
     'use strict';
-    $(document).ready(function($) {
-        if(!ExtendWooCommerce) return;
-
-        const { store_id: storeId, ajaxurl, environment  } = ExtendWooCommerce;
-
-        Extend.config({
-            storeId,
-            environment
-        });
-
-        window.ExtendWooCommerce = {
-            ...ExtendWooCommerce,
-            addPlanToCart,
-            getCart,
-            warrantyAlreadyInCart,
-            extendAjaxLog
-        }
-
-        async function addPlanToCart (opts) {
-            return await jQuery.post(ajaxurl, {
-                action: "add_to_cart_extend",
-                quantity: opts.quantity,
-                extendData: opts.plan
-            }).promise()
-        }
-
-        async function getCart() {
-            return JSON.parse(
-                await jQuery.post(ajaxurl, {
-                    action: "get_cart_extend"
-                }).promise()
-            );
-        }
-
-        function warrantyAlreadyInCart (variantId, cart) {
-            let cartContents = cart['cart_contents'];
-            if (!cartContents) {
-                cartContents = cart;
+    $(document).ready(
+        function ($) {
+            if(!ExtendWooCommerce) { return;
             }
-            const cartItems = Object.values(cartContents);
-            const extendWarranties = cartItems.filter(function (lineItem) {
-                //filter through the customAttributes and grab the referenceId
-                let extendData = lineItem.extendData;
-                if (extendData && extendData['covered_product_id']) {
-                    let referenceId = extendData['covered_product_id'];
-                    return (
-                        extendData &&
-                        !extendData.leadToken &&
-                        referenceId &&
-                        referenceId.toString() === variantId.toString()
-                    );
+
+            const { store_id: storeId, ajaxurl, environment  } = ExtendWooCommerce;
+
+            Extend.config(
+                {
+                    storeId,
+                    environment
                 }
-            });
-            return extendWarranties.length > 0;
-        }
+            );
 
-        function extendAjaxLog(message , method){
+            window.ExtendWooCommerce = {
+                ...ExtendWooCommerce,
+                addPlanToCart,
+                getCart,
+                warrantyAlreadyInCart,
+                extendAjaxLog
+            }
 
-            /* Now use an ajax call to write logs from js files... */
-            $.ajax({
-                type: 'POST',
-                url: ajaxurl,
+            async function addPlanToCart(opts)
+            {
+                return await jQuery.post(
+                    ajaxurl, {
+                        action: "add_to_cart_extend",
+                        quantity: opts.quantity,
+                        extendData: opts.plan
+                    }
+                ).promise()
+            }
 
-                data: {
-                    action: 'extend_logger_ajax_call',
-                    message: message,
-                    method: method,
-                },
-                success: function (xhr, x, checkStatus) {
-                    return null;
-                },
-                error: function(e) {
-                    console.error("extendAjaxLog error: ", e.statusText)
+            async function getCart()
+            {
+                return JSON.parse(
+                    await jQuery.post(
+                        ajaxurl, {
+                            action: "get_cart_extend"
+                        }
+                    ).promise()
+                );
+            }
+
+            function warrantyAlreadyInCart(variantId, cart)
+            {
+                let cartContents = cart['cart_contents'];
+                if (!cartContents) {
+                    cartContents = cart;
                 }
-            });
-        }
+                const cartItems = Object.values(cartContents);
+                const extendWarranties = cartItems.filter(
+                    function (lineItem) {
+                        //filter through the customAttributes and grab the referenceId
+                        let extendData = lineItem.extendData;
+                        if (extendData && extendData['covered_product_id']) {
+                            let referenceId = extendData['covered_product_id'];
+                            return (
+                            extendData &&
+                            !extendData.leadToken &&
+                            referenceId &&
+                            referenceId.toString() === variantId.toString()
+                            );
+                        }
+                    }
+                );
+                return extendWarranties.length > 0;
+            }
 
-    })
-})( jQuery );
+            function extendAjaxLog(message , method)
+            {
+
+                /* Now use an ajax call to write logs from js files... */
+                $.ajax(
+                    {
+                        type: 'POST',
+                        url: ajaxurl,
+
+                        data: {
+                            action: 'extend_logger_ajax_call',
+                            message: message,
+                            method: method,
+                        },
+                        success: function (xhr, x, checkStatus) {
+                            return null;
+                        },
+                        error: function (e) {
+                            console.error("extendAjaxLog error: ", e.statusText)
+                        }
+                    }
+                );
+            }
+
+        }
+    )
+})(jQuery);
 
 
 

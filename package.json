@@ -1,0 +1,71 @@
+{
+  "name": "extend-for-woocommerce",
+  "version": "1.0.0",
+  "description": "Product and Shipping Protection plugin for WooCommerce. Generate additional revenue for your e-commerce store by allowing your customers to protect the products they love!",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint:php": "vendor/bin/phpcs extend-protection/*",
+    "lint:php:fix": "vendor/bin/phpcbf extend-protection/*",
+    "lint": "eslint extend-protection/*",
+    "lint:fix": "eslint --fix extend-protection/*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/helloextend/extend-for-woocommerce.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/helloextend/extend-for-woocommerce/issues"
+  },
+  "homepage": "https://github.com/helloextend/extend-for-woocommerce#readme",
+  "devDependencies": {
+    "@babel/core": "^7.17.8",
+    "@babel/preset-env": "^7.16.11",
+    "@babel/preset-react": "^7.16.7",
+    "@svgr/cli": "^6.2.1",
+    "@wordpress/base-styles": "^4.3.0",
+    "@wordpress/block-editor": "^8.4.0",
+    "@wordpress/blocks": "^11.4.0",
+    "@wordpress/components": "^19.7.0",
+    "@wordpress/compose": "^5.3.0",
+    "@wordpress/data": "^6.5.0",
+    "@wordpress/dependency-extraction-webpack-plugin": "^3.4.1",
+    "@wordpress/element": "^4.3.0",
+    "@wordpress/eslint-plugin": "^11.1.0",
+    "@wordpress/hooks": "^3.5.0",
+    "@wordpress/i18n": "^4.5.0",
+    "@wordpress/icons": "^8.1.0",
+    "@wordpress/server-side-render": "^3.3.0",
+    "babel-loader": "^8.2.4",
+    "clean-webpack-plugin": "^4.0.0",
+    "copy-webpack-plugin": "^10.2.4",
+    "cross-env": "^7.0.3",
+    "css-loader": "^6.7.1",
+    "cssnano": "^5.1.7",
+    "cypress": "^10.7.0",
+    "eslint": "^8.57.0",
+    "eslint-config-wordpress": "^2.0.0",
+    "eslint-loader": "^4.0.2",
+    "eslint-plugin-jsdoc": "^38.1.6",
+    "file-loader": "^6.2.0",
+    "lodash": "^4.17.21",
+    "mini-css-extract-plugin": "^2.6.0",
+    "node-sass": "^7.0.1",
+    "optimize-css-assets-webpack-plugin": "^6.0.1",
+    "sass-loader": "^12.6.0",
+    "sass-mq": "^6.0.0",
+    "style-loader": "^3.3.1",
+    "stylelint": "^14.6.1",
+    "stylelint-config-wordpress": "^17.0.0",
+    "stylelint-webpack-plugin": "^3.2.0",
+    "uglifyjs-webpack-plugin": "^2.2.0",
+    "webpack": "^5.71.0",
+    "webpack-cli": "^4.9.2"
+  },
+  "dependencies": {
+    "prettier": "^3.2.5"
+  }
+}

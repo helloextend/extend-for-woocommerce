@@ -9,3 +9,9 @@
 #local dev resources to ignore:
 /.idea/
 /.DS_Store
+
+# Composer files
+/vendor/
+
+# Node Modules
+/node_modules/
