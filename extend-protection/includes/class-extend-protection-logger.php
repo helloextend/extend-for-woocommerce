@@ -212,9 +212,6 @@ class Extend_Protection_Logger
 
         /*
         Empty fields stored in the wp_options table... */
-        // $error_log = get_option('custom_error_log', true);
-        // $notice_log = get_option('custom_notice_log', true);
-        // $debug_log = get_option('custom_debug_log', true);
 
         $error_log_empty  = array();
         $notice_log_empty = array();

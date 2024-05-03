@@ -35,22 +35,4 @@ $output .= __('Use dynamic content to log an error', 'custom-error-log') . ':';
 $output .= '<pre>$message = \'' . __('There was an error with', 'custom-error-log') . ' \' . $foo . \' ' . __('in my theme\'', 'custom-error-log') . ';
 Extend_Protection_Logger::extend_log_error( $message );</pre>';
 
-/*
-Make it theme ready...
-*/
-/*
-$output .= '<hr style="margin-top:30px;"><h3 style="margin-top:30px;">' . __( 'Make it theme ready', 'custom-error-log' ) . '</h3>';
-
-$output .= __( 'If you want to include the basic functions of custom error log in themes that will be used by other people make sure to check if the function exists first to avoid errors', 'custom-error-log' ) . ':';
-
-$output .= '<pre>
-<span class="pre-comment">//If custom error log is active...</span>
-if( function_exists( \'extend_log_error\' ) {
-
-    <span class="pre-comment">//Log the error...</span>
-    Extend_Protection_Logger::extend_log_error( \'' . __( 'There was an error with my theme', 'custom-error-log' ) . '\' );
-
-}
-</pre>';
-*/
 echo $output;
