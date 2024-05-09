@@ -116,6 +116,12 @@ class Extend_Protection_Orders
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to extend_line_items array
             // TODO: id = reference id = sku ?
+            
+            // Looks like we are hardcoded electronics here as the category. We need to get the category from
+            // the product. Looked into this some and we'll have to implement some sort of Logic as categories
+            // can be returned as array.
+            // ref: https://stackoverflow.com/questions/21009516/get-woocommerce-product-categories-from-wordpress
+            // TODO: Pass in Categories for PP 
             if ($product_id != extend_product_protection_id() ) {
                 $extend_line_items[] = array(
                 'lineItemTransactionId' => $product->get_id(),

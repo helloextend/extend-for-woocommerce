@@ -18,7 +18,7 @@
  * @since      1.0.0
  * @package    Extend_Protection
  * @subpackage Extend_Protection/includes
- * @author     Your Name <email@example.com>
+ * @author     partner-engineering@extend.com
  */
 class Extend_Protection_Deactivator
 {
