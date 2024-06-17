@@ -57,6 +57,17 @@ Extend helps merchants generate revenue and protect customers from damage and lo
 
 You need to have WooCommerce 7.0 or greater installed and activated. You also need to have an Extend account and API key. For more information, visit the [Extend Documentation](https://docs.extend.com/docs/welcome-to-extend) page.
 
+== 3rd Party Services In Use ==
+
+Extend Protection For WooCommerce uses the following 3rd party services:
+- [Extend API](https://docs.extend.com/reference/ordersupsert-1): used to create and manage protection plans, contracts, claims, and upsell leads. In the plugin you will see the URL `api.helloextend.com`, which is the API endpoint for Extend's API.
+- [Extend SDK](https://helloextend.github.io/extend-sdk-client): The plugin also uses Extend's SDK via `sdk.helloextend.com` to render protection offers in the frontend.
+- [Extend Merchant Portal](https://merchants.extend.com/): is available for users to manage products, plans, contracts, claims, and upsell leads. It also provides enhanced reporting & dashboards: customer segmentation, catalog analysis, trends, and performance.
+
+For more information on our terms of service and privacy policy, visit the links below:
+- https://www.extend.com/terms
+- https://www.extend.com/privacy
+
 == Screenshots ==
 
 1. Kaley is our automated claims agent, who adjudicates 98% of claims adjudicated in second.
