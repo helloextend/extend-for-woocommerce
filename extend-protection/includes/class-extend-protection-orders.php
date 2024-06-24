@@ -89,9 +89,9 @@ class Extend_Protection_Orders
             // if  item id is for extend-product-protection gram $extend_meta_data and push it to the plans array
             if ($extend_meta_data['planId'] ) {
                 $extend_plans[] = array(
-                 'id'                 => $extend_meta_data['planId'],
-                 'purchasePrice'      => $extend_meta_data['price'],
-                 'covered_product_id' => $extend_meta_data['covered_product_id'],
+                    'id'                 => $extend_meta_data['planId'],
+                    'purchasePrice'      => $extend_meta_data['price'],
+                    'covered_product_id' => $extend_meta_data['covered_product_id'],
                 );
             }
         }
@@ -103,6 +103,11 @@ class Extend_Protection_Orders
             $line_id    = $item->get_id();
             $product    = $item->get_product();
             $product_id = $product->get_id();
+
+            // Get the first product category
+            $product_category_ids = $product->get_category_ids();
+            $cat_term = get_term_by('id', $product_category_ids[0], 'product_cat');
+            $first_category = $cat_term->name;
 
             // if line_id matches any id in $extend_plans[], push the plan data into the covered product
             $plan = array();
@@ -116,25 +121,19 @@ class Extend_Protection_Orders
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to extend_line_items array
             // TODO: id = reference id = sku ?
-            
-            // Looks like we are hardcoded electronics here as the category. We need to get the category from
-            // the product. Looked into this some and we'll have to implement some sort of Logic as categories
-            // can be returned as array.
-            // ref: https://stackoverflow.com/questions/21009516/get-woocommerce-product-categories-from-wordpress
-            // TODO: Pass in Categories for PP 
             if ($product_id != extend_product_protection_id() ) {
                 $extend_line_items[] = array(
-                'lineItemTransactionId' => $product->get_id(),
-                'product'               => array(
-                'id'            => $product->get_id(),
-                'title'         => $product->get_name(),
-                'category'      => 'Electronics',
-                'listPrice'     => $product->get_regular_price() * 100,
-                'purchasePrice' => (int) floatval($product->get_price() * 100),
-                'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
-                ),
-                'quantity'              => $item->get_quantity(),
-                'fulfilledQuantity'     => ! $fulfill_now ? 0 : $item->get_quantity(), // Will only fulfill based on contract event
+                    'lineItemTransactionId' => $product->get_id(),
+                    'product'               => array(
+                        'id'            => $product->get_id(),
+                        'title'         => $product->get_name(),
+                        'category'      => $first_category,
+                        'listPrice'     => $product->get_regular_price() * 100,
+                        'purchasePrice' => (int) floatval($product->get_price() * 100),
+                        'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
+                    ),
+                    'quantity'              => $item->get_quantity(),
+                    'fulfilledQuantity'     => ! $fulfill_now ? 0 : $item->get_quantity(), // Will only fulfill based on contract event
                 );
 
                 // if $plan is not empty, add the plan to the current line item
@@ -195,9 +194,9 @@ class Extend_Protection_Orders
 
             // Push shipping protection line item into extend_line_items array
             $extend_line_items[] = array(
-            'lineItemTransactionId' => $order_id . '-shipping',
-            'quoteId'               => $shipping_protection_quote_id,
-            'shipmentInfo'          => array(),
+                'lineItemTransactionId' => $order_id . '-shipping',
+                'quoteId'               => $shipping_protection_quote_id,
+                'shipmentInfo'          => array(),
             );
         } else {
             if ($this->settings['enable_extend_debug'] == 1 ) {
@@ -206,32 +205,32 @@ class Extend_Protection_Orders
         }
 
         $extend_order_data = array(
-        'currency'      => $order_data['currency'],
-        'customer'      => array(
-        'email'           => $order_data['billing']['email'],
-        'name'            => $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
-        'phone'           => $order_data['billing']['phone'],
-        'locale'          => 'en-US',
-        'billingAddress'  => array(
+            'currency'      => $order_data['currency'],
+            'customer'      => array(
+                'email'           => $order_data['billing']['email'],
+                'name'            => $order_data['billing']['first_name'] . ' ' . $order_data['billing']['last_name'],
+                'phone'           => $order_data['billing']['phone'],
+                'locale'          => 'en-US',
+                'billingAddress'  => array(
                     'address1'    => $order_data['billing']['address_1'],
                     'city'        => $order_data['billing']['city'],
                     'country'     => $order_data['billing']['country'],
                     'postalCode'  => $order_data['billing']['postcode'],
                     'province'    => $order_data['billing']['state'],
                     'countryCode' => $order_data['billing']['country'],
-        ),
-        'shippingAddress' => array(
-        'address1'    => $order_data['shipping']['address_1'],
-        'city'        => $order_data['shipping']['city'],
-        'country'     => $order_data['shipping']['country'],
-        'postalCode'  => $order_data['shipping']['postcode'],
-        'province'    => $order_data['shipping']['state'],
-        'countryCode' => $order_data['shipping']['country'],
-        ),
-        ),
-        'lineItems'     => $extend_line_items,
-        'storeId'       => $this->settings['store_id'],
-        'transactionId' => $order_id,
+                ),
+                'shippingAddress' => array(
+                    'address1'    => $order_data['shipping']['address_1'],
+                    'city'        => $order_data['shipping']['city'],
+                    'country'     => $order_data['shipping']['country'],
+                    'postalCode'  => $order_data['shipping']['postcode'],
+                    'province'    => $order_data['shipping']['state'],
+                    'countryCode' => $order_data['shipping']['country'],
+                ),
+            ),
+            'lineItems'     => $extend_line_items,
+            'storeId'       => $this->settings['store_id'],
+            'transactionId' => $order_id,
         );
 
         if ($this->settings['enable_extend_debug'] == 1 ) {
@@ -239,13 +238,13 @@ class Extend_Protection_Orders
         }
 
         $request_args = array(
-        'method'  => 'PUT',
-        'headers' => array(
-        'Content-Type'          => 'application/json',
-        'Accept'                => 'application/json; version=latest',
-        'X-Extend-Access-Token' => $this->settings['api_key'],
-        ),
-        'body'    => json_encode($extend_order_data),
+            'method'  => 'PUT',
+            'headers' => array(
+                'Content-Type'          => 'application/json',
+                'Accept'                => 'application/json; version=latest',
+                'X-Extend-Access-Token' => $this->settings['api_key'],
+            ),
+            'body'    => json_encode($extend_order_data),
         );
 
         $response = wp_remote_request($this->settings['api_host'] . '/orders', $request_args);
