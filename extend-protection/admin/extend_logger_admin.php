@@ -18,7 +18,7 @@ Require log-table.php which creates the output of the error log page...
 function extend_logger_admin()
 {
 
-    echo '<h2 class="extend_logger-title">' . __('Error Log', 'custom-error-log') . '</h2>';
+    echo '<h2 class="extend_logger-title">' . __('Error Log', 'extend-protection') . '</h2>';
 
     /* Import the main log table file... */
     include_once EXTEND_LOGGER_DIR . 'admin/extend_logger_log-table.php';
@@ -50,7 +50,7 @@ function extend_logger_log_table_scripts()
     $data_array = array(
 
     'ajaxurl'  => admin_url('admin-ajax.php'),
-    'deleting' => __('Deleting', 'custom-error-log') . '...',
+    'deleting' => __('Deleting', 'extend-protection') . '...',
 
     );
 

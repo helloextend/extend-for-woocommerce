@@ -36,7 +36,7 @@ class Extend_Protection_i18n
     {
 
         load_plugin_textdomain(
-            'extend-protectiony',
+            'extend-protection',
             false,
             dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
         );

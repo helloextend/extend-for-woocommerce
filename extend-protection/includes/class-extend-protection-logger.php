@@ -183,13 +183,13 @@ class Extend_Protection_Logger
         if ($update ) {
 
             $return  = '<div class="updated  ajax-response">';
-            $return .= sprintf(__('%1$s %2$d has been successfully deleted', 'custom-error-log'), $log_type, $error_code);
+            $return .= sprintf(__('%1$s %2$d has been successfully deleted', 'extend-protection'), $log_type, $error_code);
             $return .= '.</div>';
 
         } else {
 
             $return  = '<div class="error  ajax-response">';
-            $return .= sprintf(__('%1$s %2$d could not be deleted', 'custom-error-log'), $log_type, $error_code);
+            $return .= sprintf(__('%1$s %2$d could not be deleted', 'extend-protection'), $log_type, $error_code);
             $return .= '.</div>';
 
         }
@@ -225,13 +225,13 @@ class Extend_Protection_Logger
         if ($deleted_errors || $deleted_notices || $deleted_debugs ) {
 
             $return  = '<div class="updated  ajax-response">';
-            $return .= __('All errors have been deleted', 'custom-error-log');
+            $return .= __('All errors have been deleted', 'extend-protection');
             $return .= '.</div>';
 
         } else {
 
             $return  = '<div class="error  ajax-response">';
-            $return .= __('Errors could not be deleted', 'custom-error-log');
+            $return .= __('Errors could not be deleted', 'extend-protection');
             $return .= '.</div>';
 
         }
@@ -432,7 +432,7 @@ class Extend_Protection_Logger
     {
 
         if (! $logs ) {
-            return __('No logs could be found', 'custom-error-log');
+            return __('No logs could be found', 'extend-protection');
         }
 
         /* Sort logs into date order... */
