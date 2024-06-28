@@ -1,136 +1,136 @@
-# Copyright (C) 2024 Extend Protection For WooCommerce
-# This file is distributed under the same license as the Extend Protection For WooCommerce package.
+# Translation of extend-protection in English
+# This file is distributed under the same license as the extend-protection package.
 msgid ""
 msgstr ""
-"Project-Id-Version: Extend Protection For WooCommerce 1.0.0\n"
-"Report-Msgid-Bugs-To: https://wordpress.org/support/plugin/extend-protection\n"
-"POT-Creation-Date: 2024-06-28 17:23:55+00:00\n"
+"PO-Revision-Date: 2024-06-28 17:49:17+0000\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"PO-Revision-Date: 2024-MO-DA HO:MI+ZONE\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
-"Language-Team: LANGUAGE <LL@li.org>\n"
+"Plural-Forms: nplurals=2; plural=n != 1;\n"
+"X-Generator: GlotPress/4.0.1\n"
+"Language: en_US\n"
+"Project-Id-Version: extend-protection\n"
 
 #: admin/extend_logger_admin.php:21
 msgid "Error Log"
-msgstr ""
+msgstr "Error Log"
 
 #: admin/extend_logger_admin.php:53
 msgid "Deleting"
-msgstr ""
+msgstr "Deleting"
 
 #: admin/extend_logger_introduction.php:13
 msgid "There is no Extend Log error, debug or notice yet."
-msgstr ""
+msgstr "There is no Extend Log error, debug or notice yet."
 
 #: admin/extend_logger_introduction.php:15
 msgid "Usage"
-msgstr ""
+msgstr "Usage"
 
 #: admin/extend_logger_introduction.php:20
 msgid "Errors, debugs and notices behave in exactly the same way but you can filter the error log to show only errors or only notices. Once you have logged an error or notice you can return to this page to see a log of all your errors, debugs and notices."
-msgstr ""
+msgstr "Errors, debugs and notices behave in exactly the same way but you can filter the error log to show only errors or only notices. Once you have logged an error or notice you can return to this page to see a log of all your errors, debugs and notices."
 
 #: admin/extend_logger_introduction.php:27
 msgid "Sample Usage"
-msgstr ""
+msgstr "Sample Usage"
 
 #: admin/extend_logger_introduction.php:29
 msgid "Log an error"
-msgstr ""
+msgstr "Log an error"
 
 #: admin/extend_logger_introduction.php:31
 msgid "There was an error with my theme"
-msgstr ""
+msgstr "There was an error with my theme"
 
 #: admin/extend_logger_introduction.php:33
 msgid "Use dynamic content to log an error"
-msgstr ""
+msgstr "Use dynamic content to log an error"
 
 #: admin/extend_logger_introduction.php:35
 msgid "There was an error with"
-msgstr ""
+msgstr "There was an error with"
 
 #: admin/extend_logger_introduction.php:35
 msgid "in my theme'"
-msgstr ""
+msgstr "in my theme'"
 
 #: admin/extend_logger_log-table.php:34
 msgid "All"
-msgstr ""
+msgstr "All"
 
 #: admin/extend_logger_log-table.php:40
 msgid "Errors"
-msgstr ""
+msgstr "Errors"
 
 #: admin/extend_logger_log-table.php:46
 msgid "Notices"
-msgstr ""
+msgstr "Notices"
 
 #: admin/extend_logger_log-table.php:52
 msgid "Debugs"
-msgstr ""
+msgstr "Debugs"
 
 #: admin/extend_logger_log-table.php:58
 msgid "Clear Log"
-msgstr ""
+msgstr "Clear Log"
 
 #: admin/extend_logger_log-table.php:68
 msgid "Date"
-msgstr ""
+msgstr "Date"
 
 #: admin/extend_logger_log-table.php:70
 msgid "Time"
-msgstr ""
+msgstr "Time"
 
 #: admin/extend_logger_log-table.php:72
 msgid "Message"
-msgstr ""
+msgstr "Message"
 
 #: extend-protection.php:113
 msgid "Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here."
-msgstr ""
+msgstr "Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here."
 
 #: extend-protection.php:363
 msgid "Extend Shipping Protection"
-msgstr ""
+msgstr "Extend Shipping Protection"
 
 #: includes/class-extend-protection-logger.php:186
 msgid "%1$s %2$d has been successfully deleted"
-msgstr ""
+msgstr "%1$s %2$d has been successfully deleted"
 
 #: includes/class-extend-protection-logger.php:192
 msgid "%1$s %2$d could not be deleted"
-msgstr ""
+msgstr "%1$s %2$d could not be deleted"
 
 #: includes/class-extend-protection-logger.php:228
 msgid "All errors have been deleted"
-msgstr ""
+msgstr "All errors have been deleted"
 
 #: includes/class-extend-protection-logger.php:234
 msgid "Errors could not be deleted"
-msgstr ""
+msgstr "Errors could not be deleted"
 
 #: includes/class-extend-protection-logger.php:435
 msgid "No logs could be found"
-msgstr ""
+msgstr "No logs could be found"
+
 #. Plugin Name of the plugin/theme
 msgid "Extend Protection For WooCommerce"
-msgstr ""
+msgstr "Extend Protection For WooCommerce"
 
 #. Plugin URI of the plugin/theme
 msgid "https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce"
-msgstr ""
+msgstr "https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce"
 
 #. Description of the plugin/theme
 msgid "Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers."
-msgstr ""
+msgstr "Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers."
 
 #. Author of the plugin/theme
 msgid "Extend, Inc."
-msgstr ""
+msgstr "Extend, Inc."
 
 #. Author URI of the plugin/theme
 msgid "https://extend.com/"
-msgstr ""
+msgstr "https://extend.com/"

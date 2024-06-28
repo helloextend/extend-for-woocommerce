@@ -110,7 +110,7 @@ function extend_render_settings_page()
 {
     if (! is_woocommerce_activated() ) {
         Extend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
-        echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
+        echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
 
     echo '<div style="padding-top:30px">';
@@ -360,16 +360,17 @@ function set_shipping_fee()
         return;
     }
 
+    $fee_label  = __('Extend Shipping Protection', 'extend-protection');
+
     if (1 == WC()->session->get('shipping_fee') ) {
 
-        $fee_label  = 'Extend Shipping Protection';
         $fee_amount = WC()->session->get('shipping_fee_value');
 
         WC()->cart->add_fee($fee_label, $fee_amount);
     } elseif (1 == WC()->session->get('shipping_fee_remove') ) {
         $fees = WC()->cart->get_fees();
         foreach ( $fees as $key => $fee ) {
-            if ($fees[ $key ]->name === __('Extend Shipping Protection') ) {
+            if ($fees[ $key ]->name == $fee_label ) {
                 unset($fees[ $key ]);
             }
         }
