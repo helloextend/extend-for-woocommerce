@@ -135,7 +135,7 @@ class Extend_Protection_Shipping
                 'ExtendShippingIntegration',
                 compact('env', 'items', 'enable_extend_sp', 'ajax_url', 'update_order_review_nonce')
             );
-            echo '<tr><td colspan="2"><div id="extend-shipping-offer"></div></td></tr>';
+            echo esc_html('<tr><td colspan="2"><div id="extend-shipping-offer"></div></td></tr>');
         } else {
             // make sure to remove any SP session value
             WC()->session->set('shipping_fee_remove', true);

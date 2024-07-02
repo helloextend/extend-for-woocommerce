@@ -103,7 +103,7 @@ class Extend_Protection_PDP_Offer
                 'ExtendProductIntegration',
                 compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'extend_enabled', 'extend_pdp_offers_enabled', 'extend_modal_offers_enabled', 'extend_use_skus', 'atc_button_selector')
             );
-            echo "<div class='extend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
+            echo esc_html("<div class='extend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>");
         }
     }
 }

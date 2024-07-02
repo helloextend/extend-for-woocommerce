@@ -117,7 +117,7 @@ class Extend_Protection_Global
             $cart[ $cart_item_key ]['product_name'] = $_woo_product->get_title();
         }
 
-        echo json_encode($cart, JSON_PRETTY_PRINT);
+        echo wp_json_encode($cart, JSON_PRETTY_PRINT);
         wp_die();
     }
 

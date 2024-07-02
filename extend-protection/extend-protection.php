@@ -110,14 +110,14 @@ function extend_render_settings_page()
 {
     if (! is_woocommerce_activated() ) {
         Extend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
-        echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
+        echo esc_html('<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>');
     }
 
-    echo '<div style="padding-top:30px">';
-    echo ' <img src="' . plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg" alt="Extend Logo with Slogan" style="width: 170px;">
+    echo esc_html('<div style="padding-top:30px">');
+    echo esc_html(' <img src="' . plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg" alt="Extend Logo with Slogan" style="width: 170px;">
 			<p>Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
-            <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="extend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>';
-    echo '</div>';
+            <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="extend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>');
+    echo esc_html('</div>');
 
     settings_errors(); ?>
     <!-- begin tabs -->
@@ -162,31 +162,30 @@ function extend_render_about_page()
 
 function extend_render_documentation_page()
 {
-    echo '<h2>Extend Purchase Protection Documentation</h2>';
-    echo '<br/>';
-    echo '<h3>Product Protection</h3>';
+    echo esc_html('<h2>Extend Purchase Protection Documentation</h2>');
+    echo esc_html('<br/>');
+    echo esc_html('<h3>Product Protection</h3>');
 
     wp_enqueue_script('jquery-ui-accordion');
 
-    echo '
+    echo esc_html('
     <div class="accordion">
-    <div>
-        <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
         <div>
-            <img src="' . plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg' . '" >
+            <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
+            <div>
+                <img src="' . plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg' . '" >
+            </div>
+        </div>
+        <div>
+            <h3><a href="#" id="extend_2">2 - Second</a></h3>
+            <div>Phasellus mattis tincidunt nibh.</div>
+        </div>
+        <div>
+            <h3><a href="#" id="extend_3">3 - Third</a></h3>
+            <div>Nam dui erat, auctor a, dignissim quis.</div>
         </div>
     </div>
-    <div>
-        <h3><a href="#" id="extend_2">2 - Second</a></h3>
-        <div>Phasellus mattis tincidunt nibh.</div>
-    </div>
-    <div>
-        <h3><a href="#" id="extend_3">3 - Third</a></h3>
-        <div>Nam dui erat, auctor a, dignissim quis.</div>
-    </div>
-</div>
-';
-
+    ');
 }
 
 function extend_protection_style()
@@ -334,7 +333,7 @@ function add_shipping_protection_fee()
             WC()->session->set('shipping_fee_value', $fee_amount);
             WC()->session->set('shipping_quote_id', $_POST['shipping_quote_id']);
         } else {
-            echo ' No shipping protection fee added because of an error ';
+            echo esc_html(' No shipping protection fee added because of an error ');
         }
     }
     wp_die();
@@ -421,14 +420,14 @@ function add_extend_protection_contract( $item_id, $item )
 
             // Check if the product SKU matches product protection
             if ($product->get_sku() === 'extend-product-protection' ) {
-                echo '<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>';
+                echo esc_html('<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>');
 
                 foreach ( $contracts as $product_covered => $contract_id ) {
                     if ($extend_meta_data['covered_product_id'] == $product_covered ) {
-                        echo '<tr><td><a href="' . $url . '?contractId=' . $contract_id . '&accessToken=' . $accessToken . '">' . $contract_id . '</a></td></tr>';
+                        echo esc_html('<tr><td><a href="' . $url . '?contractId=' . $contract_id . '&accessToken=' . $accessToken . '">' . $contract_id . '</a></td></tr>');
                     }
                 }
-                echo '</tbody></table>';
+                echo esc_html('</tbody></table>');
             }
         }
     }
