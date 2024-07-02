@@ -29,33 +29,33 @@ $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
         if ($logs['have_both'] == true || $logs['have_many'] == true ) {
             ?>
 
-            <a class="extend_logger-log-filter" filter="all" nonce="<?php echo $nonce; ?>">
+            <a class="extend_logger-log-filter" filter="all" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php _e('All', 'custom-error-log'); ?>
-
-            </a> |
-
-            <a class="extend_logger-log-filter" filter="error" nonce="<?php echo $nonce; ?>">
-
-            <?php _e('Errors', 'custom-error-log'); ?>
+            <?php _e('All', 'extend-protection'); ?>
 
             </a> |
 
-            <a class="extend_logger-log-filter" filter="notice" nonce="<?php echo $nonce; ?>">
+            <a class="extend_logger-log-filter" filter="error" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php _e('Notices', 'custom-error-log'); ?>
+            <?php _e('Errors', 'extend-protection'); ?>
 
             </a> |
 
-            <a class="extend_logger-log-filter" filter="debug" nonce="<?php echo $nonce; ?>">
+            <a class="extend_logger-log-filter" filter="notice" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php _e('Debugs', 'custom-error-log'); ?>
+            <?php _e('Notices', 'extend-protection'); ?>
+
+            </a> |
+
+            <a class="extend_logger-log-filter" filter="debug" nonce="<?php echo esc_attr($nonce); ?>">
+
+            <?php _e('Debugs', 'extend-protection'); ?>
 
             </a>
 
         <?php } ?>
 
-        <a class="extend_logger-delete-all" data-nonce="<?php echo $nonce; ?>"><?php _e('Clear Log', 'custom-error-log'); ?></a>
+        <a class="extend_logger-delete-all" data-nonce="<?php echo esc_attr($nonce); ?>"><?php _e('Clear Log', 'extend-protection'); ?></a>
 
         <table class="extend_logger-table">
 
@@ -65,11 +65,11 @@ $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
 
                 <th class="extend_logger-type"></th>
 
-                <th class="extend_logger-date"><?php _e('Date', 'custom-error-log'); ?></th>
+                <th class="extend_logger-date"><?php _e('Date', 'extend-protection'); ?></th>
 
-                <th class="extend_logger-time"><?php _e('Time', 'custom-error-log'); ?></th>
+                <th class="extend_logger-time"><?php _e('Time', 'extend-protection'); ?></th>
 
-                <th class="extend_logger-message"><?php _e('Message', 'custom-error-log'); ?></th>
+                <th class="extend_logger-message"><?php _e('Message', 'extend-protection'); ?></th>
 
                 <th class="extend_logger-delete"></th>
 
@@ -82,7 +82,7 @@ $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
         <?php
 
         /* Output all logs into the table... */
-        echo Extend_Protection_Logger::extend_logger_format_logs($logs, $nonce);
+        printf(Extend_Protection_Logger::extend_logger_format_logs($logs, $nonce));
 
         ?>
 

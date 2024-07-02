@@ -829,7 +829,7 @@ class Extend_Protection_Admin
         foreach ( $extend_automated_sync_dropdown_values as $auto_sync ) {
             $selected = ( isset($this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])
             && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'] === $auto_sync ) ? 'selected' : '';
-            echo '<option value="' . $auto_sync . '" ' . $selected . '>' . ucfirst($auto_sync) . '</option>';
+            echo '<option value="' . esc_attr($auto_sync) . '" ' . esc_attr($selected) . '>' . ucfirst(esc_attr($auto_sync)) . '</option>';
         }
         ?>
         </select>
@@ -884,9 +884,9 @@ class Extend_Protection_Admin
             && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'] === $extend_pdp_hooks ) ? 'selected' : '';
 
             if ($extend_pdp_hooks == 'woocommerce_before_add_to_cart_button' ) {
-                echo '<option value="' . $extend_pdp_hooks . '" ' . $selected . '>' . $extend_pdp_hooks . ' (default)</option>';
+                echo '<option value="' . esc_attr($extend_pdp_hooks) . '" ' . esc_attr($selected) . '>' . esc_attr($extend_pdp_hooks) . ' (default)</option>';
             } else {
-                echo '<option value="' . $extend_pdp_hooks . '" ' . $selected . '>' . $extend_pdp_hooks . '</option>';
+                echo '<option value="' . esc_attr($extend_pdp_hooks) . '" ' . esc_attr($selected) . '>' . esc_attr($extend_pdp_hooks) . '</option>';
             }
         }
         ?>
@@ -941,9 +941,9 @@ class Extend_Protection_Admin
             && $this->extend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'] === $extend_sp_hooks ) ? 'selected' : '';
 
             if ($extend_sp_hooks == 'woocommerce_review_order_before_payment' ) {
-                echo '<option value="' . $extend_sp_hooks . '" ' . $selected . '>' . $extend_sp_hooks . ' (default)</option>';
+                echo '<option value="' . esc_attr($extend_sp_hooks) . '" ' . esc_attr($selected) . '>' . esc_attr($extend_sp_hooks) . ' (default)</option>';
             } else {
-                echo '<option value="' . $extend_sp_hooks . '" ' . $selected . '>' . $extend_sp_hooks . '</option>';
+                echo '<option value="' . esc_attr($extend_sp_hooks) . '" ' . esc_attr($selected) . '>' . esc_attr($extend_sp_hooks) . '</option>';
             }
         }
         ?>
@@ -993,12 +993,12 @@ class Extend_Protection_Admin
         $selected = ( isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
         && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Order Create' ) ? 'selected' : '';
         ?>
-            <option value="Order Create" <?php echo $selected; ?>>Order Create</option>
+            <option value="Order Create" <?php echo esc_attr($selected); ?>>Order Create</option>
         <?php
         $selected = ( isset($this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
         && $this->extend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Fulfillment' ) ? 'selected' : '';
         ?>
-            <option value="Fulfillment" <?php echo $selected; ?>>Fulfillment</option>
+            <option value="Fulfillment" <?php echo esc_attr($selected); ?>>Fulfillment</option>
         </select>
         <?php
     }
@@ -1011,12 +1011,12 @@ class Extend_Protection_Admin
         $selected = ( isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
         && $this->extend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'sandbox' ) ? 'selected' : '';
         ?>
-            <option value="sandbox" <?php echo $selected; ?>>Sandbox</option>
+            <option value="sandbox" <?php echo esc_attr($selected); ?>>Sandbox</option>
         <?php
         $selected = ( isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
         && $this->extend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'live' ) ? 'selected' : '';
         ?>
-            <option value="live" <?php echo $selected; ?>>Live</option>
+            <option value="live" <?php echo esc_attr($selected); ?>>Live</option>
         </select>
         <?php
     }
@@ -1116,9 +1116,9 @@ class Extend_Protection_Admin
             && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'] === $batch_sync ) ? 'selected' : '';
 
             if ($batch_sync == '100' ) {
-                echo '<option value="' . $batch_sync . '" ' . $selected . '>' . $batch_sync . ' (default)</option>';
+                echo '<option value="' . esc_attr($batch_sync) . '" ' . esc_attr($selected) . '>' . esc_attr($batch_sync) . ' (default)</option>';
             } else {
-                echo '<option value="' . $batch_sync . '" ' . $selected . '>' . $batch_sync . '</option>';
+                echo '<option value="' . esc_attr($batch_sync) . '" ' . esc_attr($selected) . '>' . esc_attr($batch_sync) . '</option>';
             }
         }
         ?>
