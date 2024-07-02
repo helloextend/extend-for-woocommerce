@@ -114,7 +114,7 @@ function extend_render_settings_page()
     }
 
     echo '<div style="padding-top:30px">';
-    echo ' <img src="' . plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg" alt="Extend Logo with Slogan" style="width: 170px;">
+    echo ' <img src="' . esc_url(plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg').'" alt="Extend Logo with Slogan" style="width: 170px;">
 			<p>Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
             <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="extend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>';
     echo '</div>';
@@ -170,23 +170,23 @@ function extend_render_documentation_page()
 
     echo '
     <div class="accordion">
-    <div>
-        <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
         <div>
-            <img src="' . plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg' . '" >
-        </div>
-    </div>
-    <div>
-        <h3><a href="#" id="extend_2">2 - Second</a></h3>
-        <div>Phasellus mattis tincidunt nibh.</div>
-    </div>
-    <div>
-        <h3><a href="#" id="extend_3">3 - Third</a></h3>
-        <div>Nam dui erat, auctor a, dignissim quis.</div>
-    </div>
-</div>
-';
-
+            <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
+            <div>
+                <img src="' . esc_url(plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg') . '" >
+            </div>
+        </div>';
+//
+//        <div>
+//            <h3><a href="#" id="extend_2">2 - Second</a></h3>
+//            <div>Phasellus mattis tincidunt nibh.</div>
+//        </div>
+//        <div>
+//            <h3><a href="#" id="extend_3">3 - Third</a></h3>
+//            <div>Nam dui erat, auctor a, dignissim quis.</div>
+//        </div>
+//    </div>
+//    ';
 }
 
 function extend_protection_style()
@@ -275,10 +275,28 @@ function extend_product_protection_create()
         // upload image and associate to product
         try {
             $product_id     = $product->get_id();
-            $upload         = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
-            $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
-            $product->set_image_id($product_img_id);
-            $product->save();
+            //check if image exists
+            if (file_exists(plugin_dir_path('images/Extend_icon.png'))){
+
+                $upload         = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
+                if (is_wp_error($upload)) {
+                    Extend_Protection_Logger::extend_log_error('Could not upload extend logo from '.plugins_url() . '/extend-protection/images/Extend_icon.png : '.$upload->get_error_message());
+                    return false;
+                }
+
+                $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
+                if (is_wp_error($product_img_id)) {
+                    Extend_Protection_Logger::extend_log_error('Could not retrieve product image id : ' );
+                    return false;
+                }
+
+                //set the product image
+                set_post_thumbnail($product_id, $product_img_id);
+
+            }else{
+                Extend_Protection_Logger::extend_log_error('Extend_icon file path incorrect: '.plugin_dir_path('images/Extend_icon.png'));
+            }
+
         } catch ( \Exception $e ) {
             Extend_Protection_Logger::extend_log_error($e->getMessage());
         }
@@ -425,7 +443,7 @@ function add_extend_protection_contract( $item_id, $item )
 
                 foreach ( $contracts as $product_covered => $contract_id ) {
                     if ($extend_meta_data['covered_product_id'] == $product_covered ) {
-                        echo '<tr><td><a href="' . $url . '?contractId=' . $contract_id . '&accessToken=' . $accessToken . '">' . $contract_id . '</a></td></tr>';
+                        echo '<tr><td><a href="'. esc_url($url . '?contractId=' . $contract_id . '&accessToken=' . $accessToken) . '">' . $contract_id . '</a></td></tr>';
                     }
                 }
                 echo '</tbody></table>';

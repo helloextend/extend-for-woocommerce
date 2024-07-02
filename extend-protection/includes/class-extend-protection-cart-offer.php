@@ -191,7 +191,7 @@ class Extend_Protection_Cart_Offer
             $categories  = get_the_terms($item_id, 'product_cat');
             $category    = $categories[0]->name;
 
-            echo "<div id='offer_$item_id' class='cart-extend-offer' data-covered='$referenceId' data-category='$category'></div>";
+            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($referenceId)."' data-category='".esc_attr($category)."'></div>";
         }
     }
 

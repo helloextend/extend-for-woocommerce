@@ -19,7 +19,7 @@ if (is_woocommerce_activated() ) {
         echo '<form method="post"  action=""><input type="submit" name="extend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
 
     } else {
-        echo ' exists! (SKU: <em>' . EXTEND_PRODUCT_PROTECTION_SKU . '</em> / ID: <em>' . $post_id . '</em>) &#9989;';
+        echo ' exists! (SKU: <em>' . EXTEND_PRODUCT_PROTECTION_SKU . '</em> / ID: <em>' . esc_html($post_id) . '</em>) &#9989;';
     }
     echo '</span>';
 }
