@@ -31,5 +31,11 @@ class Extend_Protection_Activator
         add_option('custom_debug_log');
         add_option('extend_logger_new_logs');
         add_option('extend_logger_ab_show', true);
+
+        // Extend Oauth token fields
+        add_option('extend_live_token_date');
+        add_option('extend_sandbox_token_date');
+        add_option('extend_live_token');
+        add_option('extend_sandbox_token');
     }
 }
