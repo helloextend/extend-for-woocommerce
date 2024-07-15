@@ -39,5 +39,11 @@ class Extend_Protection_Deactivator
         delete_option('custom_debug_log');
         delete_option('extend_logger_new_logs');
         delete_option('extend_logger_ab_show');
+
+        // Extend Oauth token fields
+        delete_option('extend_live_token_date');
+        delete_option('extend_sandbox_token_date');
+        delete_option('extend_live_token');
+        delete_option('extend_sandbox_token');
     }
 }
