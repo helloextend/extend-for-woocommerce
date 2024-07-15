@@ -110,11 +110,11 @@ function extend_render_settings_page()
 {
     if (! is_woocommerce_activated() ) {
         Extend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
-        echo '<div class="error"><p><strong>' . sprintf(__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
+        echo '<div class="error"><p><strong>' . sprintf(esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'woocommerce-services'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
 
     echo '<div style="padding-top:30px">';
-    echo ' <img src="' . esc_url(plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg').'" alt="Extend Logo with Slogan" style="width: 170px;">
+    echo ' <img src="' . plugins_url() . '/extend-protection/images/Extend_logo_slogan.svg" alt="Extend Logo with Slogan" style="width: 170px;">
 			<p>Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
             <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="extend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>';
     echo '</div>';
@@ -131,23 +131,23 @@ function extend_render_settings_page()
             <a href="?page=extend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo ( isset($_GET['tab']) && $_GET['tab'] === 'catalog_sync' ) ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
         </h2>
         <div class="tab-content">
-    <?php
-    $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
+            <?php
+            $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 
-    switch ( $current_tab ) {
-    case 'product_protection':
-        include_once 'tabs/product-protection.php';
-        break;
-    case 'shipping_protection':
-        include_once 'tabs/shipping-protection.php';
-        break;
-    case 'catalog_sync':
-        include_once 'tabs/catalog-sync.php';
-        break;
-    default:
-        include_once 'tabs/general-settings.php';
-    }
-    ?>
+            switch ( $current_tab ) {
+                case 'product_protection':
+                    include_once 'tabs/product-protection.php';
+                    break;
+                case 'shipping_protection':
+                    include_once 'tabs/shipping-protection.php';
+                    break;
+                case 'catalog_sync':
+                    include_once 'tabs/catalog-sync.php';
+                    break;
+                default:
+                    include_once 'tabs/general-settings.php';
+            }
+            ?>
         </div>
     </div>
 
@@ -170,23 +170,23 @@ function extend_render_documentation_page()
 
     echo '
     <div class="accordion">
+    <div>
+        <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
         <div>
-            <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
-            <div>
-                <img src="' . esc_url(plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg') . '" >
-            </div>
-        </div>';
-//
-//        <div>
-//            <h3><a href="#" id="extend_2">2 - Second</a></h3>
-//            <div>Phasellus mattis tincidunt nibh.</div>
-//        </div>
-//        <div>
-//            <h3><a href="#" id="extend_3">3 - Third</a></h3>
-//            <div>Nam dui erat, auctor a, dignissim quis.</div>
-//        </div>
-//    </div>
-//    ';
+            <img src="' . plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg' . '" >
+        </div>
+    </div>
+    <div>
+        <h3><a href="#" id="extend_2">2 - Second</a></h3>
+        <div>Phasellus mattis tincidunt nibh.</div>
+    </div>
+    <div>
+        <h3><a href="#" id="extend_3">3 - Third</a></h3>
+        <div>Nam dui erat, auctor a, dignissim quis.</div>
+    </div>
+</div>
+';
+
 }
 
 function extend_protection_style()
@@ -275,28 +275,10 @@ function extend_product_protection_create()
         // upload image and associate to product
         try {
             $product_id     = $product->get_id();
-            //check if image exists
-            if (file_exists(plugin_dir_path('images/Extend_icon.png'))){
-
-                $upload         = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
-                if (is_wp_error($upload)) {
-                    Extend_Protection_Logger::extend_log_error('Could not upload extend logo from '.plugins_url() . '/extend-protection/images/Extend_icon.png : '.$upload->get_error_message());
-                    return false;
-                }
-
-                $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
-                if (is_wp_error($product_img_id)) {
-                    Extend_Protection_Logger::extend_log_error('Could not retrieve product image id : ' );
-                    return false;
-                }
-
-                //set the product image
-                set_post_thumbnail($product_id, $product_img_id);
-
-            }else{
-                Extend_Protection_Logger::extend_log_error('Extend_icon file path incorrect: '.plugin_dir_path('images/Extend_icon.png'));
-            }
-
+            $upload         = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
+            $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
+            $product->set_image_id($product_img_id);
+            $product->save();
         } catch ( \Exception $e ) {
             Extend_Protection_Logger::extend_log_error($e->getMessage());
         }
@@ -378,17 +360,16 @@ function set_shipping_fee()
         return;
     }
 
-    $fee_label  = __('Extend Shipping Protection', 'extend-protection');
-
     if (1 == WC()->session->get('shipping_fee') ) {
 
+        $fee_label  = 'Extend Shipping Protection';
         $fee_amount = WC()->session->get('shipping_fee_value');
 
         WC()->cart->add_fee($fee_label, $fee_amount);
     } elseif (1 == WC()->session->get('shipping_fee_remove') ) {
         $fees = WC()->cart->get_fees();
         foreach ( $fees as $key => $fee ) {
-            if ($fees[ $key ]->name == $fee_label ) {
+            if ($fees[ $key ]->name === __('Extend Shipping Protection') ) {
                 unset($fees[ $key ]);
             }
         }
@@ -427,11 +408,11 @@ function add_extend_protection_contract( $item_id, $item )
 
         if ($env == 'sandbox' ) {
             $url         = 'https://customers.demo.extend.com/en-US/warranty_terms';
-            $accessToken = $settings['extend_sandbox_api_key'];
         } else {
             $url         = 'https://customers.extend.com/en-US/warranty_terms';
-            $accessToken = $settings['extend_live_api_key'];
         }
+
+        $token = Extend_Protection_Global::get_extend_token();
 
         // Get product object
         if (method_exists($item, 'get_product') ) {
@@ -443,7 +424,7 @@ function add_extend_protection_contract( $item_id, $item )
 
                 foreach ( $contracts as $product_covered => $contract_id ) {
                     if ($extend_meta_data['covered_product_id'] == $product_covered ) {
-                        echo '<tr><td><a href="'. esc_url($url . '?contractId=' . $contract_id . '&accessToken=' . $accessToken) . '">' . $contract_id . '</a></td></tr>';
+                        echo '<tr><td><a href="' . $url . '?contractId=' . $contract_id . '&accessToken=' . $token . '">' . $contract_id . '</a></td></tr>';
                     }
                 }
                 echo '</tbody></table>';

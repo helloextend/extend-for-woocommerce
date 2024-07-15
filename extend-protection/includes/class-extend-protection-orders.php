@@ -237,12 +237,20 @@ class Extend_Protection_Orders
             Extend_Protection_Logger::extend_log_debug('Debug: Extend Order Data: ' . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
         }
 
+        // Get Token from Global function
+        $token = Extend_Protection_Global::get_extend_token();
+
+        // Log the token
+        if ($this->settings['enable_extend_debug'] == 1 ) {
+            Extend_Protection_Logger::extend_log_debug('Token: ' . $token);
+        }
+
         $request_args = array(
             'method'  => 'PUT',
             'headers' => array(
                 'Content-Type'          => 'application/json',
                 'Accept'                => 'application/json; version=latest',
-                'X-Extend-Access-Token' => $this->settings['api_key'],
+                'X-Extend-Access-Token' => $token,
             ),
             'body'    => json_encode($extend_order_data),
         );
