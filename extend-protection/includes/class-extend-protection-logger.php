@@ -9,7 +9,7 @@ log_error() function, this allows developers to log custom errors in their theme
 */
 
 // Prevent direct access to the file
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH') ) {
     exit;
 }
 

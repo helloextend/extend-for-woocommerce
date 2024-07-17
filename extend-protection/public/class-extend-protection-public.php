@@ -11,7 +11,7 @@
  */
 
 // Prevent direct access to the file
-if ( ! defined( 'ABSPATH' ) ) {
+if (! defined('ABSPATH') ) {
     exit;
 }
 
