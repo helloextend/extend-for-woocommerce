@@ -10,6 +10,11 @@
  * @subpackage Extend_Protection/admin
  */
 
+// Prevent direct access to the file
+if (! defined('ABSPATH') ) {
+    exit;
+}
+
 /**
  * The Shipping Protection functionality of the plugin.
  *

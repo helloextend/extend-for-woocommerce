@@ -1,24 +1,29 @@
 <?php
 
-    /**
-     * Extend For WooCommerce Product Integration.
-     *
-     * @since   1.0.0
-     * @package Extend_Protection
-     *
-     * @package    Extend_Protection
-     * @subpackage Extend_Protection/admin
-     */
+/**
+ * Extend For WooCommerce Product Integration.
+ *
+ * @since   1.0.0
+ * @package Extend_Protection
+ *
+ * @package    Extend_Protection
+ * @subpackage Extend_Protection/admin
+ */
 
-    /**
-     * The Product Sync functionality of the plugin.
-     *
-     * Allows syncing of your catalog to Extend's mapping database
-     * to determine proper offers per item. Functionality from the admin.
-     *
-     * @package Extend_Protection
-     * @author  Extend, Inc.
-     */
+// Prevent direct access to the file
+if (! defined('ABSPATH') ) {
+    exit;
+}
+
+/**
+ * The Product Sync functionality of the plugin.
+ *
+ * Allows syncing of your catalog to Extend's mapping database
+ * to determine proper offers per item. Functionality from the admin.
+ *
+ * @package Extend_Protection
+ * @author  Extend, Inc.
+ */
 class Extend_Protection_Sync
 {
 

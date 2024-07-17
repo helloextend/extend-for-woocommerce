@@ -134,24 +134,24 @@ function extend_render_settings_page()
             $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
 
             switch ($current_tab) {
-                case 'product_protection':
-                    include_once 'tabs/product-protection.php';
-                    break;
-                case 'shipping_protection':
-                    include_once 'tabs/shipping-protection.php';
-                    break;
-                case 'catalog_sync':
-                    include_once 'tabs/catalog-sync.php';
-                    break;
-                default:
-                    include_once 'tabs/general-settings.php';
+            case 'product_protection':
+                include_once 'tabs/product-protection.php';
+                break;
+            case 'shipping_protection':
+                include_once 'tabs/shipping-protection.php';
+                break;
+            case 'catalog_sync':
+                include_once 'tabs/catalog-sync.php';
+                break;
+            default:
+                include_once 'tabs/general-settings.php';
             }
             ?>
         </div>
     </div>
 
     <!-- end tabs -->
-<?php
+    <?php
 
 }
 

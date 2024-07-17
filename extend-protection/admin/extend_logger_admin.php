@@ -9,6 +9,11 @@ This file sets up a page in the admin area under 'Tools' -> 'Error Log'.
 Set up the management page...
 */
 
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 add_action('admin_enqueue_scripts', 'extend_logger_log_table_scripts');
 
 /*

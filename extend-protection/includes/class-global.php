@@ -9,6 +9,12 @@
  * @subpackage Extend_Protection/includes
  * @link       https://extend.com
  */
+
+// Prevent direct access to the file
+if (! defined('ABSPATH') ) {
+    exit;
+}
+
 class Extend_Protection_Global
 {
 
@@ -436,7 +442,8 @@ class Extend_Protection_Global
     /**
      * Get Oauth 2 token using Client ID and Client Secret
      * If token timestamp is over 3 hours, generate a new token
-     * @since  1.0.0
+     *
+     * @since 1.0.0
      */
     public static function get_extend_token()
     {
@@ -451,12 +458,14 @@ class Extend_Protection_Global
         } else {
             $url = $settings['api_host'] . '/auth/oauth/token';
             $args = array(
-                'body'    => json_encode(array(
+                'body'    => json_encode(
+                    array(
                     'grant_type'    => 'client_credentials',
                     'client_id'     => $client_id,
                     'client_secret' => $client_secret,
                     'client_assertion' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
-                )),
+                    )
+                ),
                 'headers' => array(
                     'Content-Type' => 'application/json',
                     'Accept'       => 'application/json; version=latest'

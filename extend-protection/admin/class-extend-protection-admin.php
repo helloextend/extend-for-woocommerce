@@ -20,6 +20,12 @@
  * @subpackage Extend_Protection/admin
  * @author     Your Name <email@example.com>
  */
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Extend_Protection_Admin
 {
 
@@ -578,39 +584,39 @@ class Extend_Protection_Admin
                 $extend_automated_product_sync = $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'];
 
                 switch ($extend_automated_product_sync) {
-                    case 'never':
-                        // Remove scheduled events.
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        wp_clear_scheduled_hook('sync_products_weekly');
-                        break;
+                case 'never':
+                    // Remove scheduled events.
+                    wp_clear_scheduled_hook('sync_products_hourly');
+                    wp_clear_scheduled_hook('sync_products_daily');
+                    wp_clear_scheduled_hook('sync_products_weekly');
+                    break;
 
-                    case 'daily':
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_weekly');
-                        if (!wp_next_scheduled('sync_products_daily')) {
-                            wp_schedule_event(time(), 'daily', 'sync_products_daily');
-                        }
-                        break;
+                case 'daily':
+                    wp_clear_scheduled_hook('sync_products_hourly');
+                    wp_clear_scheduled_hook('sync_products_weekly');
+                    if (!wp_next_scheduled('sync_products_daily')) {
+                        wp_schedule_event(time(), 'daily', 'sync_products_daily');
+                    }
+                    break;
 
-                    case 'hourly':
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        wp_clear_scheduled_hook('sync_products_weekly');
-                        if (!wp_next_scheduled('sync_products_hourly')) {
-                            wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
-                        }
-                        break;
+                case 'hourly':
+                    wp_clear_scheduled_hook('sync_products_daily');
+                    wp_clear_scheduled_hook('sync_products_weekly');
+                    if (!wp_next_scheduled('sync_products_hourly')) {
+                        wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
+                    }
+                    break;
 
-                    case 'weekly':
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        if (!wp_next_scheduled('sync_products_weekly')) {
-                            wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
-                        }
-                        break;
+                case 'weekly':
+                    wp_clear_scheduled_hook('sync_products_hourly');
+                    wp_clear_scheduled_hook('sync_products_daily');
+                    if (!wp_next_scheduled('sync_products_weekly')) {
+                        wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
+                    }
+                    break;
 
-                    default:
-                        return;
+                default:
+                    return;
                 }
             }
         }
@@ -833,7 +839,7 @@ class Extend_Protection_Admin
     public function extend_automated_product_sync_callback()
     {
         $extend_automated_sync_dropdown_values = array('never', 'hourly', 'daily', 'weekly');
-?>
+        ?>
         <select name="extend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" id="extend_automated_product_sync">
             <?php
             // set default value if option is not set yet
@@ -849,7 +855,7 @@ class Extend_Protection_Admin
             }
             ?>
         </select>
-    <?php
+        <?php
     }
 
     public function extend_atc_button_selector_callback()
@@ -885,7 +891,7 @@ class Extend_Protection_Admin
             'other',
         );
 
-    ?>
+        ?>
         <select name="extend_protection_for_woocommerce_product_protection_settings[extend_pdp_offer_location]" id="extend_pdp_offer_location">
             <?php
             // set default value if option is not set yet
@@ -1014,12 +1020,12 @@ class Extend_Protection_Admin
             ?>
             <option value="Fulfillment" <?php echo esc_attr($selected); ?>>Fulfillment</option>
         </select>
-    <?php
+        <?php
     }
 
     public function extend_environment_callback()
     {
-    ?>
+        ?>
         <select name="extend_protection_for_woocommerce_general_settings[extend_environment]" id="extend_environment">
             <?php
             $selected = (isset($this->extend_protection_for_woocommerce_settings_general_options['extend_environment'])
@@ -1032,7 +1038,7 @@ class Extend_Protection_Admin
             ?>
             <option value="live" <?php echo esc_attr($selected); ?>>Live</option>
         </select>
-    <?php
+        <?php
     }
 
     public function extend_sandbox_store_id_callback()
@@ -1118,8 +1124,7 @@ class Extend_Protection_Admin
 
     public function extend_last_product_sync_callback()
     {
-        if (
-            array_key_exists('extend_last_product_sync', $this->extend_protection_for_woocommerce_settings_catalog_sync_options)
+        if (array_key_exists('extend_last_product_sync', $this->extend_protection_for_woocommerce_settings_catalog_sync_options)
             && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_last_product_sync'] <> 'Never'
             && $this->extend_protection_for_woocommerce_settings_catalog_sync_options['extend_last_product_sync'] <> ''
         ) {
@@ -1139,7 +1144,7 @@ class Extend_Protection_Admin
     function extend_sync_batch_callback()
     {
         $extend_sync_batch_dropdown_values = array('20', '50', '100', '200', '300', '400', '500');
-    ?>
+        ?>
         <select name="extend_protection_for_woocommerce_catalog_sync_settings[extend_sync_batch]" id="extend_sync_batch">
             <?php
             // set default value if option is not set yet
@@ -1160,7 +1165,7 @@ class Extend_Protection_Admin
             }
             ?>
         </select>
-<?php
+        <?php
     }
 
     function extend_sync_on_update_callback()

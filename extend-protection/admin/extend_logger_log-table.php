@@ -7,6 +7,13 @@
 This file holds the output for the admin error log under the 'Tools' menu.
 */
 
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
 $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
 
 ?>
