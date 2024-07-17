@@ -20,6 +20,12 @@
  * @subpackage Extend_Protection/includes
  * @author     partner-engineering@extend.com
  */
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Extend_Protection_Deactivator
 {
 

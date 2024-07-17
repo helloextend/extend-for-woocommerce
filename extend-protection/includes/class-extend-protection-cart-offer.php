@@ -21,6 +21,11 @@
  * @author  Extend, Inc.
  */
 
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Extend_Protection_Cart_Offer
 {
     /**

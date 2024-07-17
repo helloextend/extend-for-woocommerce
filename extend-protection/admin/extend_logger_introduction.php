@@ -10,6 +10,13 @@ It explains to new users how to start logging errors
 Introduction...
 */
 
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
 $output = __('There is no Extend Log error, debug or notice yet.', 'extend-protection');
 
 $output .= '<hr style="margin-top:30px;"><h3 style="margin-top:30px;">' . __('Usage', 'extend-protection') . '</h3>';

@@ -17,6 +17,11 @@
 - Searches for Orders in Extend
  **/
 
+// Prevent direct access to the file
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class Extend_Protection_Orders
 {
 

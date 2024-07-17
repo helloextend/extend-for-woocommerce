@@ -7,6 +7,12 @@ This file does the main work of the plugin
 
 log_error() function, this allows developers to log custom errors in their theme/plugin...
 */
+
+// Prevent direct access to the file
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class Extend_Protection_Logger
 {
 

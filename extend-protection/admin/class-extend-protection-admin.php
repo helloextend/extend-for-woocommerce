@@ -20,6 +20,12 @@
  * @subpackage Extend_Protection/admin
  * @author     Your Name <email@example.com>
  */
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
 class Extend_Protection_Admin
 {
 

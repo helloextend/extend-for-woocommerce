@@ -9,6 +9,12 @@
  * @subpackage Extend_Protection/includes
  * @link       https://extend.com
  */
+
+// Prevent direct access to the file
+if ( ! defined( 'ABSPATH' ) ) {
+    exit;
+}
+
 class Extend_Protection_Global
 {
 
