@@ -6,8 +6,8 @@
  * @link  http://example.com
  * @since 1.0.0
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  */
 
 /**
@@ -17,8 +17,8 @@
  * the plugin, and register them with the WordPress API. Call the
  * run function to execute the list of actions and filters.
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  * @author     partner-engineering@extend.com
  */
 
@@ -27,7 +27,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Extend_Protection_Loader
+class HelloExtend_Protection_Loader
 {
 
     /**

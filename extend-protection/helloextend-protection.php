@@ -10,7 +10,7 @@
  *
  * @link    http://extend.com
  * @since   1.0.0
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *
  * @wordpress-plugin
  * Plugin Name:       Extend Protection For WooCommerce
@@ -40,26 +40,26 @@ define('EXTEND_PRODUCT_PROTECTION_SKU', 'extend-product-protection');
 
 /**
  * The code that runs during plugin activation.
- * This action is documented in includes/class-extend-protection-activator.php
+ * This action is documented in includes/class-helloextend-protection-activator.php
  */
-function activate_extend_protection()
+function activate_helloextend_protection()
 {
-    include_once plugin_dir_path(__FILE__) . 'includes/class-extend-protection-activator.php';
-    Extend_Protection_Activator::activate();
+    include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-activator.php';
+    HelloExtend_Protection_Activator::activate();
 }
 
 /**
  * The code that runs during plugin deactivation.
- * This action is documented in includes/class-extend-protection-deactivator.php
+ * This action is documented in includes/class-helloextend-protection-deactivator.php
  */
-function deactivate_extend_protection()
+function deactivate_helloextend_protection()
 {
-    include_once plugin_dir_path(__FILE__) . 'includes/class-extend-protection-deactivator.php';
-    Extend_Protection_Deactivator::deactivate();
+    include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-deactivator.php';
+    HelloExtend_Protection_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_extend_protection');
-register_deactivation_hook(__FILE__, 'deactivate_extend_protection');
+register_activation_hook(__FILE__, 'activate_helloextend_protection');
+register_deactivation_hook(__FILE__, 'deactivate_helloextend_protection');
 
 /* Actions */
 
@@ -79,7 +79,7 @@ add_action('woocommerce_cart_calculate_fees', 'set_shipping_fee');
 add_action('woocommerce_checkout_order_processed', 'save_shipping_protection_quote_id', 5, 2);
 
 // Hook into WooCommerce order details display on admin screen
-add_action('woocommerce_after_order_itemmeta', 'add_extend_protection_contract', 10, 2);
+add_action('woocommerce_after_order_itemmeta', 'add_helloextend_protection_contract', 10, 2);
 
 /* end add_action */
 
@@ -88,7 +88,7 @@ add_action('woocommerce_after_order_itemmeta', 'add_extend_protection_contract',
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/class-extend-protection.php';
+require plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection.php';
 
 /**
  * Begins execution of the plugin.
@@ -99,16 +99,16 @@ require plugin_dir_path(__FILE__) . 'includes/class-extend-protection.php';
  *
  * @since 1.0.0
  */
-function run_extend_protection()
+function run_helloextend_protection()
 {
-    $plugin = new Extend_Protection();
+    $plugin = new HelloExtend_Protection();
     $plugin->run();
 }
 
 function extend_render_settings_page()
 {
     if (!is_woocommerce_activated()) {
-        Extend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
+        HelloExtend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
         echo '<div class="error"><p><strong>' . sprintf(__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
 
@@ -188,11 +188,11 @@ function extend_render_documentation_page()
     //    ';
 }
 
-function extend_protection_style()
+function helloextend_protection_style()
 {
     // Register stylesheets
-    wp_register_style('extend_protection_style', plugins_url('extend-protection/css/extend.css'));
-    wp_enqueue_style('extend_protection_style');
+    wp_register_style('helloextend_protection_style', plugins_url('extend-protection/css/helloextend.css'));
+    wp_enqueue_style('helloextend_protection_style');
 }
 
 /**
@@ -211,9 +211,9 @@ if (!function_exists('is_woocommerce_activated')) {
 }
 
 /* links on the plugin definition */
-if (!function_exists('extend_protection_links')) {
+if (!function_exists('helloextend_protection_links')) {
 
-    function extend_protection_links($links, $file)
+    function helloextend_protection_links($links, $file)
     {
         if (strpos($file, basename(__FILE__))) {
             $links[] = '<a href="https://www.extend.com/get-help" class="extend_support" title="Get Help"></a>';
@@ -222,7 +222,7 @@ if (!function_exists('extend_protection_links')) {
         return $links;
     }
 }
-add_filter('plugin_row_meta', 'extend_protection_links', 10, 2);
+add_filter('plugin_row_meta', 'helloextend_protection_links', 10, 2);
 
 
 /*extend_logger */
@@ -250,9 +250,9 @@ function extend_product_protection_create()
         // delete if sku exists first
         $deleteProduct = wc_get_product(extend_product_protection_id());
         if (empty($deleteProduct)) {
-            Extend_Protection_Logger::extend_log_notice('Create Extend product protection item product function was called, and product with sku ' . EXTEND_PRODUCT_PROTECTION_SKU . ' did not exist prior');
+            HelloExtend_Protection_Logger::extend_log_notice('Create Extend product protection item product function was called, and product with sku ' . EXTEND_PRODUCT_PROTECTION_SKU . ' did not exist prior');
         } else {
-            Extend_Protection_Logger::extend_log_notice('Create Extend product protection item function was called, and product with sku ' . EXTEND_PRODUCT_PROTECTION_SKU . ' existed prior');
+            HelloExtend_Protection_Logger::extend_log_notice('Create Extend product protection item function was called, and product with sku ' . EXTEND_PRODUCT_PROTECTION_SKU . ' existed prior');
             $deleteProduct->delete();
         }
 
@@ -268,7 +268,7 @@ function extend_product_protection_create()
             $product->set_virtual(true);
             $product->save();
         } catch (\Exception $e) {
-            Extend_Protection_Logger::extend_log_error($e->getMessage());
+            HelloExtend_Protection_Logger::extend_log_error($e->getMessage());
         }
 
         // upload image and associate to product
@@ -279,23 +279,23 @@ function extend_product_protection_create()
 
                 $upload         = wc_rest_upload_image_from_url(plugins_url() . '/extend-protection/images/Extend_icon.png');
                 if (is_wp_error($upload)) {
-                    Extend_Protection_Logger::extend_log_error('Could not upload extend logo from ' . plugins_url() . '/extend-protection/images/Extend_icon.png : ' . $upload->get_error_message());
+                    HelloExtend_Protection_Logger::extend_log_error('Could not upload extend logo from ' . plugins_url() . '/extend-protection/images/Extend_icon.png : ' . $upload->get_error_message());
                     return false;
                 }
 
                 $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
                 if (is_wp_error($product_img_id)) {
-                    Extend_Protection_Logger::extend_log_error('Could not retrieve product image id : ');
+                    HelloExtend_Protection_Logger::extend_log_error('Could not retrieve product image id : ');
                     return false;
                 }
 
                 //set the product image
                 set_post_thumbnail($product_id, $product_img_id);
             } else {
-                Extend_Protection_Logger::extend_log_error('Extend_icon file path incorrect: ' . plugin_dir_path('images/Extend_icon.png'));
+                HelloExtend_Protection_Logger::extend_log_error('Extend_icon file path incorrect: ' . plugin_dir_path('images/Extend_icon.png'));
             }
         } catch (\Exception $e) {
-            Extend_Protection_Logger::extend_log_error($e->getMessage());
+            HelloExtend_Protection_Logger::extend_log_error($e->getMessage());
         }
     }
 }
@@ -313,7 +313,7 @@ function extend_logger_constants()
 function extend_logger_includes()
 {
     /* Include main admin file, this sets up the plugin's admin area */
-    include_once EXTEND_LOGGER_DIR . 'admin/extend_logger_admin.php';
+    include_once EXTEND_LOGGER_DIR . 'admin/helloextend_logger_admin.php';
 }
 
 function extend_product_protection_id(): ?int
@@ -396,10 +396,10 @@ function set_shipping_fee()
 
 function save_shipping_protection_quote_id($order_id)
 {
-    $settings = get_option('extend_protection_for_woocommerce_general_settings');
+    $settings = get_option('helloextend_protection_for_woocommerce_general_settings');
 
     if ($settings['enable_extend_debug'] == 1) {
-        Extend_Protection_Logger::extend_log_debug('Adding metadata for order id ' . $order_id . ' -> shipping_quote_id : ' . WC()->session->get('shipping_quote_id'));
+        HelloExtend_Protection_Logger::extend_log_debug('Adding metadata for order id ' . $order_id . ' -> shipping_quote_id : ' . WC()->session->get('shipping_quote_id'));
     }
 
     if (WC()->session->get('shipping_quote_id') !== null) {
@@ -411,7 +411,7 @@ function save_shipping_protection_quote_id($order_id)
  *  display the contract information for relevant items in the admin order
 */
 
-function add_extend_protection_contract($item_id, $item)
+function add_helloextend_protection_contract($item_id, $item)
 {
     // Get the order object && the contracts meta if any
     $order            = $item->get_order();
@@ -419,7 +419,7 @@ function add_extend_protection_contract($item_id, $item)
     $extend_meta_data = (array) $item->get_meta('_extend_data');
 
     if (is_array($contracts)) {
-        $settings = get_option('extend_protection_for_woocommerce_general_settings');
+        $settings = get_option('helloextend_protection_for_woocommerce_general_settings');
         $env      = $settings['extend_environment'] ?? 'sandbox';
 
         if ($env == 'sandbox') {
@@ -428,7 +428,7 @@ function add_extend_protection_contract($item_id, $item)
             $url         = 'https://customers.extend.com/en-US/warranty_terms';
         }
 
-        $token = Extend_Protection_Global::get_extend_token();
+        $token = HelloExtend_Protection_Global::get_extend_token();
 
         // Get product object
         if (method_exists($item, 'get_product')) {
@@ -449,4 +449,4 @@ function add_extend_protection_contract($item_id, $item)
     }
 }
 
-run_extend_protection();
+run_helloextend_protection();

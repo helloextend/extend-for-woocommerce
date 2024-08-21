@@ -1,6 +1,6 @@
 <form id="extend-settings" method="post" action="options.php">
     <?php
-        settings_fields('extend_protection_for_woocommerce_settings_catalog_sync_option_group');
+        settings_fields('helloextend_protection_for_woocommerce_settings_catalog_sync_option_group');
         do_settings_sections('extend-protection-for-woocommerce-settings-admin-catalog-sync');
         submit_button();
     ?>

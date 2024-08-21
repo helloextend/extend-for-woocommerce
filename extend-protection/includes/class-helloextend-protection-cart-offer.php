@@ -4,10 +4,10 @@
  * Extend For WooCommerce Product Integration.
  *
  * @since   1.0.0
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/admin
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/admin
  */
 
 /**
@@ -17,7 +17,7 @@
  * Enqueues the necessary JS
  * Renders Extend cart offers
  *
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  * @author  Extend, Inc.
  */
 
@@ -26,16 +26,16 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Extend_Protection_Cart_Offer
+class HelloExtend_Protection_Cart_Offer
 {
     /**
      * The ID of this plugin.
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private string $extend_protection;
+    private string $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -54,7 +54,7 @@ class Extend_Protection_Cart_Offer
     public function __construct()
     {
         $this->hooks();
-        $this->settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = HelloExtend_Protection_Global::get_extend_settings();
     }
 
     /**
@@ -219,7 +219,7 @@ class Extend_Protection_Cart_Offer
                 compact('cart', 'extend_enable_cart_offers')
             );
         } else {
-            Extend_Protection_Logger::extend_log_error('Cart Offers Class: Extend is not enabled');
+            HelloExtend_Protection_Logger::extend_log_error('Cart Offers Class: Extend is not enabled');
         }
     }
 }

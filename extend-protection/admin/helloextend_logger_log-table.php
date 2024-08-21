@@ -14,7 +14,7 @@ if (!defined('ABSPATH')) {
 }
 
 
-$logs = Extend_Protection_Logger::extend_logger_get_all_logs();
+$logs = HelloExtend_Protection_Logger::extend_logger_get_all_logs();
 
 ?>
 
@@ -89,7 +89,7 @@ $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
         <?php
 
         /* Output all logs into the table... */
-        printf(Extend_Protection_Logger::extend_logger_format_logs($logs, $nonce));
+        printf(HelloExtend_Protection_Logger::extend_logger_format_logs($logs, $nonce));
 
         ?>
 
@@ -104,7 +104,7 @@ $logs = Extend_Protection_Logger::extend_logger_get_all_logs();
     /* If there are no logs output the introduction text from introduction.php... */
     else {
 
-        include EXTEND_LOGGER_DIR . '/admin/extend_logger_introduction.php';
+        include EXTEND_LOGGER_DIR . '/admin/helloextend_logger_introduction.php';
 
     }
 

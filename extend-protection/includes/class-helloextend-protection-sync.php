@@ -4,10 +4,10 @@
  * Extend For WooCommerce Product Integration.
  *
  * @since   1.0.0
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/admin
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/admin
  */
 
 // Prevent direct access to the file
@@ -21,10 +21,10 @@ if (! defined('ABSPATH') ) {
  * Allows syncing of your catalog to Extend's mapping database
  * to determine proper offers per item. Functionality from the admin.
  *
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  * @author  Extend, Inc.
  */
-class Extend_Protection_Sync
+class HelloExtend_Protection_Sync
 {
 
     /**
@@ -32,9 +32,9 @@ class Extend_Protection_Sync
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private string $extend_protection;
+    private string $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -47,11 +47,11 @@ class Extend_Protection_Sync
     private array $settings;
     private string $directory;
 
-    public function __construct( $extend_protection, $version )
+    public function __construct( $helloextend_protection, $version )
     {
-        $this->extend_protection = $extend_protection;
+        $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
-        $this->settings          = Extend_Protection_Global::get_extend_settings();
+        $this->settings          = HelloExtend_Protection_Global::get_extend_settings();
         $this->directory         = ABSPATH . 'wp-content/extend/sync';
         $this->hooks();
 
@@ -91,10 +91,10 @@ class Extend_Protection_Sync
             return;
         }
 
-        $sync_options                             = get_option('extend_protection_for_woocommerce_catalog_sync_settings');
+        $sync_options                             = get_option('helloextend_protection_for_woocommerce_catalog_sync_settings');
         $sync_options['extend_last_product_sync'] = null;
 
-        update_option('extend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
+        update_option('helloextend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
         wp_die();
     }
 
@@ -159,7 +159,7 @@ class Extend_Protection_Sync
         $products = new WP_Query($args);
 
         // Debug : show the actual SQL query to see what was processed
-        // Extend_Protection_Logger::extend_log_debug('Query :' .$products->request);
+        // HelloExtend_Protection_Logger::extend_log_debug('Query :' .$products->request);
 
         $batch_data = array();
 
@@ -173,24 +173,24 @@ class Extend_Protection_Sync
             }
 
             if ($this->settings['enable_extend_debug'] == 1 ) {
-                Extend_Protection_Logger::extend_log_debug('DEBUG: batchdata for batch #' . $batch_current . ' >>> ' . print_r($batch_data, true));
+                HelloExtend_Protection_Logger::extend_log_debug('DEBUG: batchdata for batch #' . $batch_current . ' >>> ' . print_r($batch_data, true));
             }
             // batch_data is the payload we send to extend
             $request_args = $this->buildRequest($batch_data);
             $response     = wp_remote_request($this->settings['api_host'] . '/stores/' . $this->settings['store_id'] . '/products?batch=true', $request_args);
 
             if ($this->settings['enable_extend_debug'] == 1 ) {
-                Extend_Protection_Logger::extend_log_debug('DEBUG response: ' . print_r($response, true));
+                HelloExtend_Protection_Logger::extend_log_debug('DEBUG response: ' . print_r($response, true));
             }
 
             if (is_wp_error($response) ) {
                 $error_message = $response->get_error_message();
-                Extend_Protection_Logger::extend_log_error(' Catalog Sync Batch #' . $batch_current . ' : POST request failed: ' . $error_message);
+                HelloExtend_Protection_Logger::extend_log_error(' Catalog Sync Batch #' . $batch_current . ' : POST request failed: ' . $error_message);
             } else {
                 $response_code = wp_remote_retrieve_response_code($response);
                 if ($response_code === 201 ) {
                     // success
-                    Extend_Protection_Logger::extend_log_notice('Catalog Sync Batch #' . $batch_current . ' was successful');
+                    HelloExtend_Protection_Logger::extend_log_notice('Catalog Sync Batch #' . $batch_current . ' was successful');
 
                     $data = json_decode(wp_remote_retrieve_body($response));
 
@@ -203,7 +203,7 @@ class Extend_Protection_Sync
             $this->send_sync_success($batch_current, $batch_data, $batch_total);
 
         } else {
-            Extend_Protection_Logger::extend_log_error('No recently updated products found to sync.');
+            HelloExtend_Protection_Logger::extend_log_error('No recently updated products found to sync.');
             $batch_data_empty = array();
             $this->send_sync_success(1, $batch_data_empty, 1);
         }
@@ -290,7 +290,7 @@ class Extend_Protection_Sync
         }
 
         if ($this->settings['enable_extend_debug'] == 1 ) {
-            Extend_Protection_Logger::extend_log_debug('DEBUG : Catalog Sync Payload :' . print_r($payload, true));
+            HelloExtend_Protection_Logger::extend_log_debug('DEBUG : Catalog Sync Payload :' . print_r($payload, true));
         }
 
         return $payload;
@@ -340,12 +340,12 @@ class Extend_Protection_Sync
             return;
         }
 
-        $sync_options                             = get_option('extend_protection_for_woocommerce_catalog_sync_settings');
+        $sync_options                             = get_option('helloextend_protection_for_woocommerce_catalog_sync_settings');
         $sync_time                                = time();
         $sync_options['extend_last_product_sync'] = $sync_time;
 
-        update_option('extend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
-        Extend_Protection_Logger::extend_log_notice(
+        update_option('helloextend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
+        HelloExtend_Protection_Logger::extend_log_notice(
             "Catalog sync completed. 
         Please refer to the log in <a href='" . site_url() . 'wp-content/extend/sync/sync-' . date('m-d-y') . ".log'>wp-content/extend/sync/sync-" . date('m-d-y') . '.log</a>'
         );
@@ -431,12 +431,12 @@ class Extend_Protection_Sync
                 $response     = wp_remote_request($this->settings['api_host'] . '/stores/' . $this->settings['store_id'] . '/products?batch=true', $request_args);
 
                 if ($this->settings['enable_extend_debug'] == 1 ) {
-                    Extend_Protection_Logger::extend_log_debug('DEBUG response: ' . print_r($response, true));
+                    HelloExtend_Protection_Logger::extend_log_debug('DEBUG response: ' . print_r($response, true));
                 }
 
                 if (is_wp_error($response) ) {
                     $error_message = $response->get_error_message();
-                    Extend_Protection_Logger::extend_log_error('Product Sync : POST request failed: ' . $error_message);
+                    HelloExtend_Protection_Logger::extend_log_error('Product Sync : POST request failed: ' . $error_message);
                 } else {
                     $response_code = wp_remote_retrieve_response_code($response);
                     if ($response_code === 201 ) {
@@ -445,21 +445,21 @@ class Extend_Protection_Sync
                         if (isset($data->added) && is_array($data->added) ) {
                                $batch_added_count = count($data->added);
                             if ($batch_added_count > 0 ) {
-                                Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID ' . $product_id . ' added');
+                                HelloExtend_Protection_Logger::extend_log_notice('Single Product Sync : item ID ' . $product_id . ' added');
                             }
                         }
 
                         if (isset($data->updated) && is_array($data->updated) ) {
                             $batch_updated_count = count($data->updated);
                             if ($batch_updated_count > 0 ) {
-                                Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID ' . $product_id . ' updated');
+                                HelloExtend_Protection_Logger::extend_log_notice('Single Product Sync : item ID ' . $product_id . ' updated');
                             }
                         }
 
                         if (isset($data->errors) && is_array($data->errors) ) {
                             $batch_errors_count = count($data->errors);
                             if ($batch_errors_count > 0 ) {
-                                Extend_Protection_Logger::extend_log_notice('Single Product Sync : item ID' . $product_id . ' returned an error');
+                                HelloExtend_Protection_Logger::extend_log_notice('Single Product Sync : item ID' . $product_id . ' returned an error');
                             }
                         }
                     } //end response 201
@@ -469,7 +469,7 @@ class Extend_Protection_Sync
             }//end while
             $this->log_syncs($response, $batch_data, '1');
         } else {
-            Extend_Protection_Logger::extend_log_error('No recently updated products found to sync.');
+            HelloExtend_Protection_Logger::extend_log_error('No recently updated products found to sync.');
         }
     }
 
@@ -480,7 +480,7 @@ class Extend_Protection_Sync
     {
         // get calling function : debug_backtrace()[1]['function'] should return sync_product_cron_job;
         if ($this->settings['extend_automated_product_sync'] <> 'never' ) {
-            Extend_Protection_Logger::extend_log_notice('Running Scheduled Product Sync on the schedule called : ' . $this->settings['extend_automated_product_sync']);
+            HelloExtend_Protection_Logger::extend_log_notice('Running Scheduled Product Sync on the schedule called : ' . $this->settings['extend_automated_product_sync']);
 
             $batch_size = $this->settings['extend_sync_batch'];
             $args       = array(
@@ -539,7 +539,7 @@ class Extend_Protection_Sync
                         $response     = wp_remote_request($this->settings['api_host'] . '/stores/' . $this->settings['store_id'] . '/products?batch=true', $request_args);
                         if (is_wp_error($response) ) {
                             $error_message = $response->get_error_message();
-                            Extend_Protection_Logger::extend_log_error(' Catalog Sync Batch #' . $page . ' : POST request failed: ' . $error_message);
+                            HelloExtend_Protection_Logger::extend_log_error(' Catalog Sync Batch #' . $page . ' : POST request failed: ' . $error_message);
                         } else {
                             $response_code = wp_remote_retrieve_response_code($response);
                             if ($response_code === 201 ) {
@@ -562,7 +562,7 @@ class Extend_Protection_Sync
         } else {
             // only write in the log if debug is on, to avoid crowding logs
             if ($this->settings['enable_extend_debug'] == 1 ) {
-                Extend_Protection_Logger::extend_log_error('No recently updated products found to sync through schedule.');
+                HelloExtend_Protection_Logger::extend_log_error('No recently updated products found to sync through schedule.');
             }
         }
     }
@@ -702,7 +702,7 @@ class Extend_Protection_Sync
             }
             if ($batch_errors_count > 0 ) {
                 $error_summary = 'Catalog Sync Batch #' . $batch_current . ', ' . $batch_errors_count . $items_errored . "\n" . implode(', ', $errors_item);
-                Extend_Protection_Logger::extend_log_error('Catalog Sync Batch #' . $batch_current . ', ' . $batch_errors_count . $items_errored . implode(',', $errors_item));
+                HelloExtend_Protection_Logger::extend_log_error('Catalog Sync Batch #' . $batch_current . ', ' . $batch_errors_count . $items_errored . implode(',', $errors_item));
                 $this->log_sync_summary($error_summary);
             }
         }

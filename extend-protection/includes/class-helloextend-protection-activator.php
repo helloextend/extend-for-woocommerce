@@ -6,8 +6,8 @@
  * @link  http://example.com
  * @since 1.0.0
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  * @author     support@extend.com
  */
 
@@ -16,7 +16,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Extend_Protection_Activator
+class HelloExtend_Protection_Activator
 {
 
     /**

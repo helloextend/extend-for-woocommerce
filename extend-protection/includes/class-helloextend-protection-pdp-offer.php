@@ -4,10 +4,10 @@
  * Extend For WooCommerce Product Integration.
  *
  * @since   1.0.0
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/admin
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/admin
  */
 
 // Prevent direct access to the file
@@ -21,12 +21,12 @@ if (! defined('ABSPATH') ) {
  * Adds .extend-offer div to the product display page,
  * and enqueues the necessary JS
  *
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *  * // TODO: Q for JM - What does the subpackage need to be?
-// * @subpackage Extend_Protection/admin
+// * @subpackage HelloExtend_Protection/admin
  * @author  Extend, Inc.
  */
-class Extend_Protection_PDP_Offer
+class HelloExtend_Protection_PDP_Offer
 {
 
     /**
@@ -34,9 +34,9 @@ class Extend_Protection_PDP_Offer
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private $extend_protection;
+    private $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -57,13 +57,13 @@ class Extend_Protection_PDP_Offer
     /**
      * Initialize the class and set its properties.
      *
-     * @param string $extend_protection The name of this plugin.
+     * @param string $helloextend_protection The name of this plugin.
      * @param string $version           The version of this plugin.
      * @since 1.0.0
      */
-    public function __construct( $extend_protection, $version )
+    public function __construct( $helloextend_protection, $version )
     {
-        $this->extend_protection = $extend_protection;
+        $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
 
         $this->basename = plugin_basename(__FILE__);
@@ -71,7 +71,7 @@ class Extend_Protection_PDP_Offer
         $this->path     = plugin_dir_path(__FILE__);
 
         /* retrieve environment variables */
-        $this->settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = HelloExtend_Protection_Global::get_extend_settings();
 
         /* Initializes product_offer on the PDP Offer Location selected in wp-admin > Extend */
         add_action($this->settings['extend_pdp_offer_location'], [ $this, 'product_offer' ]);
