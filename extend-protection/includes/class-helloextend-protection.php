@@ -9,8 +9,8 @@
  * @link  http://example.com
  * @since 1.0.0
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  * @author     support@extend.com
  */
 
@@ -19,7 +19,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Extend_Protection
+class HelloExtend_Protection
 {
 
 
@@ -29,7 +29,7 @@ class Extend_Protection
      *
      * @since  1.0.0
      * @access protected
-     * @var    Extend_Protection_Loader $loader Maintains and registers all hooks for the plugin.
+     * @var    HelloExtend_Protection_Loader $loader Maintains and registers all hooks for the plugin.
      */
     protected $loader;
 
@@ -38,9 +38,9 @@ class Extend_Protection
      *
      * @since  1.0.0
      * @access protected
-     * @var    string $extend_protection The string used to uniquely identify this plugin.
+     * @var    string $helloextend_protection The string used to uniquely identify this plugin.
      */
-    protected $extend_protection;
+    protected $helloextend_protection;
 
     /**
      * The current version of the plugin.
@@ -86,10 +86,10 @@ class Extend_Protection
      * @since 1.0.0
      */
     protected $path = '';
-    private Extend_Protection_Cart_Offer $cart_offer;
-    private Extend_Protection_Orders $orders;
-    private Extend_Protection_Shipping $shipping_protection;
-    private Extend_Protection_Sync $sync;
+    private HelloExtend_Protection_Cart_Offer $cart_offer;
+    private HelloExtend_Protection_Orders $orders;
+    private HelloExtend_Protection_Shipping $shipping_protection;
+    private HelloExtend_Protection_Sync $sync;
 
     /**
      * Define the core functionality of the plugin.
@@ -107,7 +107,7 @@ class Extend_Protection
         } else {
             $this->version = '1.0.0';
         }
-        $this->extend_protection = 'extend-protection';
+        $this->helloextend_protection = 'extend-protection';
 
         $this->url  = plugin_dir_url(__FILE__);
         $this->path = plugin_dir_path(__FILE__);
@@ -128,11 +128,11 @@ class Extend_Protection
      *
      * Include the following files that make up the plugin:
      *
-     * - Extend_Protection_Loader. Orchestrates the hooks of the plugin.
-     * - Extend_Protection_i18n. Defines internationalization functionality.
-     * - Extend_Protection_Admin. Defines all hooks for the admin area.
-     * - Extend_Protection_Public. Defines all hooks for the public side of the site.
-     * - Extend_Protection_PDP_Offer. Renders Extend offers on PDP page.
+     * - HelloExtend_Protection_Loader. Orchestrates the hooks of the plugin.
+     * - HelloExtend_Protection_i18n. Defines internationalization functionality.
+     * - HelloExtend_Protection_Admin. Defines all hooks for the admin area.
+     * - HelloExtend_Protection_Public. Defines all hooks for the public side of the site.
+     * - HelloExtend_Protection_PDP_Offer. Renders Extend offers on PDP page.
      *
      * Create an instance of the loader which will be used to register the hooks
      * with WordPress.
@@ -147,70 +147,70 @@ class Extend_Protection
          * The class responsible for orchestrating the actions and filters of the
          * core plugin.
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-loader.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-loader.php';
 
         /**
          * The class responsible for defining internationalization functionality
          * of the plugin.
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-i18n.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-i18n.php';
 
         /**
          * The class responsible for defining all actions that occur in the admin area.
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-extend-protection-admin.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'admin/class-helloextend-protection-admin.php';
 
         /**
          * The class responsible for defining all actions that occur in the public-facing
          * side of the site.
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'public/class-extend-protection-public.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'public/class-helloextend-protection-public.php';
 
         /**
          * The class responsible for adding .extend-offer div and the JS to render Extend
          * offers on the PDP page
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-pdp-offer.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-pdp-offer.php';
 
         /**
          * The class responsible for rendering extend offers on the cart page
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-cart-offer.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-cart-offer.php';
 
         /**
          * The class responsible for handling the Extend Orders API
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-orders.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-orders.php';
 
         /**
          * The class responsible for loading the global class and enqueing the JS
          * to add extend offers to the cart
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-global.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-global.php';
 
         /**
          * The class responsible for handling the Logs
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-logger.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-logger.php';
 
         /**
          * The class responsible for handling the Shipping Protection
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-shipping.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-shipping.php';
 
         /**
          * The class responsible for handling the Product Sync
          */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-extend-protection-sync.php';
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-sync.php';
 
-        $this->loader = new Extend_Protection_Loader();
+        $this->loader = new HelloExtend_Protection_Loader();
 
     }
 
     /**
      * Define the locale for this plugin for internationalization.
      *
-     * Uses the Extend_Protection_i18n class in order to set the domain and to register the hook
+     * Uses the HelloExtend_Protection_i18n class in order to set the domain and to register the hook
      * with WordPress.
      *
      * @since  1.0.0
@@ -219,7 +219,7 @@ class Extend_Protection
     private function set_locale()
     {
 
-        $plugin_i18n = new Extend_Protection_i18n();
+        $plugin_i18n = new HelloExtend_Protection_i18n();
 
         $this->loader->add_action('plugins_loaded', $plugin_i18n, 'load_plugin_textdomain');
 
@@ -235,8 +235,8 @@ class Extend_Protection
     private function define_admin_hooks()
     {
 
-        $plugin_admin = new Extend_Protection_Admin($this->get_extend_protection(), $this->get_version());
-        $this->sync   = new Extend_Protection_Sync($this->get_extend_protection(), $this->get_version());
+        $plugin_admin = new HelloExtend_Protection_Admin($this->get_helloextend_protection(), $this->get_version());
+        $this->sync   = new HelloExtend_Protection_Sync($this->get_helloextend_protection(), $this->get_version());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -252,13 +252,13 @@ class Extend_Protection
     private function define_global_hooks()
     {
         wp_register_script('extend_script', $this->sdk_url);
-        wp_register_script('extend_global_script', $this->url . '../js/global.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
-        wp_register_script('extend_product_integration_script', $this->url . '../js/extend-pdp-offers.js', [ 'jquery', 'extend_global_script' ], '1.0.0', true);
-        wp_register_script('extend_cart_integration_script', $this->url . '../js/extend-cart-offers.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
-        wp_register_script('extend_shipping_integration_script', $this->url . '../js/extend-shipping-offers.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
-        wp_register_script('extend_sync_script', $this->url . '../js/extend-sync.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
+        wp_register_script('extend_global_script', $this->url . '../js/helloextend-global.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
+        wp_register_script('extend_product_integration_script', $this->url . '../js/helloextend-pdp-offers.js', [ 'jquery', 'extend_global_script' ], '1.0.0', true);
+        wp_register_script('extend_cart_integration_script', $this->url . '../js/helloextend-cart-offers.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
+        wp_register_script('extend_shipping_integration_script', $this->url . '../js/helloextend-shipping-offers.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
+        wp_register_script('extend_sync_script', $this->url . '../js/helloextend-sync.js', [ 'jquery', 'extend_script' ], '1.0.0', true);
 
-        $this->global_hooks = new Extend_Protection_Global($this->get_extend_protection(), $this->get_version());
+        $this->global_hooks = new HelloExtend_Protection_Global($this->get_helloextend_protection(), $this->get_version());
     }
 
     /**
@@ -270,7 +270,7 @@ class Extend_Protection
      */
     private function define_pdp_offer_hooks()
     {
-        $this->pdp_offer = new Extend_Protection_PDP_Offer($this->get_extend_protection(), $this->get_version());
+        $this->pdp_offer = new HelloExtend_Protection_PDP_Offer($this->get_helloextend_protection(), $this->get_version());
     }
 
     /**
@@ -282,7 +282,7 @@ class Extend_Protection
      */
     private function define_cart_offer_hooks()
     {
-        $this->cart_offer = new Extend_Protection_Cart_Offer($this->get_extend_protection(), $this->get_version());
+        $this->cart_offer = new HelloExtend_Protection_Cart_Offer($this->get_helloextend_protection(), $this->get_version());
     }
 
     /**
@@ -294,7 +294,7 @@ class Extend_Protection
      */
     private function define_shipping_protection_offer_hooks()
     {
-        $this->shipping_protection_offer = new Extend_Protection_Shipping($this->get_extend_protection(), $this->get_version());
+        $this->shipping_protection_offer = new HelloExtend_Protection_Shipping($this->get_helloextend_protection(), $this->get_version());
     }
 
     /**
@@ -306,7 +306,7 @@ class Extend_Protection
      */
     private function define_orders_hooks()
     {
-        $this->orders = new Extend_Protection_Orders($this->get_extend_protection(), $this->get_version());
+        $this->orders = new HelloExtend_Protection_Orders($this->get_helloextend_protection(), $this->get_version());
     }
 
     /**
@@ -319,7 +319,7 @@ class Extend_Protection
     private function define_public_hooks()
     {
 
-        $plugin_public = new Extend_Protection_Public($this->get_extend_protection(), $this->get_version());
+        $plugin_public = new HelloExtend_Protection_Public($this->get_helloextend_protection(), $this->get_version());
 
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
@@ -343,15 +343,15 @@ class Extend_Protection
      * @return string    The name of the plugin.
      * @since  1.0.0
      */
-    public function get_extend_protection()
+    public function get_helloextend_protection()
     {
-        return $this->extend_protection;
+        return $this->helloextend_protection;
     }
 
     /**
      * The reference to the class that orchestrates the hooks with the plugin.
      *
-     * @return Extend_Protection_Loader    Orchestrates the hooks of the plugin.
+     * @return HelloExtend_Protection_Loader    Orchestrates the hooks of the plugin.
      * @since  1.0.0
      */
     public function get_loader()

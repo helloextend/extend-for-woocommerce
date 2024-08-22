@@ -6,8 +6,8 @@
  * @link  http://example.com
  * @since 1.0.0
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/public
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/public
  */
 
 // Prevent direct access to the file
@@ -21,11 +21,11 @@ if (! defined('ABSPATH') ) {
  * Defines the plugin name, version, and two examples hooks for how to
  * enqueue the public-facing stylesheet and JavaScript.
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/public
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/public
  * @author     Your Name <email@example.com>
  */
-class Extend_Protection_Public
+class HelloExtend_Protection_Public
 {
 
     /**
@@ -33,9 +33,9 @@ class Extend_Protection_Public
      *
      * @since  1.0.0
      * @access private
-     * @var    string    $extend_protection    The ID of this plugin.
+     * @var    string    $helloextend_protection    The ID of this plugin.
      */
-    private $extend_protection;
+    private $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -50,13 +50,13 @@ class Extend_Protection_Public
      * Initialize the class and set its properties.
      *
      * @since 1.0.0
-     * @param string $extend_protection The name of the plugin.
+     * @param string $helloextend_protection The name of the plugin.
      * @param string $version           The version of this plugin.
      */
-    public function __construct( $extend_protection, $version )
+    public function __construct( $helloextend_protection, $version )
     {
 
-        $this->extend_protection = $extend_protection;
+        $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
 
     }
@@ -73,15 +73,15 @@ class Extend_Protection_Public
          * This function is provided for demonstration purposes only.
          *
          * An instance of this class should be passed to the run() function
-         * defined in Extend_Protection_Loader as all of the hooks are defined
+         * defined in HelloExtend_Protection_Loader as all of the hooks are defined
          * in that particular class.
          *
-         * The Extend_Protection_Loader will then create the relationship
+         * The HelloExtend_Protection_Loader will then create the relationship
          * between the defined hooks and the functions defined in this
          * class.
          */
 
-        wp_enqueue_style($this->extend_protection, plugin_dir_url(__FILE__) . 'css/extend-protection-public.css', array(), $this->version, 'all');
+        wp_enqueue_style($this->helloextend_protection, plugin_dir_url(__FILE__) . 'css/helloextend-protection-public.css', array(), $this->version, 'all');
 
     }
 
@@ -97,15 +97,15 @@ class Extend_Protection_Public
          * This function is provided for demonstration purposes only.
          *
          * An instance of this class should be passed to the run() function
-         * defined in Extend_Protection_Loader as all of the hooks are defined
+         * defined in HelloExtend_Protection_Loader as all of the hooks are defined
          * in that particular class.
          *
-         * The Extend_Protection_Loader will then create the relationship
+         * The HelloExtend_Protection_Loader will then create the relationship
          * between the defined hooks and the functions defined in this
          * class.
          */
 
-        wp_enqueue_script($this->extend_protection, plugin_dir_url(__FILE__) . 'js/extend-protection-public.js', array( 'jquery' ), $this->version, false);
+        wp_enqueue_script($this->helloextend_protection, plugin_dir_url(__FILE__) . 'js/helloextend-protection-public.js', array( 'jquery' ), $this->version, false);
 
     }
 }

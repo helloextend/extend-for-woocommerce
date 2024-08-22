@@ -13,7 +13,7 @@ if (! defined('ABSPATH') ) {
     exit;
 }
 
-class Extend_Protection_Logger
+class HelloExtend_Protection_Logger
 {
 
     public static function extend_log_error( $message )
@@ -528,7 +528,7 @@ class Extend_Protection_Logger
     }
 }
 
-$extendProtectionLogger = new Extend_Protection_Logger();
+$extendProtectionLogger = new HelloExtend_Protection_Logger();
 
 add_action('wp_ajax_nopriv_extend_logger_delete_all', array( $extendProtectionLogger, 'extend_logger_delete_all' ));
 add_action('wp_ajax_extend_logger_delete_all', array( $extendProtectionLogger, 'extend_logger_delete_all' ));

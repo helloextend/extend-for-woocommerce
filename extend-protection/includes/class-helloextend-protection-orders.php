@@ -4,8 +4,8 @@
  * Extend For WooCommerce Orders class
  *
  * @since      1.0.0
- * @package    Extend_Protection
- * @subpackage Extend_Protection/admin
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/admin
  *
  * Description: The Orders functionality of the plugin.
  *  It hooks onto the WooCommerces order actions and makes API requests to Extend.
@@ -22,7 +22,7 @@ if (! defined('ABSPATH') ) {
     exit;
 }
 
-class Extend_Protection_Orders
+class HelloExtend_Protection_Orders
 {
 
     /**
@@ -30,9 +30,9 @@ class Extend_Protection_Orders
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private $extend_protection;
+    private $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -56,16 +56,16 @@ class Extend_Protection_Orders
     /**
      * Initialize the class and set its properties.
      *
-     * @param string $extend_protection The name of this plugin.
+     * @param string $helloextend_protection The name of this plugin.
      * @param string $version           The version of this plugin.
      * @since 1.0.0
      */
-    public function __construct($extend_protection, $version)
+    public function __construct($helloextend_protection, $version)
     {
-        $this->extend_protection = $extend_protection;
+        $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
         /* retrieve environment variables */
-        $this->settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = HelloExtend_Protection_Global::get_extend_settings();
 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action('woocommerce_checkout_order_processed', [$this, 'create_update_order'], 10, 1);
@@ -161,7 +161,7 @@ class Extend_Protection_Orders
         $contract_creation = $this->settings['extend_product_protection_contract_create'];
         if ($contract_creation == 0) {
             if ($this->settings['enable_extend_debug'] == 1) {
-                Extend_Protection_Logger::extend_log_error('Contract creation is disabled. No contract will be created for this order.');
+                HelloExtend_Protection_Logger::extend_log_error('Contract creation is disabled. No contract will be created for this order.');
             }
             return;
         }
@@ -194,7 +194,7 @@ class Extend_Protection_Orders
         $shipping_protection_quote_id = get_post_meta($order_id, '_shipping_protection_quote_id', true);
         // check if shipping protection meta exists
         if ($shipping_protection_quote_id) {
-            Extend_Protection_Logger::extend_log_notice('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
+            HelloExtend_Protection_Logger::extend_log_notice('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
 
             // Push shipping protection line item into extend_line_items array
             $extend_line_items[] = array(
@@ -204,7 +204,7 @@ class Extend_Protection_Orders
             );
         } else {
             if ($this->settings['enable_extend_debug'] == 1) {
-                Extend_Protection_Logger::extend_log_notice('Shipping Protection Meta Does Not Exist');
+                HelloExtend_Protection_Logger::extend_log_notice('Shipping Protection Meta Does Not Exist');
             }
         }
 
@@ -238,15 +238,15 @@ class Extend_Protection_Orders
         );
 
         if ($this->settings['enable_extend_debug'] == 1) {
-            Extend_Protection_Logger::extend_log_debug('Debug: Extend Order Data: ' . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
+            HelloExtend_Protection_Logger::extend_log_debug('Debug: Extend Order Data: ' . print_r(json_encode($extend_order_data, JSON_PRETTY_PRINT), true));
         }
 
         // Get Token from Global function
-        $token = Extend_Protection_Global::get_extend_token();
+        $token = HelloExtend_Protection_Global::get_extend_token();
 
         // Log the token
         if ($this->settings['enable_extend_debug'] == 1) {
-            Extend_Protection_Logger::extend_log_debug('Token: ' . $token);
+            HelloExtend_Protection_Logger::extend_log_debug('Token: ' . $token);
         }
 
         $request_args = array(
@@ -263,7 +263,7 @@ class Extend_Protection_Orders
 
         if (is_wp_error($response)) {
             $error_message = $response->get_error_message();
-            Extend_Protection_Logger::extend_log_error(' Order ID ' . $order->get_id() . ' : PUT request failed: ' . $error_message);
+            HelloExtend_Protection_Logger::extend_log_error(' Order ID ' . $order->get_id() . ' : PUT request failed: ' . $error_message);
         } else {
             $response_code = wp_remote_retrieve_response_code($response);
 
@@ -271,7 +271,7 @@ class Extend_Protection_Orders
             if ($response_code === 201 || $response_code === 200) {
                 // Only log if "Enable debugging Log" is enabled
                 if ($this->settings['enable_extend_debug'] == 1) {
-                    Extend_Protection_Logger::extend_log_debug('Order ID ' . $order->get_id() . ' : PUT request successful: ' . wp_remote_retrieve_body($response));
+                    HelloExtend_Protection_Logger::extend_log_debug('Order ID ' . $order->get_id() . ' : PUT request successful: ' . wp_remote_retrieve_body($response));
                 }
                 // if put was successful and if there is a contract ID in the response, write it back to the order metadata at the lineitem level
                 $data      = json_decode(wp_remote_retrieve_body($response));
@@ -291,10 +291,10 @@ class Extend_Protection_Orders
                 }
             } else {
                 if ($this->settings['enable_extend_debug'] == 1) {
-                    Extend_Protection_Logger::extend_log_debug('Order  ID ' . $order->get_id() . ' : PUT request failed with status code ' . $response_code);
-                    Extend_Protection_Logger::extend_log_debug('Body response: ' . wp_remote_retrieve_body($response));
+                    HelloExtend_Protection_Logger::extend_log_debug('Order  ID ' . $order->get_id() . ' : PUT request failed with status code ' . $response_code);
+                    HelloExtend_Protection_Logger::extend_log_debug('Body response: ' . wp_remote_retrieve_body($response));
                 } else {
-                    Extend_Protection_Logger::extend_log_error('Order  ID ' . $order->get_id() . ' : PUT request failed with status code ' . $response_code);
+                    HelloExtend_Protection_Logger::extend_log_error('Order  ID ' . $order->get_id() . ' : PUT request failed with status code ' . $response_code);
                 }
             }
         }

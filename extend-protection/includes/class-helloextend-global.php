@@ -4,9 +4,9 @@
  * Extend for WooCommerce Global Class
  *
  * @since      1.0.0
- * @package    Extend_Protection
+ * @package    HelloExtend_Protection
  * @author     Extend, Inc.
- * @subpackage Extend_Protection/includes
+ * @subpackage HelloExtend_Protection/includes
  * @link       https://extend.com
  */
 
@@ -15,7 +15,7 @@ if (! defined('ABSPATH') ) {
     exit;
 }
 
-class Extend_Protection_Global
+class HelloExtend_Protection_Global
 {
 
     /**
@@ -23,9 +23,9 @@ class Extend_Protection_Global
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private $extend_protection;
+    private $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -40,7 +40,7 @@ class Extend_Protection_Global
      * Parent plugin class
      *
      * @since 1.0.0
-     * @var   Extend_Protection
+     * @var   HelloExtend_Protection
      */
     protected $plugin = null;
 
@@ -48,12 +48,12 @@ class Extend_Protection_Global
      * Constructor
      *
      * @since 1.0.0
-     * @param Extend_Protection $plugin Main plugin object
+     * @param HelloExtend_Protection $plugin Main plugin object
      */
-    public function __construct($extend_protection, $version)
+    public function __construct($helloextend_protection, $version)
     {
 
-        $this->extend_protection = $extend_protection;
+        $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
         $this->hooks();
     }
@@ -138,35 +138,35 @@ class Extend_Protection_Global
     {
         static $settings;
 
-        $extend_protection_general_settings             = (array) get_option('extend_protection_for_woocommerce_general_settings');
-        $extend_protection_product_protection_settings  = (array) get_option('extend_protection_for_woocommerce_product_protection_settings');
-        $extend_protection_shipping_protection_settings = (array) get_option('extend_protection_for_woocommerce_shipping_protection_settings');
-        $extend_protection_catalog_sync_settings        = (array) get_option('extend_protection_for_woocommerce_catalog_sync_settings');
+        $helloextend_protection_general_settings             = (array) get_option('helloextend_protection_for_woocommerce_general_settings');
+        $helloextend_protection_product_protection_settings  = (array) get_option('helloextend_protection_for_woocommerce_product_protection_settings');
+        $helloextend_protection_shipping_protection_settings = (array) get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
+        $helloextend_protection_catalog_sync_settings        = (array) get_option('helloextend_protection_for_woocommerce_catalog_sync_settings');
 
-        $settings['enable_extend'] = array_key_exists('enable_extend', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['enable_extend'] : 0;
+        $settings['enable_extend'] = array_key_exists('enable_extend', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['enable_extend'] : 0;
 
-        $settings['extend_enable_cart_offers'] = array_key_exists('extend_enable_cart_offers', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_enable_cart_offers'] : 0;
+        $settings['extend_enable_cart_offers'] = array_key_exists('extend_enable_cart_offers', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_enable_cart_offers'] : 0;
 
-        $settings['extend_enable_cart_balancing'] = array_key_exists('extend_enable_cart_balancing', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_enable_cart_balancing'] : 0;
+        $settings['extend_enable_cart_balancing'] = array_key_exists('extend_enable_cart_balancing', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_enable_cart_balancing'] : 0;
 
-        $settings['extend_enable_pdp_offers'] = array_key_exists('extend_enable_pdp_offers', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_enable_pdp_offers'] : 0;
+        $settings['extend_enable_pdp_offers'] = array_key_exists('extend_enable_pdp_offers', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_enable_pdp_offers'] : 0;
 
-        $settings['extend_enable_modal_offers'] = array_key_exists('extend_enable_modal_offers', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_enable_modal_offers'] : 0;
+        $settings['extend_enable_modal_offers'] = array_key_exists('extend_enable_modal_offers', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_enable_modal_offers'] : 0;
 
-        $settings['extend_pdp_offer_location'] = array_key_exists('extend_pdp_offer_location', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_pdp_offer_location']
+        $settings['extend_pdp_offer_location'] = array_key_exists('extend_pdp_offer_location', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_pdp_offer_location']
             : 'woocommerce_before_add_to_cart_button';
 
-        $settings['extend_pdp_offer_location_other'] = array_key_exists('extend_pdp_offer_location_other', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_pdp_offer_location_other'] : '';
+        $settings['extend_pdp_offer_location_other'] = array_key_exists('extend_pdp_offer_location_other', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_pdp_offer_location_other'] : '';
 
-        $settings['extend_atc_button_selector'] = array_key_exists('extend_atc_button_selector', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_atc_button_selector'] : 'button.single_add_to_cart_button';
+        $settings['extend_atc_button_selector'] = array_key_exists('extend_atc_button_selector', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_atc_button_selector'] : 'button.single_add_to_cart_button';
 
         // update pdp offer location if "other" is selected otherwise default
         if ($settings['extend_pdp_offer_location'] == 'other' && $settings['extend_pdp_offer_location_other'] !== '') {
@@ -176,29 +176,29 @@ class Extend_Protection_Global
         }
 
         /* Contract Creation Settings */
-        $settings['extend_product_protection_contract_create'] = array_key_exists('extend_product_protection_contract_create', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_product_protection_contract_create'] : 0;
+        $settings['extend_product_protection_contract_create'] = array_key_exists('extend_product_protection_contract_create', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_product_protection_contract_create'] : 0;
 
-        $settings['extend_product_protection_contract_create_event'] = array_key_exists('extend_product_protection_contract_create_event', $extend_protection_product_protection_settings)
-            ? $extend_protection_product_protection_settings['extend_product_protection_contract_create_event'] : 'Fulfillment';
+        $settings['extend_product_protection_contract_create_event'] = array_key_exists('extend_product_protection_contract_create_event', $helloextend_protection_product_protection_settings)
+            ? $helloextend_protection_product_protection_settings['extend_product_protection_contract_create_event'] : 'Fulfillment';
 
-        $settings['extend_environment'] = array_key_exists('extend_environment', $extend_protection_general_settings)
-            ? $extend_protection_general_settings['extend_environment'] : 'sandbox';
+        $settings['extend_environment'] = array_key_exists('extend_environment', $helloextend_protection_general_settings)
+            ? $helloextend_protection_general_settings['extend_environment'] : 'sandbox';
 
-        $settings['enable_extend_debug'] = array_key_exists('enable_extend_debug', $extend_protection_general_settings)
-            ? $extend_protection_general_settings['enable_extend_debug'] : 0;
+        $settings['enable_extend_debug'] = array_key_exists('enable_extend_debug', $helloextend_protection_general_settings)
+            ? $helloextend_protection_general_settings['enable_extend_debug'] : 0;
 
         /* shipping protection */
-        if ($extend_protection_shipping_protection_settings) {
-            $settings['enable_extend_sp'] = array_key_exists('enable_extend_sp', $extend_protection_shipping_protection_settings)
-                ? $extend_protection_shipping_protection_settings['enable_extend_sp'] : 0;
+        if ($helloextend_protection_shipping_protection_settings) {
+            $settings['enable_extend_sp'] = array_key_exists('enable_extend_sp', $helloextend_protection_shipping_protection_settings)
+                ? $helloextend_protection_shipping_protection_settings['enable_extend_sp'] : 0;
 
-            $settings['extend_sp_offer_location'] = array_key_exists('extend_sp_offer_location', $extend_protection_shipping_protection_settings)
-                ? $extend_protection_shipping_protection_settings['extend_sp_offer_location']
+            $settings['extend_sp_offer_location'] = array_key_exists('extend_sp_offer_location', $helloextend_protection_shipping_protection_settings)
+                ? $helloextend_protection_shipping_protection_settings['extend_sp_offer_location']
                 : 'woocommerce_review_order_after_shipping';
 
-            $settings['extend_sp_offer_location_other'] = array_key_exists('extend_sp_offer_location_other', $extend_protection_shipping_protection_settings)
-                ? $extend_protection_shipping_protection_settings['extend_sp_offer_location_other'] : '';
+            $settings['extend_sp_offer_location_other'] = array_key_exists('extend_sp_offer_location_other', $helloextend_protection_shipping_protection_settings)
+                ? $helloextend_protection_shipping_protection_settings['extend_sp_offer_location_other'] : '';
 
             // update sp offer location if "other" is selected otherwise default
             if ($settings['extend_sp_offer_location'] == 'other' && $settings['extend_sp_offer_location_other'] !== '') {
@@ -210,17 +210,17 @@ class Extend_Protection_Global
 
         /* Set variables depending on environment */
         if ($settings['extend_environment'] == 'live') {
-            $settings['store_id'] = array_key_exists('extend_live_store_id', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_live_store_id'] : '';
+            $settings['store_id'] = array_key_exists('extend_live_store_id', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_live_store_id'] : '';
 
             $settings['api_host'] = 'https://api.helloextend.com';
 
-            $settings['client_secret'] = array_key_exists('extend_live_client_secret', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_live_client_secret'] : '';
+            $settings['client_secret'] = array_key_exists('extend_live_client_secret', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_live_client_secret'] : '';
 
             // Client ID
-            $settings['client_id'] = array_key_exists('extend_live_client_id', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_live_client_id'] : '';
+            $settings['client_id'] = array_key_exists('extend_live_client_id', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_live_client_id'] : '';
 
             // Create token variable
             $settings['token'] = get_option('extend_live_token') ? get_option('extend_live_token') : '';
@@ -228,16 +228,16 @@ class Extend_Protection_Global
             // Create token date variable
             $settings['token_date'] = get_option('extend_live_token_date') ? get_option('extend_live_token_date') : '';
         } else {
-            $settings['store_id'] = array_key_exists('extend_sandbox_store_id', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_sandbox_store_id'] : '';
+            $settings['store_id'] = array_key_exists('extend_sandbox_store_id', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_sandbox_store_id'] : '';
 
             $settings['api_host'] = 'https://api-demo.helloextend.com';
 
-            $settings['client_secret'] = array_key_exists('extend_sandbox_client_secret', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_sandbox_client_secret'] : '';
+            $settings['client_secret'] = array_key_exists('extend_sandbox_client_secret', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_sandbox_client_secret'] : '';
 
-            $settings['client_id'] = array_key_exists('extend_sandbox_client_id', $extend_protection_general_settings)
-                ? $extend_protection_general_settings['extend_sandbox_client_id'] : '';
+            $settings['client_id'] = array_key_exists('extend_sandbox_client_id', $helloextend_protection_general_settings)
+                ? $helloextend_protection_general_settings['extend_sandbox_client_id'] : '';
 
             // Create token variable
             $settings['token'] = get_option('extend_sandbox_token') ? get_option('extend_sandbox_token') : '';
@@ -249,31 +249,31 @@ class Extend_Protection_Global
         $settings['sdk_url']             = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
         $settings['warranty_product_id'] = extend_product_protection_id();
         /*
-        $settings['extend_use_skus']     = array_key_exists('extend_use_skus', $extend_protection_product_protection_settings)
-                                            ? $extend_protection_product_protection_settings['extend_use_skus'] : 0;
+        $settings['extend_use_skus']     = array_key_exists('extend_use_skus', $helloextend_protection_product_protection_settings)
+                                            ? $helloextend_protection_product_protection_settings['extend_use_skus'] : 0;
         */
         if (empty($settings['warranty_product_id'])) {
-            Extend_Protection_Logger::extend_log_error('Error: Warranty product is not created.');
+            HelloExtend_Protection_Logger::extend_log_error('Error: Warranty product is not created.');
         }
 
         /* catalog sync settings */
-        $settings['extend_use_skus'] = array_key_exists('extend_use_skus', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_use_skus'] : 0;
+        $settings['extend_use_skus'] = array_key_exists('extend_use_skus', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_use_skus'] : 0;
 
-        $settings['extend_automated_product_sync'] = array_key_exists('extend_automated_product_sync', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_automated_product_sync'] : 0;
+        $settings['extend_automated_product_sync'] = array_key_exists('extend_automated_product_sync', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_automated_product_sync'] : 0;
 
-        $settings['extend_last_product_sync'] = array_key_exists('extend_last_product_sync', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_last_product_sync'] : null;
+        $settings['extend_last_product_sync'] = array_key_exists('extend_last_product_sync', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_last_product_sync'] : null;
 
-        $settings['extend_use_special_price'] = array_key_exists('extend_use_special_price', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_use_special_price'] : 0;
+        $settings['extend_use_special_price'] = array_key_exists('extend_use_special_price', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_use_special_price'] : 0;
 
-        $settings['extend_sync_batch'] = array_key_exists('extend_sync_batch', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_sync_batch'] : 100;
+        $settings['extend_sync_batch'] = array_key_exists('extend_sync_batch', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_sync_batch'] : 100;
 
-        $settings['extend_sync_on_update'] = array_key_exists('extend_sync_on_update', $extend_protection_catalog_sync_settings)
-            ? $extend_protection_catalog_sync_settings['extend_sync_on_update'] : 0;
+        $settings['extend_sync_on_update'] = array_key_exists('extend_sync_on_update', $helloextend_protection_catalog_sync_settings)
+            ? $helloextend_protection_catalog_sync_settings['extend_sync_on_update'] : 0;
 
         return $settings;
     }
@@ -422,7 +422,7 @@ class Extend_Protection_Global
             wp_enqueue_script('extend_global_script');
             wp_localize_script('extend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
         } else {
-            Extend_Protection_Logger::extend_log_error('Store Id missing or Extend Product Protection is disabled');
+            HelloExtend_Protection_Logger::extend_log_error('Store Id missing or Extend Product Protection is disabled');
         }
     }
 
@@ -476,7 +476,7 @@ class Extend_Protection_Global
             $response = wp_remote_post($url, $args);
 
             if (is_wp_error($response)) {
-                Extend_Protection_Logger::extend_log_error('Error retrieving token: ' . $response->get_error_message());
+                HelloExtend_Protection_Logger::extend_log_error('Error retrieving token: ' . $response->get_error_message());
                 $token = null;
             } else {
                 $response = json_decode($response['body']);

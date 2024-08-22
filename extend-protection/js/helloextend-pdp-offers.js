@@ -163,7 +163,7 @@
                 });
 
             } else {
-                console.warn("extend-pdp-offers.js error: Unsupported product type: ", product_type);
+                console.warn("helloextend-pdp-offers.js error: Unsupported product type: ", product_type);
                 supportedProductType = false;
             }
 

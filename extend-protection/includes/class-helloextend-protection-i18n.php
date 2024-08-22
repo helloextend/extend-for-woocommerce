@@ -9,8 +9,8 @@
  * @link  http://example.com
  * @since 1.0.0
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  */
 
 /**
@@ -20,8 +20,8 @@
  * so that it is ready for translation.
  *
  * @since      1.0.0
- * @package    Extend_Protection
- * @subpackage Extend_Protection/includes
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/includes
  * @author     partner-engineering@extend.com
  */
 
@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class Extend_Protection_i18n
+class HelloExtend_Protection_i18n
 {
 
     /**

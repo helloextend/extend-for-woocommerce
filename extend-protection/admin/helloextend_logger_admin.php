@@ -26,7 +26,7 @@ function extend_logger_admin()
     echo '<h2 class="extend_logger-title">' . __('Error Log', 'extend-protection') . '</h2>';
 
     /* Import the main log table file... */
-    include_once EXTEND_LOGGER_DIR . 'admin/extend_logger_log-table.php';
+    include_once EXTEND_LOGGER_DIR . 'admin/helloextend_logger_log-table.php';
 
     /* Clear the new logs array as now all logs should have been seen... */
     update_option('extend_logger_new_logs', null);
@@ -47,10 +47,10 @@ function extend_logger_load_log_table_scripts()
 function extend_logger_log_table_scripts()
 {
 
-    wp_register_style('mainStyle', EXTEND_LOGGER_URI . 'css/extend_logger.css');
+    wp_register_style('mainStyle', EXTEND_LOGGER_URI . 'css/helloextend_logger.css');
 
     /* Enqueue script for the error log table and pass translatable strings to it... */
-    wp_register_script('logTable', EXTEND_LOGGER_URI . 'js/extend_logger_logTable.js', array( 'jquery' ), '', true);
+    wp_register_script('logTable', EXTEND_LOGGER_URI . 'js/helloextend_logger_logTable.js', array( 'jquery' ), '', true);
 
     $data_array = array(
 

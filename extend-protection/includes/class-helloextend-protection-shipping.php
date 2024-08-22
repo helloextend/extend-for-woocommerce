@@ -4,10 +4,10 @@
  * Extend For WooCommerce Product Integration.
  *
  * @since   1.0.0
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  *
- * @package    Extend_Protection
- * @subpackage Extend_Protection/admin
+ * @package    HelloExtend_Protection
+ * @subpackage HelloExtend_Protection/admin
  */
 
 // Prevent direct access to the file
@@ -22,11 +22,11 @@ if (! defined('ABSPATH') ) {
  * Enqueues the necessary JS
  * Renders Extend checkout shipping protection offers
  *
- * @package Extend_Protection
+ * @package HelloExtend_Protection
  * @author  Extend, Inc.
  */
 
-class Extend_Protection_Shipping
+class HelloExtend_Protection_Shipping
 {
 
     const EXTEND_SP_LABEL          = 'Extend Shipping Protection';
@@ -37,9 +37,9 @@ class Extend_Protection_Shipping
      *
      * @since  1.0.0
      * @access private
-     * @var    string $extend_protection The ID of this plugin.
+     * @var    string $helloextend_protection The ID of this plugin.
      */
-    private string $extend_protection;
+    private string $helloextend_protection;
 
     /**
      * The version of this plugin.
@@ -54,7 +54,7 @@ class Extend_Protection_Shipping
     public function __construct()
     {
 
-        $this->settings = Extend_Protection_Global::get_extend_settings();
+        $this->settings = HelloExtend_Protection_Global::get_extend_settings();
         $this->hooks();
     }
 
@@ -129,7 +129,7 @@ class Extend_Protection_Shipping
         $items = json_encode($items);
 
         if ($this->settings['enable_extend_debug'] == 1 ) {
-            Extend_Protection_Logger::extend_log_debug('DEBUG : Shipping Protection Cart Item Payload :' . print_r($items, true));
+            HelloExtend_Protection_Logger::extend_log_debug('DEBUG : Shipping Protection Cart Item Payload :' . print_r($items, true));
         }
 
         if ($enable_extend_sp == 1 ) {
