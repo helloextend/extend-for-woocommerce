@@ -281,7 +281,7 @@ class HelloExtend_Protection_Global
     public static function add_to_cart_extend()
     {
         $warranty_product_id = wc_get_product_id_by_sku('extend-product-protection');
-        $quantity            = $_REQUEST['quantity'];
+        $quantity            = sanitize_key($_REQUEST['quantity']);
         $extend_data         = $_REQUEST['extendData'];
 
         if (!isset($warranty_product_id) || !isset($quantity) || !isset($extend_data)) {
@@ -300,7 +300,7 @@ class HelloExtend_Protection_Global
         if (!empty($cart_items)) {
 
             foreach ($cart_items as $key => $value) {
-                if (isset($value['extendData'])) {
+                if (isset($value['extendData']) && !empty($value['extendData'])) {
                     $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
                 }
             }
@@ -309,7 +309,7 @@ class HelloExtend_Protection_Global
 
     public function cart_item_price($price, $cart_item, $cart_item_key)
     {
-        if (isset($cart_item['extendData'])) {
+        if (isset($cart_item['extendData']) && !empty($cart_item['extendData'])) {
             $price = round($cart_item['extendData']['price'] / 100, 2);
             return wc_price($price);
         }
@@ -324,7 +324,7 @@ class HelloExtend_Protection_Global
     public function cart_item_name($name, $cart_item, $cart_item_key)
     {
 
-        if (isset($cart_item['extendData'])) {
+        if (isset($cart_item['extendData']) && !empty($cart_item['extendData'])) {
             $term = $cart_item['extendData']['term'];
             return "Extend Protection Plan - {$term} Months";
         }
@@ -355,7 +355,7 @@ class HelloExtend_Protection_Global
     // This function transfers data from cart items, to order items
     public function order_item_meta($item, $cart_item_key, $cart_item)
     {
-        if (isset($cart_item['extendData'])) {
+        if (isset($cart_item['extendData']) &&  !empty($cart_item['extendData'])) {
             $item->add_meta_data('_extend_data', $cart_item['extendData']);
 
             $covered_id = $cart_item['extendData']['covered_product_id'];
@@ -384,7 +384,7 @@ class HelloExtend_Protection_Global
             return $data;
         }
 
-        if (isset($cart_item['extendData'])) {
+        if (isset($cart_item['extendData']) && !empty($cart_item['extendData'])) {
             $covered_id = $cart_item['extendData']['covered_product_id'];
             $term       = $cart_item['extendData']['term'];
             // $covered        = self::extend_get_product($covered_id);
@@ -460,10 +460,10 @@ class HelloExtend_Protection_Global
             $args = array(
                 'body'    => json_encode(
                     array(
-                    'grant_type'    => 'client_credentials',
-                    'client_id'     => $client_id,
-                    'client_secret' => $client_secret,
-                    'client_assertion' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
+                        'grant_type'    => 'client_credentials',
+                        'client_id'     => $client_id,
+                        'client_secret' => $client_secret,
+                        'client_assertion' => 'urn:ietf:params:oauth:client-assertion-type:jwt-bearer'
                     )
                 ),
                 'headers' => array(

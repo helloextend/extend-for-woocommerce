@@ -110,8 +110,8 @@ class HelloExtend_Protection_Sync
 
         check_ajax_referer('extend_sync_nonce', 'nonce');
 
-        $batch_size = isset($_POST['batch_size']) ? intval($_POST['batch_size']) : 100;
-        $index      = isset($_POST['index']) ? intval($_POST['index']) : 0;
+        $batch_size = isset($_POST['batch_size']) ? intval(sanitize_key($_POST['batch_size'])) : 100;
+        $index      = isset($_POST['index']) ? intval(sanitize_key($_POST['index'])) : 0;
 
         /*
         *  build WP Query to retrieve all products, non virtual
@@ -119,27 +119,27 @@ class HelloExtend_Protection_Sync
         *  filter out any product not updated since
         */
         $args = array(
-        'post_type'      => 'product',
-        'post_status'    => 'publish',
-        'meta_query'     => array(
-        array(
+            'post_type'      => 'product',
+            'post_status'    => 'publish',
+            'meta_query'     => array(
+                array(
                     'key'     => '_virtual',
                     'value'   => 'yes',
                     'compare' => '!=',
-        ),
-        ),
-        'posts_per_page' => -1,
-        'orderby'        => 'title',
-        'order'          => 'ASC',
+                ),
+            ),
+            'posts_per_page' => -1,
+            'orderby'        => 'title',
+            'order'          => 'ASC',
         );
 
         // if there is a last sync date, adjust the filter
         if (strtolower($this->settings['extend_last_product_sync']) != 'never' && ! is_null($this->settings['extend_last_product_sync']) ) {
             $args['date_query'] = array(
-            array(
-            'after'     => date('Y-m-d h:i:s', strtolower($this->settings['extend_last_product_sync'])),
-            'inclusive' => 'true',
-            ),
+                array(
+                    'after'     => date('Y-m-d h:i:s', strtolower($this->settings['extend_last_product_sync'])),
+                    'inclusive' => 'true',
+                ),
             );
         }
         // run the query once  to retrieve the number of products to calculate total batches
@@ -216,9 +216,9 @@ class HelloExtend_Protection_Sync
     {
         wp_send_json_success(
             array(
-            'batch_number' => $batch_number,
-            'batch_data'   => $batch_data,
-            'batch_total'  => $batch_total,
+                'batch_number' => $batch_number,
+                'batch_data'   => $batch_data,
+                'batch_total'  => $batch_total,
             )
         );
     }
@@ -253,19 +253,19 @@ class HelloExtend_Protection_Sync
         }
 
         $payload = array(
-        'category'    => $category ?? 'No Category',
-        'title'       => $product->get_name(),
-        'referenceId' => $this->get_sku_or_id($product),
-        'price'       => array(
-        'amount'       => $price * 100,
-        'currencyCode' => get_option('woocommerce_currency'),
-        ),
-        'identifiers' => array(
-        'sku'  => $this->get_sku_or_id($product),
-        'type' => $product->get_type(),
-        ),
-        'description' => $description ?? 'No Description',
-        'imageUrl'    => $image_url,
+            'category'    => $category ?? 'No Category',
+            'title'       => $product->get_name(),
+            'referenceId' => $this->get_sku_or_id($product),
+            'price'       => array(
+                'amount'       => $price * 100,
+                'currencyCode' => get_option('woocommerce_currency'),
+            ),
+            'identifiers' => array(
+                'sku'  => $this->get_sku_or_id($product),
+                'type' => $product->get_type(),
+            ),
+            'description' => $description ?? 'No Description',
+            'imageUrl'    => $image_url,
         );
 
         // is product a variant ?
@@ -353,8 +353,8 @@ class HelloExtend_Protection_Sync
         if (defined('DOING_AJAX') ) {
             wp_send_json_success(
                 array(
-                'time'          => date('Y-m-d h:i:s A', $sync_time),
-                'sync_unixtime' => $sync_time,
+                    'time'          => date('Y-m-d h:i:s A', $sync_time),
+                    'sync_unixtime' => $sync_time,
                 )
             );
         }
@@ -406,17 +406,17 @@ class HelloExtend_Protection_Sync
         *  build WP Query to retrieve the product id
         */
         $args = array(
-        'post_type'      => 'product',
-        'p'              => $id,         // Specific product ID
-        'post_status'    => 'publish',   // Ensure the product is published
-        'posts_per_page' => 1,           // Limit to one result
-        'meta_query'     => array(
-        array(
-        'key'     => '_virtual',
-        'value'   => 'yes',
-        'compare' => '!=',
-        ),
-        ),
+            'post_type'      => 'product',
+            'p'              => $id,         // Specific product ID
+            'post_status'    => 'publish',   // Ensure the product is published
+            'posts_per_page' => 1,           // Limit to one result
+            'meta_query'     => array(
+                array(
+                    'key'     => '_virtual',
+                    'value'   => 'yes',
+                    'compare' => '!=',
+                ),
+            ),
         );
 
         $product_query = new WP_Query($args);
@@ -443,7 +443,7 @@ class HelloExtend_Protection_Sync
                         // success
                         $data = json_decode(wp_remote_retrieve_body($response));
                         if (isset($data->added) && is_array($data->added) ) {
-                               $batch_added_count = count($data->added);
+                            $batch_added_count = count($data->added);
                             if ($batch_added_count > 0 ) {
                                 HelloExtend_Protection_Logger::extend_log_notice('Single Product Sync : item ID ' . $product_id . ' added');
                             }
@@ -484,18 +484,18 @@ class HelloExtend_Protection_Sync
 
             $batch_size = $this->settings['extend_sync_batch'];
             $args       = array(
-            'post_type'      => 'product',
-            'post_status'    => 'publish',
-            'meta_query'     => array(
-            array(
-            'key'     => '_virtual',
-            'value'   => 'yes',
-            'compare' => '!=',
-            ),
-            ),
-            'posts_per_page' => -1,
-            'orderby'        => 'title',
-            'order'          => 'ASC',
+                'post_type'      => 'product',
+                'post_status'    => 'publish',
+                'meta_query'     => array(
+                    array(
+                        'key'     => '_virtual',
+                        'value'   => 'yes',
+                        'compare' => '!=',
+                    ),
+                ),
+                'posts_per_page' => -1,
+                'orderby'        => 'title',
+                'order'          => 'ASC',
             );
 
             // dynamically build the date filter if relevant
@@ -509,19 +509,19 @@ class HelloExtend_Protection_Sync
             // run the query with the batch_size and offset
             for ( $page = 1; $page <= $batch_total; $page++ ) {
                 $args = array(
-                'post_type'      => 'product',
-                'post_status'    => 'publish',
-                'meta_query'     => array(
-                array(
-                'key'     => '_virtual',
-                'value'   => 'yes',
-                'compare' => '!=',
-                ),
-                ),
-                'posts_per_page' => $batch_size,
-                'orderby'        => 'title',
-                'order'          => 'ASC',
-                'paged'          => $page,
+                    'post_type'      => 'product',
+                    'post_status'    => 'publish',
+                    'meta_query'     => array(
+                        array(
+                            'key'     => '_virtual',
+                            'value'   => 'yes',
+                            'compare' => '!=',
+                        ),
+                    ),
+                    'posts_per_page' => $batch_size,
+                    'orderby'        => 'title',
+                    'order'          => 'ASC',
+                    'paged'          => $page,
                 );
 
                 $product_query = new WP_Query($args);
@@ -573,13 +573,13 @@ class HelloExtend_Protection_Sync
     private function buildRequest( $batch_data )
     {
         return array(
-        'method'  => 'POST',
-        'headers' => array(
-        'Content-Type'          => 'application/json',
-        'Accept'                => 'application/json; version=latest',
-        'X-Extend-Access-Token' => $this->settings['api_key'],
-        ),
-        'body'    => json_encode($batch_data),
+            'method'  => 'POST',
+            'headers' => array(
+                'Content-Type'          => 'application/json',
+                'Accept'                => 'application/json; version=latest',
+                'X-Extend-Access-Token' => $this->settings['api_key'],
+            ),
+            'body'    => json_encode($batch_data),
         );
     }
 
@@ -588,10 +588,10 @@ class HelloExtend_Protection_Sync
         // if there is a last sync date, adjust the filter
         if (strtolower($this->settings['extend_last_product_sync']) != 'never' && ! is_null($this->settings['extend_last_product_sync']) ) {
             $args['date_query'] = array(
-            array(
-            'after'     => date('Y-m-d h:i:s', strtolower($this->settings['extend_last_product_sync'])),
-            'inclusive' => 'true',
-            ),
+                array(
+                    'after'     => date('Y-m-d h:i:s', strtolower($this->settings['extend_last_product_sync'])),
+                    'inclusive' => 'true',
+                ),
             );
         }
         return $args;
@@ -635,20 +635,20 @@ class HelloExtend_Protection_Sync
             $batch_added_count = count($data->added);
             $added_item        = array();
             foreach ( $data->added as $added ) {
-                $added_item[] = '[id: ' . $added->referenceId . ' / sku: ' . $added->identifiers->sku . ']';
+                $added_item[] = '[id: ' . $added->referenceId . ' / sku: ' . $added->identifiers->get_sku() . ']';
             }
             switch ( $batch_added_count ) {
-            case ( $batch_added_count > 1 ):
-                $items_added = ' items added : ';
-                break;
+                case ( $batch_added_count > 1 ):
+                    $items_added = ' items added : ';
+                    break;
 
-            case ( $batch_added_count == 1 ):
-                $items_added = ' item added : ';
-                break;
+                case ( $batch_added_count == 1 ):
+                    $items_added = ' item added : ';
+                    break;
 
-            default:
-                $items_added = ' item added. ';
-                break;
+                default:
+                    $items_added = ' item added. ';
+                    break;
             }
             if ($batch_added_count > 0 ) {
                 $added_summary = 'Catalog Sync Batch #' . $batch_current . ', ' . $batch_added_count . $items_added . "\n" . implode(', ', $added_item);
@@ -660,20 +660,20 @@ class HelloExtend_Protection_Sync
             $batch_updated_count = count($data->updated);
             $updated_item        = array();
             foreach ( $data->updated as $updated ) {
-                $updated_item[] = '[id: ' . $updated->referenceId . ' / sku: ' . $updated->identifiers->sku . ']';
+                $updated_item[] = '[id: ' . $updated->referenceId . ' / sku: ' . $updated->identifiers->get_sku() . ']';
             }
             switch ( $batch_updated_count ) {
-            case ( $batch_updated_count > 1 ):
-                $items_updated = ' items updated : ';
-                break;
+                case ( $batch_updated_count > 1 ):
+                    $items_updated = ' items updated : ';
+                    break;
 
-            case ( $batch_updated_count == 1 ):
-                $items_updated = ' item updated : ';
-                break;
+                case ( $batch_updated_count == 1 ):
+                    $items_updated = ' item updated : ';
+                    break;
 
-            default:
-                $items_updated = ' item updated. ';
-                break;
+                default:
+                    $items_updated = ' item updated. ';
+                    break;
             }
             if ($batch_updated_count > 0 ) {
                 $updated_summary = 'Catalog Sync Batch #' . $batch_current . ', ' . $batch_updated_count . $items_updated . "\n" . implode(', ', $updated_item);
@@ -685,20 +685,20 @@ class HelloExtend_Protection_Sync
             $batch_errors_count = count($data->errors);
             $errors_item        = array();
             foreach ( $data->errors as $errors ) {
-                $errors_item[] = '[id: ' . $errors->referenceId . '/ sku: ' . $errors->identifiers->sku . ']';
+                $errors_item[] = '[id: ' . $errors->referenceId . '/ sku: ' . $errors->identifiers->get_sku() . ']';
             }
             switch ( $batch_errors_count ) {
-            case ( $batch_errors_count > 1 ):
-                $items_errored = ' items errored : ';
-                break;
+                case ( $batch_errors_count > 1 ):
+                    $items_errored = ' items errored : ';
+                    break;
 
-            case ( $batch_errors_count == 1 ):
-                $items_errored = ' item errored : ';
-                break;
+                case ( $batch_errors_count == 1 ):
+                    $items_errored = ' item errored : ';
+                    break;
 
-            default:
-                $items_errored = ' item errored. ';
-                break;
+                default:
+                    $items_errored = ' item errored. ';
+                    break;
             }
             if ($batch_errors_count > 0 ) {
                 $error_summary = 'Catalog Sync Batch #' . $batch_current . ', ' . $batch_errors_count . $items_errored . "\n" . implode(', ', $errors_item);

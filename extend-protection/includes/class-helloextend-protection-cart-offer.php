@@ -86,16 +86,16 @@ class HelloExtend_Protection_Cart_Offer
         foreach ( $cart_contents as $line ) {
 
             // if we're on a warranty item
-            if (intval($line['product_id']) === intval($this->settings['warranty_product_id']) && isset($line['extendData']) ) {
+            if (intval($line['product_id']) === intval($this->settings['warranty_product_id']) && isset($line['extendData']) && !empty($line['extendData']) ) {
                 // Grab reference id
                 $product_reference_id = $line['extendData']['covered_product_id'];
 
                 // If this product doesn't exist, create it with the warranty quantity and warranty added, else add to warranty quantity, and add warranty to warranty list
                 if (! isset($products[ $product_reference_id ]) ) {
                     $products[ $product_reference_id ] = [
-                    'quantity'          => 0,
-                    'warranty_quantity' => $line['quantity'],
-                    'warranties'        => [ $line ],
+                        'quantity'          => 0,
+                        'warranty_quantity' => $line['quantity'],
+                        'warranties'        => [ $line ],
                     ];
                 } else {
                     $products[ $product_reference_id ]['warranty_quantity'] += $line['quantity'];
@@ -106,9 +106,9 @@ class HelloExtend_Protection_Cart_Offer
                 $id = $line['variation_id'] > 0 ? $line['variation_id'] : $line['product_id'];
                 if (! isset($products[ $id ]) ) {
                     $products[ $id ] = [
-                     'quantity'          => $line['quantity'],
-                     'warranty_quantity' => 0,
-                     'warranties'        => [],
+                        'quantity'          => $line['quantity'],
+                        'warranty_quantity' => 0,
+                        'warranties'        => [],
                     ];
                 } else {
                     $products[ $id ]['quantity'] += $line['quantity'];
@@ -191,7 +191,7 @@ class HelloExtend_Protection_Cart_Offer
         // if it's not a warranty, add offer element
         if (! isset($cart_item['extendData']) ) {
             $item_id     = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-            $item_sku    = $cart_item['data']->sku ? $cart_item['data']->sku : $item_id;
+            $item_sku    = $cart_item['data']->get_sku() ? $cart_item['data']->get_sku() : $item_id;
             $referenceId = $this->settings['extend_use_skus'] ? $item_sku : $item_id;
             $categories  = get_the_terms($item_id, 'product_cat');
             $category    = $categories[0]->name;
