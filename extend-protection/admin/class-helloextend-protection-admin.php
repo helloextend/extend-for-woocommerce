@@ -578,45 +578,45 @@ class HelloExtend_Protection_Admin
 
         // handle the scheduled jobs if the extend_product_sync settigns are being saved
         if (isset($_REQUEST['page']) && isset($_REQUEST['tab']) && isset($_REQUEST['settings-updated'])) {
-            if ($_REQUEST['page'] == 'extend' && $_REQUEST['tab'] == 'catalog_sync' && $_REQUEST['settings-updated'] == 'true') {
+            if (sanitize_text_field($_REQUEST['page']) == 'extend' && sanitize_text_field($_REQUEST['tab']) == 'catalog_sync' && sanitize_text_field($_REQUEST['settings-updated']) == 'true') {
 
                 // check if extend_automated_product_sync = never : on save if schedule is set to never, reset the cron
                 $extend_automated_product_sync = $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'];
 
                 switch ($extend_automated_product_sync) {
-                case 'never':
-                    // Remove scheduled events.
-                    wp_clear_scheduled_hook('sync_products_hourly');
-                    wp_clear_scheduled_hook('sync_products_daily');
-                    wp_clear_scheduled_hook('sync_products_weekly');
-                    break;
+                    case 'never':
+                        // Remove scheduled events.
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        break;
 
-                case 'daily':
-                    wp_clear_scheduled_hook('sync_products_hourly');
-                    wp_clear_scheduled_hook('sync_products_weekly');
-                    if (!wp_next_scheduled('sync_products_daily')) {
-                        wp_schedule_event(time(), 'daily', 'sync_products_daily');
-                    }
-                    break;
+                    case 'daily':
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        if (!wp_next_scheduled('sync_products_daily')) {
+                            wp_schedule_event(time(), 'daily', 'sync_products_daily');
+                        }
+                        break;
 
-                case 'hourly':
-                    wp_clear_scheduled_hook('sync_products_daily');
-                    wp_clear_scheduled_hook('sync_products_weekly');
-                    if (!wp_next_scheduled('sync_products_hourly')) {
-                        wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
-                    }
-                    break;
+                    case 'hourly':
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        wp_clear_scheduled_hook('sync_products_weekly');
+                        if (!wp_next_scheduled('sync_products_hourly')) {
+                            wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
+                        }
+                        break;
 
-                case 'weekly':
-                    wp_clear_scheduled_hook('sync_products_hourly');
-                    wp_clear_scheduled_hook('sync_products_daily');
-                    if (!wp_next_scheduled('sync_products_weekly')) {
-                        wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
-                    }
-                    break;
+                    case 'weekly':
+                        wp_clear_scheduled_hook('sync_products_hourly');
+                        wp_clear_scheduled_hook('sync_products_daily');
+                        if (!wp_next_scheduled('sync_products_weekly')) {
+                            wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
+                        }
+                        break;
 
-                default:
-                    return;
+                    default:
+                        return;
                 }
             }
         }
@@ -840,7 +840,7 @@ class HelloExtend_Protection_Admin
     {
         $extend_automated_sync_dropdown_values = array('never', 'hourly', 'daily', 'weekly');
         ?>
-        <select name="helloextend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" id="extend_automated_product_sync">
+		<select name="helloextend_protection_for_woocommerce_catalog_sync_settings[extend_automated_product_sync]" id="extend_automated_product_sync">
             <?php
             // set default value if option is not set yet
             if (!isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['extend_automated_product_sync'])) {
@@ -854,7 +854,7 @@ class HelloExtend_Protection_Admin
                 echo '<option value="' . esc_attr($auto_sync) . '" ' . esc_attr($selected) . '>' . ucfirst(esc_attr($auto_sync)) . '</option>';
             }
             ?>
-        </select>
+		</select>
         <?php
     }
 
@@ -892,7 +892,7 @@ class HelloExtend_Protection_Admin
         );
 
         ?>
-        <select name="helloextend_protection_for_woocommerce_product_protection_settings[extend_pdp_offer_location]" id="extend_pdp_offer_location">
+		<select name="helloextend_protection_for_woocommerce_product_protection_settings[extend_pdp_offer_location]" id="extend_pdp_offer_location">
             <?php
             // set default value if option is not set yet
             if (!isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['extend_pdp_offer_location'])) {
@@ -911,7 +911,7 @@ class HelloExtend_Protection_Admin
                 }
             }
             ?>
-        </select>
+		</select>
         <?php
         // show information in a popup
         echo '<label for="extend_pdp_offer_location"><a href="?page=extend-docs#offer_placement">What\'s this ?</a></label>';
@@ -949,7 +949,7 @@ class HelloExtend_Protection_Admin
             'other',
         );
         ?>
-        <select name="helloextend_protection_for_woocommerce_shipping_protection_settings[extend_sp_offer_location]" id="extend_sp_offer_location">
+		<select name="helloextend_protection_for_woocommerce_shipping_protection_settings[extend_sp_offer_location]" id="extend_sp_offer_location">
             <?php
             // set default value if option is not set yet
             if (!isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['extend_sp_offer_location'])) {
@@ -968,7 +968,7 @@ class HelloExtend_Protection_Admin
                 }
             }
             ?>
-        </select>
+		</select>
 
         <?php
         // show information in a popup
@@ -1008,36 +1008,36 @@ class HelloExtend_Protection_Admin
     public function extend_product_protection_contract_create_event_callback()
     {
         ?>
-        <select name="helloextend_protection_for_woocommerce_product_protection_settings[extend_product_protection_contract_create_event]" id="extend_product_protection_contract_create_event">
+		<select name="helloextend_protection_for_woocommerce_product_protection_settings[extend_product_protection_contract_create_event]" id="extend_product_protection_contract_create_event">
             <?php
             $selected = (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
                 && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Order Create') ? 'selected' : '';
             ?>
-            <option value="Order Create" <?php echo esc_attr($selected); ?>>Order Create</option>
+			<option value="Order Create" <?php echo esc_attr($selected); ?>>Order Create</option>
             <?php
             $selected = (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'])
                 && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['extend_product_protection_contract_create_event'] === 'Fulfillment') ? 'selected' : '';
             ?>
-            <option value="Fulfillment" <?php echo esc_attr($selected); ?>>Fulfillment</option>
-        </select>
+			<option value="Fulfillment" <?php echo esc_attr($selected); ?>>Fulfillment</option>
+		</select>
         <?php
     }
 
     public function extend_environment_callback()
     {
         ?>
-        <select name="helloextend_protection_for_woocommerce_general_settings[extend_environment]" id="extend_environment">
+		<select name="helloextend_protection_for_woocommerce_general_settings[extend_environment]" id="extend_environment">
             <?php
             $selected = (isset($this->helloextend_protection_for_woocommerce_settings_general_options['extend_environment'])
                 && $this->helloextend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'sandbox') ? 'selected' : '';
             ?>
-            <option value="sandbox" <?php echo esc_attr($selected); ?>>Sandbox</option>
+			<option value="sandbox" <?php echo esc_attr($selected); ?>>Sandbox</option>
             <?php
             $selected = (isset($this->helloextend_protection_for_woocommerce_settings_general_options['extend_environment'])
                 && $this->helloextend_protection_for_woocommerce_settings_general_options['extend_environment'] === 'live') ? 'selected' : '';
             ?>
-            <option value="live" <?php echo esc_attr($selected); ?>>Live</option>
-        </select>
+			<option value="live" <?php echo esc_attr($selected); ?>>Live</option>
+		</select>
         <?php
     }
 
@@ -1145,7 +1145,7 @@ class HelloExtend_Protection_Admin
     {
         $extend_sync_batch_dropdown_values = array('20', '50', '100', '200', '300', '400', '500');
         ?>
-        <select name="helloextend_protection_for_woocommerce_catalog_sync_settings[extend_sync_batch]" id="extend_sync_batch">
+		<select name="helloextend_protection_for_woocommerce_catalog_sync_settings[extend_sync_batch]" id="extend_sync_batch">
             <?php
             // set default value if option is not set yet
             if (!isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['extend_sync_batch'])) {
@@ -1164,7 +1164,7 @@ class HelloExtend_Protection_Admin
                 }
             }
             ?>
-        </select>
+		</select>
         <?php
     }
 

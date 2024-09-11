@@ -25,8 +25,8 @@ class HelloExtend_Protection_Logger
         if (! $error_log ) {
             $error_log = array(
 
-            'errors'     => array(),
-            'next_error' => 1,
+                'errors'     => array(),
+                'next_error' => 1,
 
             );
 
@@ -37,10 +37,10 @@ class HelloExtend_Protection_Logger
         /* Insert new error into array... */
         $error_log['errors'][ $error_id ] = array(
 
-        'type'    => 'error',
-        'date'    => current_time('timestamp'),
-        'id'      => $error_id,
-        'message' => sanitize_text_field($message),
+            'type'    => 'error',
+            'date'    => current_time('timestamp'),
+            'id'      => $error_id,
+            'message' => sanitize_text_field($message),
 
         );
 
@@ -70,8 +70,8 @@ class HelloExtend_Protection_Logger
 
             $notice_log = array(
 
-            'notices'     => array(),
-            'next_notice' => 1,
+                'notices'     => array(),
+                'next_notice' => 1,
 
             );
 
@@ -82,10 +82,10 @@ class HelloExtend_Protection_Logger
         /* Insert new notice into array... */
         $notice_log['notices'][ $notice_id ] = array(
 
-        'type'    => 'notice',
-        'date'    => current_time('timestamp'),
-        'id'      => $notice_id,
-        'message' => sanitize_text_field($message),
+            'type'    => 'notice',
+            'date'    => current_time('timestamp'),
+            'id'      => $notice_id,
+            'message' => sanitize_text_field($message),
 
         );
 
@@ -117,8 +117,8 @@ class HelloExtend_Protection_Logger
 
             $debug_log = array(
 
-            'debugs'     => array(),
-            'next_debug' => 1,
+                'debugs'     => array(),
+                'next_debug' => 1,
 
             );
 
@@ -129,10 +129,10 @@ class HelloExtend_Protection_Logger
         /* Insert new debug into array... */
         $debug_log['debugs'][ $debug_id ] = array(
 
-        'type'    => 'debug',
-        'date'    => current_time('timestamp'),
-        'id'      => $debug_id,
-        'message' => sanitize_text_field($message),
+            'type'    => 'debug',
+            'date'    => current_time('timestamp'),
+            'id'      => $debug_id,
+            'message' => sanitize_text_field($message),
 
         );
 
@@ -159,15 +159,18 @@ class HelloExtend_Protection_Logger
     {
 
         /* Check that the nonce is correct to avoid safety issues... */
-        if (! wp_verify_nonce($_POST['nonce'], 'extend_logger_nonce') ) {
+        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'extend_logger_nonce') ) {
 
             exit('Wrong nonce - delete single');
 
         }
 
         /* Get information about the error to delete from the ajax POST... */
-        $error_code = $_POST['error_code'];
-        $log_type   = $_POST['log_type'];
+
+        // Sanitize wordpress ajax post
+
+        $error_code =  sanitize_key( wp_unslash( $_POST['error_code'] ) );
+        $log_type   = sanitize_text_field( wp_unslash( $_POST['log_type'] ) );
 
         /* Get the correct log from the wp_options table... */
         $logs = get_option('custom_' . $log_type . '_log', true);
@@ -212,7 +215,7 @@ class HelloExtend_Protection_Logger
     public static function extend_logger_delete_all()
     {
         /* Check that the nonce is correct to avoid safety issues... */
-        if (! wp_verify_nonce($_POST['nonce'], 'extend_logger_nonce') ) {
+        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ) , 'extend_logger_nonce') ) {
             exit('Wrong nonce - delete all');
         }
 
@@ -322,12 +325,12 @@ class HelloExtend_Protection_Logger
         /* Return an array containing the logs and information of what types exist... */
         $return = array(
 
-        'logs'         => $logs,
-        'have_errors'  => $have_errors,
-        'have_notices' => $have_notices,
-        'have_debugs'  => $have_notices,
-        'have_both'    => $have_both,
-        'have_many'    => $have_many,
+            'logs'         => $logs,
+            'have_errors'  => $have_errors,
+            'have_notices' => $have_notices,
+            'have_debugs'  => $have_notices,
+            'have_both'    => $have_both,
+            'have_many'    => $have_many,
 
         );
 
@@ -380,12 +383,12 @@ class HelloExtend_Protection_Logger
         /* Return an array containing the logs and information of what types exist... */
         $return = array(
 
-        'logs'         => $logs,
-        'have_errors'  => $have_errors,
-        'have_notices' => $have_notices,
-        'have_debugs'  => $have_debugs,
-        'have_both'    => false,
-        'have_many'    => false,
+            'logs'         => $logs,
+            'have_errors'  => $have_errors,
+            'have_notices' => $have_notices,
+            'have_debugs'  => $have_debugs,
+            'have_both'    => false,
+            'have_many'    => false,
 
         );
 
@@ -404,7 +407,7 @@ class HelloExtend_Protection_Logger
         Check that the nonce is correct to avoid safety issues...
         The nonce is passed via a POST from the ajax call...
         */
-        if (! wp_verify_nonce($_POST['nonce'], 'extend_logger_nonce') ) {
+        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'extend_logger_nonce') ) {
             exit('Wrong nonce filter log');
         }
 
@@ -412,7 +415,7 @@ class HelloExtend_Protection_Logger
         The filter is posted by the ajax call to tell this function which
         type of logs it wants...
         */
-        $filter = $_POST['filter'];
+        $filter = sanitize_text_field( wp_unslash( $_POST['filter'] ) );
 
         /* If there is no filter get all logs... */
         if ($filter == 'all' ) {
@@ -423,7 +426,7 @@ class HelloExtend_Protection_Logger
         }
 
         /* Format the logs... */
-        $return = self::extend_logger_format_logs($logs, $_POST['nonce']);
+        $return = self::extend_logger_format_logs($logs, sanitize_text_field( wp_unslash ($_POST['nonce'] ) ) );
 
         /* Send output back to ajax call... */
         die($return);
@@ -502,7 +505,7 @@ class HelloExtend_Protection_Logger
 
     public static function extend_logger_ab_toggle()
     {
-        $value  = $_POST['update'];
+        $value  = sanitize_text_field( wp_unslash( $_POST['update'] ) );
         $update = update_option('extend_logger_ab_show', $value);
         die();
     }
@@ -516,9 +519,9 @@ class HelloExtend_Protection_Logger
         $new_logs = get_option('extend_logger_new_logs');
         if (! $new_logs ) {
             $new_logs = array(
-            'errors'  => array(),
-            'notices' => array(),
-            'debugs'  => array(),
+                'errors'  => array(),
+                'notices' => array(),
+                'debugs'  => array(),
             );
         }
 

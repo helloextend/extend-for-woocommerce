@@ -119,38 +119,38 @@ function extend_render_settings_page()
     echo '</div>';
 
     settings_errors(); ?>
-    <!-- begin tabs -->
+	<!-- begin tabs -->
 
-    <div class="wrap">
-        <h2>Extend Protection Settings</h2>
-        <h2 class="nav-tab-wrapper">
-            <a href="?page=extend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || $_GET['tab'] === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
-            <a href="?page=extend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
-            <a href="?page=extend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
-            <a href="?page=extend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) && $_GET['tab'] === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
-        </h2>
-        <div class="tab-content">
+	<div class="wrap">
+		<h2>Extend Protection Settings</h2>
+		<h2 class="nav-tab-wrapper">
+			<a href="?page=extend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || sanitize_text_field($_GET['tab']) === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
+			<a href="?page=extend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
+			<a href="?page=extend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+			<a href="?page=extend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
+		</h2>
+		<div class="tab-content">
             <?php
-            $current_tab = isset($_GET['tab']) ? $_GET['tab'] : 'general';
+            $current_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']): 'general';
 
             switch ($current_tab) {
-            case 'product_protection':
-                include_once 'tabs/product-protection.php';
-                break;
-            case 'shipping_protection':
-                include_once 'tabs/shipping-protection.php';
-                break;
-            case 'catalog_sync':
-                include_once 'tabs/catalog-sync.php';
-                break;
-            default:
-                include_once 'tabs/general-settings.php';
+                case 'product_protection':
+                    include_once 'tabs/product-protection.php';
+                    break;
+                case 'shipping_protection':
+                    include_once 'tabs/shipping-protection.php';
+                    break;
+                case 'catalog_sync':
+                    include_once 'tabs/catalog-sync.php';
+                    break;
+                default:
+                    include_once 'tabs/general-settings.php';
             }
             ?>
-        </div>
-    </div>
+		</div>
+	</div>
 
-    <!-- end tabs -->
+	<!-- end tabs -->
     <?php
 
 }
@@ -175,17 +175,6 @@ function extend_render_documentation_page()
                 <img src="' . esc_url(plugins_url() . '/extend-protection/images/woocommerce_hooks.jpg') . '" >
             </div>
         </div>';
-    //
-    //        <div>
-    //            <h3><a href="#" id="extend_2">2 - Second</a></h3>
-    //            <div>Phasellus mattis tincidunt nibh.</div>
-    //        </div>
-    //        <div>
-    //            <h3><a href="#" id="extend_3">3 - Third</a></h3>
-    //            <div>Nam dui erat, auctor a, dignissim quis.</div>
-    //        </div>
-    //    </div>
-    //    ';
 }
 
 function helloextend_protection_style()
@@ -341,13 +330,13 @@ function add_shipping_protection_fee()
     }
 
     if (isset($_POST['fee_amount']) && isset($_POST['fee_label'])) {
-        $fee_amount = floatval(number_format($_POST['fee_amount'] / 100, 2));
+        $fee_amount = floatval(number_format( sanitize_text_field($_POST['fee_amount']) / 100, 2));
         $fee_label  = sanitize_text_field($_POST['fee_label']);
 
         if ($fee_amount && $fee_label) {
             WC()->session->set('shipping_fee', true);
             WC()->session->set('shipping_fee_value', $fee_amount);
-            WC()->session->set('shipping_quote_id', $_POST['shipping_quote_id']);
+            WC()->session->set('shipping_quote_id', sanitize_key($_POST['shipping_quote_id']));
         } else {
             echo ' No shipping protection fee added because of an error ';
         }
