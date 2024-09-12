@@ -247,11 +247,10 @@ class HelloExtend_Protection_Global
         }
 
         $settings['sdk_url']             = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
-        $settings['warranty_product_id'] = extend_product_protection_id();
-        /*
-        $settings['extend_use_skus']     = array_key_exists('extend_use_skus', $helloextend_protection_product_protection_settings)
-                                            ? $helloextend_protection_product_protection_settings['extend_use_skus'] : 0;
-        */
+
+        $settings['warranty_product_id'] = array_key_exists('warranty_product_id', $settings)
+            ? $settings['warranty_product_id'] : extend_product_protection_id();
+
         if (empty($settings['warranty_product_id'])) {
             HelloExtend_Protection_Logger::extend_log_error('Error: Warranty product is not created.');
         }

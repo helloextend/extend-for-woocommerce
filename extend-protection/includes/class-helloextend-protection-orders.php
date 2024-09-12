@@ -122,10 +122,12 @@ class HelloExtend_Protection_Orders
                 }
             }
 
+            // Get extend product id from settings
+            $extend_product_protection_id = $this->settings['warranty_product_id'];
+
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to extend_line_items array
-            // TODO: id = reference id = sku ?
-            if ($product_id != extend_product_protection_id()) {
+            if ($product_id != $extend_product_protection_id) {
                 $extend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product'               => array(
