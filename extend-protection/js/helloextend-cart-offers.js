@@ -27,7 +27,7 @@ jQuery(document).ready(function() {
         let ref_id =  val.dataset.covered;
         let category = val.dataset.category;
         let qty = jQuery(val).parents('.cart_item').find('input.qty').val();
-        let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/\$/g, '').replace(",", "")
+        let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,]/g, '');
         let extendPrice = Math.round(parseFloat(price).toFixed(2) * 100);
 
         // If the warranty is already in the cart or if Extend offers are disabled, stop processing this item.
