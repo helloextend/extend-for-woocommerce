@@ -4,7 +4,7 @@ Plugin URI: https://www.extend.com/
 Contributors: whereispolaris, extendengineering
 Tags: extend, protection, tracking
 Requires at least: 4.0
-Tested up to: 6.4.1
+Tested up to: 6.7
 Stable tag: 1.0.0
 Requires PHP: 7.4
 License: GPLv2 or later
