@@ -25,10 +25,19 @@
  * Domain Path:       /languages
  */
 
+
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
 // If this file is called directly, abort.
 if (!defined('WPINC')) {
     die;
 }
+
+
 
 /**
  * Currently plugin version.
