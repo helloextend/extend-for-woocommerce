@@ -108,7 +108,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection.php';
  *
  * @since 1.0.0
  */
-function helloextend__run()
+function helloextend_run()
 {
     $plugin = new HelloExtend_Protection();
     $plugin->run();
