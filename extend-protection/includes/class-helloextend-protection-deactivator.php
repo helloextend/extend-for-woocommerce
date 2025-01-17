@@ -40,9 +40,9 @@ class HelloExtend_Protection_Deactivator
     {
 
         /* Extend Logging: On deactivation clear errors and notices from the database. */
-        delete_option('helloextend_plugin_error_log');
-        delete_option('helloextend_plugin_notice_log');
-        delete_option('helloextend_plugin_debug_log');
+        delete_option('helloextend_error_log');
+        delete_option('helloextend_notice_log');
+        delete_option('helloextend_debug_log');
         delete_option('helloextend_logger_new_logs');
         delete_option('helloextend_logger_ab_show');
 

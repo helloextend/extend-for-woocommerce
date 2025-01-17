@@ -29,9 +29,9 @@ class HelloExtend_Protection_Activator
     public static function activate()
     {
         /* Extend  Logging : On activation create two fields in the wp_options table to store our errors, debugs and notices. */
-        add_option('helloextend_plugin_error_log');
-        add_option('helloextend_plugin_notice_log');
-        add_option('helloextend_plugin_debug_log');
+        add_option('helloextend_error_log');
+        add_option('helloextend_notice_log');
+        add_option('helloextend_debug_log');
         add_option('helloextend_logger_new_logs');
         add_option('helloextend_logger_ab_show', true);
 

@@ -8,7 +8,7 @@
 </form>
 <?php
 // Extend Product Protection Item  Management
-if (helloextend_plugin_is_woocommerce_activated() ) {
+if (helloextend_is_woocommerce_activated() ) {
     $post_id = null;
     echo "<span class='settings-product-protection-item'>Extend Product Protection Item ";
     $post_id = wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);

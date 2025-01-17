@@ -20,7 +20,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Get error logs from the wp_options table... */
-        $error_log = get_option('helloextend_plugin_error_log');
+        $error_log = get_option('helloextend_error_log');
 
         if (! $error_log ) {
             $error_log = array(
@@ -48,7 +48,7 @@ class HelloExtend_Protection_Logger
         $error_log['next_error']++;
 
         /* Update the error log in the wp_options table... */
-        $update = update_option('helloextend_plugin_error_log', $error_log);
+        $update = update_option('helloextend_error_log', $error_log);
 
         /* Add to list of new logs... */
         if ($update ) {
@@ -65,7 +65,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Get notice logs from the wp_options table... */
-        $notice_log = get_option('helloextend_plugin_notice_log', true);
+        $notice_log = get_option('helloextend_notice_log', true);
         if (! $notice_log ) {
 
             $notice_log = array(
@@ -93,7 +93,7 @@ class HelloExtend_Protection_Logger
         $notice_log['next_notice']++;
 
         /* Update the notice log in the wp_options table... */
-        $update = update_option('helloextend_plugin_notice_log', $notice_log);
+        $update = update_option('helloextend_notice_log', $notice_log);
 
         /* Add to list of new logs... */
         if ($update ) {
@@ -112,7 +112,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Get debug logs from the wp_options table... */
-        $debug_log = get_option('helloextend_plugin_debug_log', true);
+        $debug_log = get_option('helloextend_debug_log', true);
 
         // Ensure $debug_log is an array
         if (!is_array($debug_log)) {
@@ -143,7 +143,7 @@ class HelloExtend_Protection_Logger
         $debug_log['next_debug']++;
 
         /* Update the debug log in the wp_options table... */
-        $update = update_option('helloextend_plugin_debug_log', $debug_log);
+        $update = update_option('helloextend_debug_log', $debug_log);
 
         /* Add to list of new logs... */
         if ($update) {
@@ -227,9 +227,9 @@ class HelloExtend_Protection_Logger
         $notice_log_empty = array();
         $debug_log_empty  = array();
 
-        $deleted_errors  = update_option('helloextend_plugin_error_log', $error_log_empty);
-        $deleted_notices = update_option('helloextend_plugin_notice_log', $notice_log_empty);
-        $deleted_debugs  = update_option('helloextend_plugin_debug_log', $debug_log_empty);
+        $deleted_errors  = update_option('helloextend_error_log', $error_log_empty);
+        $deleted_notices = update_option('helloextend_notice_log', $notice_log_empty);
+        $deleted_debugs  = update_option('helloextend_debug_log', $debug_log_empty);
 
         /* Build the response */
         if ($deleted_errors || $deleted_notices || $deleted_debugs ) {
@@ -273,9 +273,9 @@ class HelloExtend_Protection_Logger
     public static function extend_logger_get_all_logs()
     {
 
-        $errors  = get_option('helloextend_plugin_error_log', true);
-        $notices = get_option('helloextend_plugin_notice_log', true);
-        $debugs  = get_option('helloextend_plugin_debug_log', true);
+        $errors  = get_option('helloextend_error_log', true);
+        $notices = get_option('helloextend_notice_log', true);
+        $debugs  = get_option('helloextend_debug_log', true);
 
         /* These variables are used to see if errors, notices and debugs exist... */
         $have_errors  = false;
