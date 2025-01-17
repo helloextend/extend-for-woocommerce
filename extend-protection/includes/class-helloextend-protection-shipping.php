@@ -18,7 +18,7 @@ if (! defined('ABSPATH') ) {
 /**
  * The Shipping Protection functionality of the plugin.
  *
- * Adds extend-shipping-offer div to the checkout area
+ * Adds helloextend-shipping-offer div to the checkout area
  * Enqueues the necessary JS
  * Renders Extend checkout shipping protection offers
  *
@@ -140,7 +140,7 @@ class HelloExtend_Protection_Shipping
                 'ExtendShippingIntegration',
                 compact('env', 'items', 'enable_extend_sp', 'ajax_url', 'update_order_review_nonce')
             );
-            echo '<tr><td colspan="2"><div id="extend-shipping-offer" style="height: 120px;"></div></td></tr>';
+            echo '<tr><td colspan="2"><div id="helloextend-shipping-offer" style="height: 120px;"></div></td></tr>';
         } else {
             // make sure to remove any SP session value
             WC()->session->set('shipping_fee_remove', true);

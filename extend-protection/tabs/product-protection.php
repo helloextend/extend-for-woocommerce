@@ -1,9 +1,3 @@
-<?php
-// If this file is accessed directly, exit.
-if (!defined('ABSPATH')) {
-    exit;
-}
-?>
 
 <form id="extend-settings" method="post" action="options.php">
     <?php
@@ -14,7 +8,7 @@ if (!defined('ABSPATH')) {
 </form>
 <?php
 // Extend Product Protection Item  Management
-if (is_woocommerce_activated() ) {
+if (helloextend_plugin_is_woocommerce_activated() ) {
     $post_id = null;
     echo "<span class='settings-product-protection-item'>Extend Product Protection Item ";
     $post_id = wc_get_product_id_by_sku(EXTEND_PRODUCT_PROTECTION_SKU);

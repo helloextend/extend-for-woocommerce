@@ -51,7 +51,7 @@ function extend_loggerDeleteSingle()
             $(deleted).nextAll().toggleClass('extend_logger-dark');
             $(deleted).hide();
 
-            $('#extend_logger-ajax-message').html('').append('<div class="update-nag ajax-response">'+errorAjax.deleting+'</div>');
+            $('#helloextend_logger-ajax-message').html('').append('<div class="update-nag ajax-response">'+errorAjax.deleting+'</div>');
 
             var nonce = $(this).attr('data-nonce');
 
@@ -71,8 +71,8 @@ function extend_loggerDeleteSingle()
                     },
                     success: function ( data, textStatus, XMLHttpRequest ) {
 
-                        $('#extend_logger-ajax-message').html('');
-                        $('#extend_logger-ajax-message').append(data);
+                        $('#helloextend_logger-ajax-message').html('');
+                        $('#helloextend_logger-ajax-message').append(data);
 
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
@@ -102,7 +102,7 @@ function extend_loggerDeleteAll()
             /* Delete all errors visibily from the error log table... */
             $('.extend_logger-table-row').hide();
 
-            $('#extend_logger-ajax-message').html('').append('<div class="update-nag ajax-response">'+errorAjax.deleting+'</div>');
+            $('#helloextend_logger-ajax-message').html('').append('<div class="update-nag ajax-response">'+errorAjax.deleting+'</div>');
 
             var nonce = $(this).attr('data-nonce');
 
@@ -120,8 +120,8 @@ function extend_loggerDeleteAll()
                     },
                     success: function ( data, textStatus, XMLHttpRequest ) {
 
-                        $('#extend_logger-ajax-message').html('');
-                        $('#extend_logger-ajax-message').append(data);
+                        $('#helloextend_logger-ajax-message').html('');
+                        $('#helloextend_logger-ajax-message').append(data);
 
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
@@ -195,7 +195,7 @@ Toggles on and off the admin bar button...
 function extend_loggerAbToggle()
 {
 
-    $('#extend_logger_ab_show').change(
+    $('#helloextend_logger_ab_show').change(
         function () {
 
             if($(this).is(":checked") ) {

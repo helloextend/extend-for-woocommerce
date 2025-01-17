@@ -29,17 +29,17 @@ class HelloExtend_Protection_Activator
     public static function activate()
     {
         /* Extend  Logging : On activation create two fields in the wp_options table to store our errors, debugs and notices. */
-        add_option('custom_error_log');
-        add_option('custom_notice_log');
-        add_option('custom_debug_log');
-        add_option('extend_logger_new_logs');
-        add_option('extend_logger_ab_show', true);
+        add_option('helloextend_plugin_error_log');
+        add_option('helloextend_plugin_notice_log');
+        add_option('helloextend_plugin_debug_log');
+        add_option('helloextend_logger_new_logs');
+        add_option('helloextend_logger_ab_show', true);
 
         // Extend Oauth token fields
-        add_option('extend_live_token_date');
-        add_option('extend_sandbox_token_date');
-        add_option('extend_live_token');
-        add_option('extend_sandbox_token');
+        add_option('helloextend_live_token_date');
+        add_option('helloextend_sandbox_token_date');
+        add_option('helloextend_live_token');
+        add_option('helloextend_sandbox_token');
 
         //create the extend protection product if it doesn't exist (or if it's in the trash)
         $extend_product_protection_id = extend_product_protection_id();

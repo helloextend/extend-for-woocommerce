@@ -27,7 +27,7 @@
                 if (enable_extend_sp === '1') {
                     Extend.shippingProtection.render(
                         {
-                            selector: '#extend-shipping-offer',
+                            selector: '#helloextend-shipping-offer',
                             items: items_array,
                             // isShippingProtectionInCart: false,
                             onEnable: function (quote) {

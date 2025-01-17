@@ -29,7 +29,7 @@ function extend_logger_admin()
     include_once EXTEND_LOGGER_DIR . 'admin/helloextend_logger_log-table.php';
 
     /* Clear the new logs array as now all logs should have been seen... */
-    update_option('extend_logger_new_logs', null);
+    update_option('helloextend_logger_new_logs', null);
 
 }
 

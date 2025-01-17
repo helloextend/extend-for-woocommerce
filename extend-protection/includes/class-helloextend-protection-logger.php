@@ -20,7 +20,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Get error logs from the wp_options table... */
-        $error_log = get_option('custom_error_log');
+        $error_log = get_option('helloextend_plugin_error_log');
 
         if (! $error_log ) {
             $error_log = array(
@@ -48,7 +48,7 @@ class HelloExtend_Protection_Logger
         $error_log['next_error']++;
 
         /* Update the error log in the wp_options table... */
-        $update = update_option('custom_error_log', $error_log);
+        $update = update_option('helloextend_plugin_error_log', $error_log);
 
         /* Add to list of new logs... */
         if ($update ) {
@@ -65,7 +65,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Get notice logs from the wp_options table... */
-        $notice_log = get_option('custom_notice_log', true);
+        $notice_log = get_option('helloextend_plugin_notice_log', true);
         if (! $notice_log ) {
 
             $notice_log = array(
@@ -93,7 +93,7 @@ class HelloExtend_Protection_Logger
         $notice_log['next_notice']++;
 
         /* Update the notice log in the wp_options table... */
-        $update = update_option('custom_notice_log', $notice_log);
+        $update = update_option('helloextend_plugin_notice_log', $notice_log);
 
         /* Add to list of new logs... */
         if ($update ) {
@@ -111,45 +111,46 @@ class HelloExtend_Protection_Logger
     public static function extend_log_debug( $message )
     {
 
-        /* Get notice logs from the wp_options table... */
-        $debug_log = get_option('custom_debug_log', true);
-        if (! $debug_log ) {
+        /* Get debug logs from the wp_options table... */
+        $debug_log = get_option('helloextend_plugin_debug_log', true);
 
-            $debug_log = array(
+        // Ensure $debug_log is an array
+        if (!is_array($debug_log)) {
+            $debug_log = array();
+        }
 
-                'debugs'     => array(),
-                'next_debug' => 1,
+        // Ensure $debug_log['debugs'] is an array
+        if (!isset($debug_log['debugs']) || !is_array($debug_log['debugs'])) {
+            $debug_log['debugs'] = array();
+        }
 
-            );
-
+        // Ensure $debug_log['next_debug'] exists and is numeric
+        if (!isset($debug_log['next_debug']) || !is_numeric($debug_log['next_debug'])) {
+            $debug_log['next_debug'] = 1;
         }
 
         $debug_id = $debug_log['next_debug'];
 
         /* Insert new debug into array... */
         $debug_log['debugs'][ $debug_id ] = array(
-
             'type'    => 'debug',
             'date'    => current_time('timestamp'),
             'id'      => $debug_id,
             'message' => sanitize_text_field($message),
-
         );
 
-        /* Increase the debug code to use for the next debug logged... */
+        /* Increase the debug ID for the next log */
         $debug_log['next_debug']++;
 
         /* Update the debug log in the wp_options table... */
-        $update = update_option('custom_debug_log', $debug_log);
+        $update = update_option('helloextend_plugin_debug_log', $debug_log);
 
         /* Add to list of new logs... */
-        if ($update ) {
-
+        if ($update) {
             self::extend_logger_add_to_new_logs($debug_id, 'debugs');
-
         }
-
     }
+
 
     /*
     extend_logger_delete_single() gets used by the error log table to delete a single error or notice from the array...
@@ -226,9 +227,9 @@ class HelloExtend_Protection_Logger
         $notice_log_empty = array();
         $debug_log_empty  = array();
 
-        $deleted_errors  = update_option('custom_error_log', $error_log_empty);
-        $deleted_notices = update_option('custom_notice_log', $notice_log_empty);
-        $deleted_debugs  = update_option('custom_debug_log', $debug_log_empty);
+        $deleted_errors  = update_option('helloextend_plugin_error_log', $error_log_empty);
+        $deleted_notices = update_option('helloextend_plugin_notice_log', $notice_log_empty);
+        $deleted_debugs  = update_option('helloextend_plugin_debug_log', $debug_log_empty);
 
         /* Build the response */
         if ($deleted_errors || $deleted_notices || $deleted_debugs ) {
@@ -272,9 +273,9 @@ class HelloExtend_Protection_Logger
     public static function extend_logger_get_all_logs()
     {
 
-        $errors  = get_option('custom_error_log', true);
-        $notices = get_option('custom_notice_log', true);
-        $debugs  = get_option('custom_debug_log', true);
+        $errors  = get_option('helloextend_plugin_error_log', true);
+        $notices = get_option('helloextend_plugin_notice_log', true);
+        $debugs  = get_option('helloextend_plugin_debug_log', true);
 
         /* These variables are used to see if errors, notices and debugs exist... */
         $have_errors  = false;
@@ -448,7 +449,7 @@ class HelloExtend_Protection_Logger
         uasort($logs['logs'], 'self::extend_logger_sort_by_date');
 
         /* Get the list of new logs so we can mark unseen logs as new... */
-        $new_logs = get_option('extend_logger_new_logs', true);
+        $new_logs = get_option('helloextend_logger_new_logs', true);
 
         /* Create output for each log... */
         $return    = '';
@@ -506,17 +507,17 @@ class HelloExtend_Protection_Logger
     public static function extend_logger_ab_toggle()
     {
         $value  = sanitize_text_field( wp_unslash( $_POST['update'] ) );
-        $update = update_option('extend_logger_ab_show', $value);
+        $update = update_option('helloextend_logger_ab_show', $value);
         die();
     }
 
     /*
-    extend_logger_add_to_new_logs() adds a new log to the extend_logger_new_logs option...
+    extend_logger_add_to_new_logs() adds a new log to the helloextend_logger_new_logs option...
     Currently used for displaying the amount of unmoderated logs in the admin bar...
     */
     public static function extend_logger_add_to_new_logs( $id, $type )
     {
-        $new_logs = get_option('extend_logger_new_logs');
+        $new_logs = get_option('helloextend_logger_new_logs');
         if (! $new_logs ) {
             $new_logs = array(
                 'errors'  => array(),
@@ -526,7 +527,7 @@ class HelloExtend_Protection_Logger
         }
 
         $new_logs[ $type ][] = $id;
-        $update              = update_option('extend_logger_new_logs', $new_logs);
+        $update              = update_option('helloextend_logger_new_logs', $new_logs);
 
     }
 }

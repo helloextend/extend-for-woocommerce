@@ -51,7 +51,7 @@ define('EXTEND_PRODUCT_PROTECTION_SKU', 'extend-product-protection');
  * The code that runs during plugin activation.
  * This action is documented in includes/class-helloextend-protection-activator.php
  */
-function activate_helloextend_protection()
+function helloextend_plugin_activate()
 {
     include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-activator.php';
     HelloExtend_Protection_Activator::activate();
@@ -61,14 +61,14 @@ function activate_helloextend_protection()
  * The code that runs during plugin deactivation.
  * This action is documented in includes/class-helloextend-protection-deactivator.php
  */
-function deactivate_helloextend_protection()
+function helloextend_plugin_deactivate()
 {
     include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-deactivator.php';
     HelloExtend_Protection_Deactivator::deactivate();
 }
 
-register_activation_hook(__FILE__, 'activate_helloextend_protection');
-register_deactivation_hook(__FILE__, 'deactivate_helloextend_protection');
+register_activation_hook(__FILE__, 'helloextend_plugin_activate');
+register_deactivation_hook(__FILE__, 'helloextend_plugin_deactivate');
 
 /* Actions */
 
@@ -80,12 +80,12 @@ add_action('plugins_loaded', 'extend_logger_includes');
 add_action('init', 'extend_product_protection_create');
 
 /* shipping protection fee management */
-add_action('wp_ajax_add_shipping_protection_fee', 'add_shipping_protection_fee');
-add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'add_shipping_protection_fee');
-add_action('wp_ajax_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
-add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'remove_shipping_protection_fee');
-add_action('woocommerce_cart_calculate_fees', 'set_shipping_fee');
-add_action('woocommerce_checkout_order_processed', 'save_shipping_protection_quote_id', 5, 2);
+add_action('wp_ajax_add_shipping_protection_fee', 'helloextend_plugin_add_shipping_protection_fee');
+add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'helloextend_plugin_add_shipping_protection_fee');
+add_action('wp_ajax_remove_shipping_protection_fee', 'helloextend_plugin_remove_shipping_protection_fee');
+add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'helloextend_plugin_remove_shipping_protection_fee');
+add_action('woocommerce_cart_calculate_fees', 'helloextend_plugin_set_shipping_fee');
+add_action('woocommerce_checkout_order_processed', 'helloextend_plugin_save_shipping_protection_quote_id', 5, 2);
 
 // Hook into WooCommerce order details display on admin screen
 add_action('woocommerce_after_order_itemmeta', 'add_helloextend_protection_contract', 10, 2);
@@ -108,7 +108,7 @@ require plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection.php';
  *
  * @since 1.0.0
  */
-function run_helloextend_protection()
+function helloextend_plugin_run()
 {
     $plugin = new HelloExtend_Protection();
     $plugin->run();
@@ -116,7 +116,7 @@ function run_helloextend_protection()
 
 function extend_render_settings_page()
 {
-    if (!is_woocommerce_activated()) {
+    if (!helloextend_plugin_is_woocommerce_activated()) {
         HelloExtend_Protection_Logger::extend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
         echo '<div class="error"><p><strong>' . sprintf(__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'extend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
     }
@@ -196,9 +196,9 @@ function helloextend_protection_style()
 /**
  * Check if WooCommerce is activated
  */
-if (!function_exists('is_woocommerce_activated')) {
+if (!function_exists('helloextend_plugin_is_woocommerce_activated')) {
 
-    function is_woocommerce_activated()
+    function helloextend_plugin_is_woocommerce_activated()
     {
         if (class_exists('woocommerce')) {
             return true;
@@ -225,9 +225,9 @@ add_filter('plugin_row_meta', 'helloextend_protection_links', 10, 2);
 
 /*extend_logger */
 
-if (!function_exists('write_log')) {
+if (!function_exists('helloextend_plugin_write_log')) {
 
-    function write_log($log)
+    function helloextend_plugin_write_log($log)
     {
         if (is_array($log) || is_object($log)) {
             error_log(print_r($log, true));
@@ -332,7 +332,7 @@ function extend_product_protection_id(): ?int
     return null;
 }
 
-function add_shipping_protection_fee()
+function helloextend_plugin_add_shipping_protection_fee()
 {
     if (!defined('DOING_AJAX') || !$_POST) {
         return;
@@ -353,7 +353,7 @@ function add_shipping_protection_fee()
     wp_die();
 }
 
-function remove_shipping_protection_fee()
+function helloextend_plugin_remove_shipping_protection_fee()
 {
     if (!defined('DOING_AJAX') || !$_POST) {
         return;
@@ -367,7 +367,7 @@ function remove_shipping_protection_fee()
     wp_die();
 }
 
-function set_shipping_fee()
+function helloextend_plugin_set_shipping_fee()
 {
     if (is_admin() && !defined('DOING_AJAX') || !is_checkout()) {
         return;
@@ -392,7 +392,7 @@ function set_shipping_fee()
     }
 }
 
-function save_shipping_protection_quote_id($order_id)
+function helloextend_plugin_save_shipping_protection_quote_id($order_id)
 {
     $settings = get_option('helloextend_protection_for_woocommerce_general_settings');
 
@@ -447,4 +447,4 @@ function add_helloextend_protection_contract($item_id, $item)
     }
 }
 
-run_helloextend_protection();
+helloextend_plugin_run();

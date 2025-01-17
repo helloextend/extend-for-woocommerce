@@ -19,7 +19,7 @@
             var batchSize = extend_sync_batch > 0 ? extend_sync_batch  : 100; // Number of products to process per AJAX call
 
             //reset last sync button event
-            $('#extend-catalog-sync-reset').on(
+            $('#helloextend-catalog-sync-reset').on(
                 "click", function () {
                     $('#progress-bar-container').hide();
                     $('#progress-bar').css('width', '0% !important');
@@ -95,7 +95,7 @@
                                             },
                                             success: function (response) {
                                                 $("span#last_sync_field").text(response.data.time);
-                                                $("input#extend_last_product_sync").val(response.data.sync_unixtime);
+                                                $("input#helloextend_last_product_sync").val(response.data.sync_unixtime);
                                             }
                                         }
                                     );
@@ -110,7 +110,7 @@
             } //end function processBatchProducts
 
             // Event handler for a Run Manual Sync
-            $('#extend-catalog-sync-run').on(
+            $('#helloextend-catalog-sync-run').on(
                 "click", function () {
                     $('#progress-bar').css('width', '0');
                     processBatchProducts();

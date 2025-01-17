@@ -142,13 +142,13 @@ a.extend_logger-delete-all {
     cursor: pointer;
 }
 
-#extend_logger-ab-toggle {
+#helloextend_logger-ab-toggle {
     float: right;
     margin-right: 15px;
     margin-top: 30px;
 }
 
-#extend_logger-ab-toggle label {
+#helloextend_logger-ab-toggle label {
     font-size: 0.9em;
     color: #999;
     margin-right: 5px;

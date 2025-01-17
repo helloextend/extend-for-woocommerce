@@ -40,16 +40,16 @@ class HelloExtend_Protection_Deactivator
     {
 
         /* Extend Logging: On deactivation clear errors and notices from the database. */
-        delete_option('custom_error_log');
-        delete_option('custom_notice_log');
-        delete_option('custom_debug_log');
-        delete_option('extend_logger_new_logs');
-        delete_option('extend_logger_ab_show');
+        delete_option('helloextend_plugin_error_log');
+        delete_option('helloextend_plugin_notice_log');
+        delete_option('helloextend_plugin_debug_log');
+        delete_option('helloextend_logger_new_logs');
+        delete_option('helloextend_logger_ab_show');
 
         // Extend Oauth token fields
-        delete_option('extend_live_token_date');
-        delete_option('extend_sandbox_token_date');
-        delete_option('extend_live_token');
-        delete_option('extend_sandbox_token');
+        delete_option('helloextend_live_token_date');
+        delete_option('helloextend_sandbox_token_date');
+        delete_option('helloextend_live_token');
+        delete_option('helloextend_sandbox_token');
     }
 }

@@ -223,10 +223,10 @@ class HelloExtend_Protection_Global
                 ? $helloextend_protection_general_settings['extend_live_client_id'] : '';
 
             // Create token variable
-            $settings['token'] = get_option('extend_live_token') ? get_option('extend_live_token') : '';
+            $settings['token'] = get_option('helloextend_live_token') ? get_option('extend_live_token') : '';
 
             // Create token date variable
-            $settings['token_date'] = get_option('extend_live_token_date') ? get_option('extend_live_token_date') : '';
+            $settings['token_date'] = get_option('helloextend_live_token_date') ? get_option('helloextend_live_token_date') : '';
         } else {
             $settings['store_id'] = array_key_exists('extend_sandbox_store_id', $helloextend_protection_general_settings)
                 ? $helloextend_protection_general_settings['extend_sandbox_store_id'] : '';
@@ -240,10 +240,10 @@ class HelloExtend_Protection_Global
                 ? $helloextend_protection_general_settings['extend_sandbox_client_id'] : '';
 
             // Create token variable
-            $settings['token'] = get_option('extend_sandbox_token') ? get_option('extend_sandbox_token') : '';
+            $settings['token'] = get_option('helloextend_sandbox_token') ? get_option('helloextend_sandbox_token') : '';
 
             // Create token date variable
-            $settings['token_date'] = get_option('extend_sandbox_token_date') ? get_option('extend_sandbox_token_date') : '';
+            $settings['token_date'] = get_option('helloextend_sandbox_token_date') ? get_option('helloextend_sandbox_token_date') : '';
         }
 
         $settings['sdk_url']             = 'https://sdk.helloextend.com/extend-sdk-client/v1/extend-sdk-client.min.js';
@@ -483,12 +483,12 @@ class HelloExtend_Protection_Global
                 if ($response->access_token) {
                     // switch settings environments
                     if ($settings['extend_environment'] == 'live') {
-                        update_option('extend_live_token', $response->access_token);
-                        update_option('extend_live_token_date', time());
+                        update_option('helloextend_live_token', $response->access_token);
+                        update_option('helloextend_live_token_date', time());
                         $token = $response->access_token;
                     } else {
-                        update_option('extend_sandbox_token', $response->access_token);
-                        update_option('extend_sandbox_token_date', time());
+                        update_option('helloextend_sandbox_token', $response->access_token);
+                        update_option('helloextend_sandbox_token_date', time());
                         $token = $response->access_token;
                     }
                 } else {
