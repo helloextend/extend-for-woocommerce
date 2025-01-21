@@ -1,0 +1,54 @@
+#helloextend-settings .form-table td {
+    padding:5px 10px;
+    vertical-align: middle;
+}
+
+#helloextend-settings .form-table th {
+    padding:5px 10px 5px 0;
+    vertical-align: top;
+
+}
+
+#helloextend-settings .form-table label {
+    font-size: 0.8em;
+    font-style: italic;
+}
+
+#helloextend-settings input.helloextend_sp_offer_location_other, input.helloextend_pdp_offer_location_other {
+    margin-top : 10px;
+}
+
+
+.helloextend_linkedin{
+    background-image: url('../../images/linkedin.png');
+}
+
+.helloextend_support{
+    background-image: url('../../images/support.png');
+}
+
+.helloextend_linkedin, .helloextend_support {
+    height: 16px;
+    background-repeat: no-repeat;
+    background-size: contain;
+    padding-left: 20px;
+    text-decoration: none;
+    vertical-align: middle;
+    display: inline-block;
+}
+
+/* product sync progress bar */
+
+#progress-bar-container {
+    display:none;
+    width: 100%;
+    height: 8px;
+    background-color: #ddd;
+}
+
+#progress-bar {
+    width: 0;
+    height: 100%;
+    background-color: #4caf50;
+    transition: width 0.3s;
+}
