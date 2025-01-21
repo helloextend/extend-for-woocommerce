@@ -1,3 +1,9 @@
+<?php
+// If this file is accessed directly, exit.
+if (!defined('ABSPATH')) {
+    exit;
+}
+?>
 
 <form id="extend-settings" method="post" action="options.php">
     <?php
