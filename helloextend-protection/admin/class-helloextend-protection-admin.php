@@ -163,8 +163,10 @@ class HelloExtend_Protection_Admin
         wp_localize_script('helloextend_sync_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'nonce', 'helloextend_sync_batch'));
 
         /* end for sync */
-
-        wp_enqueue_script($this->helloextend_protection, plugin_dir_url(__FILE__) . 'js/helloextend-protection-admin.js', array('jquery'), $this->version, false);
+        global $current_screen;
+        if ($current_screen->id == 'extend_page_helloextend-docs'){
+            wp_enqueue_script($this->helloextend_protection, plugin_dir_url(__FILE__) . 'js/helloextend-protection-admin.js', array('jquery'), $this->version, false);
+        }
     }
 
     /**
