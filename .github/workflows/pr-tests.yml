@@ -1,4 +1,4 @@
-name: Run Tests on Pull Request
+name: Deploy Plugin via REST API and Run Tests
 
 on:
   pull_request:
@@ -6,20 +6,29 @@ on:
       - master
 
 jobs:
-  test:
+  deploy-and-test:
     runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
-        with:
-          node-version: 18
+      - name: Zip the plugin folder
+        run: zip -r helloextend-protection.zip helloextend-protection
 
-      - name: Install dependencies
-        run: npm install
+      - name: Upload plugin via WordPress REST API
+        run: |
+          curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins" \
+          -u "${{ secrets.WP_ADMIN_AUTH }}" \
+          -F "plugin=@helloextend-protection.zip"
 
-      - name: Run a simple test
-        run: echo "Running basic test..." && exit 0
+      - name: Install and activate plugin
+        run: |
+          curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/helloextend-protection/activate" \
+          -u "${{ secrets.WP_ADMIN_AUTH }}"
+
+      - name: Install Cypress
+        run: npx cypress install
+
+      - name: Run Cypress tests
+        run: npx cypress run
