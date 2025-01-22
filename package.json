@@ -5,10 +5,10 @@
   "main": "index.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "lint:php": "vendor/bin/phpcs extend-protection/*",
-    "lint:php:fix": "vendor/bin/phpcbf extend-protection/*",
-    "lint": "eslint extend-protection/*",
-    "lint:fix": "eslint --fix extend-protection/*"
+    "lint:php": "vendor/bin/phpcs helloextend-protection/*",
+    "lint:php:fix": "vendor/bin/phpcbf helloextend-protection/*",
+    "lint": "eslint helloextend-protection/*",
+    "lint:fix": "eslint --fix helloextend-protection/*"
   },
   "repository": {
     "type": "git",
