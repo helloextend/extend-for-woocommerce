@@ -4,7 +4,7 @@
   "description": "Product and Shipping Protection plugin for WooCommerce. Generate additional revenue for your e-commerce store by allowing your customers to protect the products they love!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1",
+    "test": "echo \"Error: no test specified\" && exit 1"
   },
   "repository": {
     "type": "git",
