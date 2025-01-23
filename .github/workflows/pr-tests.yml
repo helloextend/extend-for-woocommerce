@@ -11,11 +11,10 @@ jobs:
 
     steps:
 
-      - name: GitHub Action Starting
-        run: echo "Starting GitHub Action"
-
-      - name: Checkout repository
+      - name: Checkout PR branch
         uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
 
       - name: Zip the plugin folder
         run: zip -r helloextend-protection.zip helloextend-protection
