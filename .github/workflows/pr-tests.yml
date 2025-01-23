@@ -28,7 +28,7 @@ jobs:
           -u "${{ secrets.WP_ADMIN_AUTH }}"
 
       - name: Install Cypress
-        run: npx cypress install
+      - run: npm install cypress@10.11.0
 
       - name: Run Cypress tests
         run: npx cypress run
