@@ -7,6 +7,6 @@ module.exports = defineConfig({
     fixturesFolder: 'cypress/fixtures',
     screenshotsFolder: 'cypress/screenshots',
     videosFolder: 'cypress/videos',
-    supportFile: 'cypress/support/index.js'
+    supportFile: false
   }
 });
