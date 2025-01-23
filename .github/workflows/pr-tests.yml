@@ -22,14 +22,16 @@ jobs:
 
       - name: Upload plugin via WordPress REST API
         run: |
-          curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins" \
-          -u "${{ secrets.WP_ADMIN_AUTH }}" \
-          -F "plugin=@helloextend-protection.zip"
+          RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins" \
+            -u "${{ secrets.WP_ADMIN_AUTH }}" \
+            -F "plugin=@helloextend-protection.zip")
+          echo "Upload Response: $RESPONSE"
 
       - name: Install and activate plugin
         run: |
-          curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/helloextend-protection/activate" \
-          -u "${{ secrets.WP_ADMIN_AUTH }}"
+          RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/install" \
+            -u "${{ secrets.WP_ADMIN_AUTH }}")
+          echo "Install & Activate Response: $RESPONSE"
 
       - name: Install Cypress
         run: npm install cypress@10.11.0
