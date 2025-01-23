@@ -26,7 +26,7 @@ jobs:
             -F "plugin=@helloextend-protection.zip")
           echo "Upload Response: $RESPONSE"
 
-      - name: Install and activate plugin in woocommerce.woodys.extend.com store
+      - name: Install and activate plugin Woody's store
         run: |
           RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/install" \
             -u "${{ secrets.WP_ADMIN_AUTH }}")
