@@ -123,7 +123,7 @@ function helloextend_render_settings_page()
 
     echo '<div style="padding-top:30px">';
     echo ' <img src="' . esc_url(plugins_url() . '/helloextend-protection/images/Extend_logo_slogan.svg') . '" alt="Extend Logo with Slogan" style="width: 170px;">
-			<p>Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
+			<p>TEST: Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
             <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="helloextend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>';
     echo '</div>';
 
