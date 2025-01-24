@@ -37,7 +37,7 @@ jobs:
             -u "${{ secrets.WP_ADMIN_AUTH }}")
           echo "Cleanup Response: $RESPONSE"
 
-      - name: Install Cypress
+      - name: Install Cypress@10.11.0
         run: npm install cypress --save-dev
 
       - name: Run Cypress tests for plugin settings
