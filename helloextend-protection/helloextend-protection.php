@@ -183,7 +183,7 @@ function helloextend_render_documentation_page()
             <div>
                 <img src="' . esc_url(plugins_url() . '/helloextend-protection/images/woocommerce_hooks.jpg') . '" >
             </div>
-        </div>';
+    </div>';
 }
 
 function helloextend_protection_style()

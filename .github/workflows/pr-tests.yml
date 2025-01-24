@@ -1,0 +1,45 @@
+name: Woody's Store Test — https://woocommerce.woodys.extend.com/
+
+on:
+  pull_request:
+    branches:
+      - master
+
+jobs:
+  deploy-and-test:
+    runs-on: ubuntu-latest
+
+    steps:
+
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.event.pull_request.head.ref }}
+
+      - name: Zip the plugin folder
+        run: zip -r helloextend-protection.zip helloextend-protection
+
+      - name: Upload plugin via WordPress REST API
+        run: |
+          RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins" \
+            -u "${{ secrets.WP_ADMIN_AUTH }}" \
+            -F "plugin=@helloextend-protection.zip")
+          echo "Upload Response: $RESPONSE"
+
+      - name: Install and activate plugin Woody's store
+        run: |
+          RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/install" \
+            -u "${{ secrets.WP_ADMIN_AUTH }}")
+          echo "Install & Activate Response: $RESPONSE"
+
+      - name: Delete uploaded zip file
+        run: |
+          RESPONSE=$(curl -X DELETE "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/cleanup?file=helloextend-protection.zip" \
+            -u "${{ secrets.WP_ADMIN_AUTH }}")
+          echo "Cleanup Response: $RESPONSE"
+
+      - name: Install Cypress
+        run: npm install cypress@10.11.0
+
+      - name: Run Cypress tests
+        run: npx cypress run
