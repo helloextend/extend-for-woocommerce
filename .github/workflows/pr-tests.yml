@@ -43,8 +43,8 @@ jobs:
       - name: Run Cypress tests for plugin settings
         run: npx cypress run --spec "cypress/integration/general_settings.cy.js"
         env:
-          CYPRESS_WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
-          CYPRESS_WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
-          CYPRESS_STORE_ID: ${{ secrets.STORE_ID }}
-          CYPRESS_CLIENT_ID: ${{ secrets.CLIENT_ID }}
-          CYPRESS_CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+          WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
+          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
+          STORE_ID: ${{ secrets.STORE_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
