@@ -19,3 +19,7 @@
 # Cypress files
 /cypress/screenshots/
 /cypress/videos/
+
+# Environment file
+.env
+cypress.env.json
