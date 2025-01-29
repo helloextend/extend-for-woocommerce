@@ -38,7 +38,7 @@ jobs:
           echo "Cleanup Response: $RESPONSE"
 
       - name: Install Cypress@10.11.0
-        run: npm install cypress --save-dev
+        run: npm install cypress@10.11.0
 
       - name: Run Cypress tests for plugin settings
         run: npx cypress run --spec "cypress/integration/general_settings.cy.js"
