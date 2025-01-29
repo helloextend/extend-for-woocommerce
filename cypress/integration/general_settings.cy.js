@@ -1,10 +1,6 @@
 describe('Update Plugin Settings in WP-Admin', () => {
     before(() => {
 
-        console.log("SITE_URL:", Cypress.env('SITE_URL'));
-        console.log("WP_ADMIN_USERNAME:", Cypress.env('WP_ADMIN_USERNAME'));
-        console.log("WP_ADMIN_PASSWORD:", Cypress.env('WP_ADMIN_PASSWORD'));
-
         // Log in to WordPress Admin
         cy.visit(`${Cypress.env('SITE_URL')}/wp-login.php`);
 

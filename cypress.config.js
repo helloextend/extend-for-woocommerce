@@ -9,12 +9,12 @@ module.exports = defineConfig({
     videosFolder: 'cypress/videos',
     supportFile: false,
     env: {
-      SITE_URL: process.env.SITE_URL,
-      WP_ADMIN_USERNAME: process.env.WP_ADMIN_USERNAME,
-      WP_ADMIN_PASSWORD: process.env.WP_ADMIN_PASSWORD,
-      STORE_ID: process.env.STORE_ID,
-      CLIENT_ID: process.env.CLIENT_ID,
-      CLIENT_SECRET: process.env.CLIENT_SECRET
+      CYPRESS_SITE_URL: process.env.SITE_URL,
+      CYPRESS_WP_ADMIN_USERNAME: process.env.WP_ADMIN_USERNAME,
+      CYPRESS_WP_ADMIN_PASSWORD: process.env.WP_ADMIN_PASSWORD,
+      CYPRESS_STORE_ID: process.env.STORE_ID,
+      CYPRESS_CLIENT_ID: process.env.CLIENT_ID,
+      CYPRESS_CLIENT_SECRET: process.env.CLIENT_SECRET
     }
   }
 });
