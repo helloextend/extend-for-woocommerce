@@ -40,9 +40,6 @@ jobs:
       - name: Install Cypress@10.11.0
         run: npm install cypress --save-dev
 
-      - name: Clear Cypress Cache
-        run: rm -rf ~/.cache/Cypress
-
       - name: Run Cypress tests for plugin settings
         run: npx cypress run --spec "cypress/integration/general_settings.cy.js"
         env:
