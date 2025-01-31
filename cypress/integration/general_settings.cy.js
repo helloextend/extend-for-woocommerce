@@ -1,4 +1,4 @@
-describe('Update Plugin Settings in WP-Admin', () => {
+describe('Update Plugin General Settings in WP-Admin > Extend', () => {
     before(() => {
         // Log in to WordPress Admin
         cy.visit('https://woocommerce.woodys.extend.com/wp-login.php');
