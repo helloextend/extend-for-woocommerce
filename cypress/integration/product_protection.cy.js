@@ -1,4 +1,4 @@
-describe('Update Plugin Product Protection Settings in WP-Admin > Extend', () => {
+describe('Update Extend Plugin "Product Protection" Settings Tab', () => {
     before(() => {
         // Log in to WordPress Admin
         cy.visit('https://woocommerce.woodys.extend.com/wp-login.php');

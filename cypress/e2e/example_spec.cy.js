@@ -1,4 +1,4 @@
-// cypress/e2e/example_spec.cy.js
+// cypress/e2e/shipping_protection.cy.js
 
 describe('Cypress Test', () => {
     it('Visits the Extend Warranty site', () => {
