@@ -41,9 +41,7 @@ jobs:
         run: npm install cypress@10.11.0
 
       - name: Run Cypress tests for plugin settings
-        run: |
-          npx cypress run --spec "cypress/integration/general_settings.cy.js"
-          npx cypress run --spec "cypress/integration/product_protection.cy.js"
+        run: npx cypress run --spec "cypress/integration/plugin_settings.cy.js"
         env:
           WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
           WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
