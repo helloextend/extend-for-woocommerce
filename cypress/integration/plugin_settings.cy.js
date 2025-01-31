@@ -37,21 +37,46 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
         cy.contains('Settings saved').should('exist');
     });
 
-    it('Updates Product Protection Settings', () => {
+    it('Navigates to product protection settings and updates fields', () => {
         // Visit Product Protection Settings Page
         cy.visit('https://woocommerce.woodys.extend.com/wp-admin/admin.php?page=helloextend-protection-settings&tab=product_protection');
 
-        // Check and enable required checkboxes
-        ['#enable_helloextend', '#helloextendenable_cart_offers', '#helloextendenable_cart_balancing',
-            '#helloextendenable_pdp_offers', '#helloextendproduct_protection_contract_create'].forEach(selector => {
-            cy.get(selector).then(($el) => {
-                if (!$el.is(':checked')) {
-                    cy.wrap($el).check();
-                }
-            });
+        // Check #enable_helloextend if unchecked
+        cy.get('#enable_helloextend').then(($el) => {
+            if (!$el.is(':checked')) {
+                cy.wrap($el).check();
+            }
         });
 
-        // Select "Fulfillment" for Contract Create Event
+        // Check #helloextendenable_cart_offers if unchecked
+        cy.get('#helloextendenable_cart_offers').then(($el) => {
+            if (!$el.is(':checked')) {
+                cy.wrap($el).check();
+            }
+        });
+
+        // Check #helloextendenable_cart_balancing if unchecked
+        cy.get('#helloextendenable_cart_balancing').then(($el) => {
+            if (!$el.is(':checked')) {
+                cy.wrap($el).check();
+            }
+        });
+
+        // Check #helloextendenable_pdp_offers if unchecked
+        cy.get('#helloextendenable_pdp_offers').then(($el) => {
+            if (!$el.is(':checked')) {
+                cy.wrap($el).check();
+            }
+        });
+
+        // Check #helloextendproduct_protection_contract_create if unchecked
+        cy.get('#helloextendproduct_protection_contract_create').then(($el) => {
+            if (!$el.is(':checked')) {
+                cy.wrap($el).check();
+            }
+        });
+
+        // Select "Fulfillment" for #helloextendproduct_protection_contract_create_event
         cy.get('#helloextendproduct_protection_contract_create_event').select('Fulfillment');
 
         // Click Save Changes
@@ -61,7 +86,7 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
         cy.contains('Settings saved.').should('exist');
     });
 
-    it('Updates Shipping Protection Settings', () => {
+    it('Navigates to Shipping Protection settings and updates fields', () => {
         // Visit Shipping Protection Settings Page
         cy.visit('https://woocommerce.woodys.extend.com/wp-admin/admin.php?page=helloextend-protection-settings&tab=shipping_protection');
 
