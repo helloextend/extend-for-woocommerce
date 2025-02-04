@@ -48,3 +48,6 @@ jobs:
           STORE_ID: ${{ secrets.STORE_ID }}
           CLIENT_ID: ${{ secrets.CLIENT_ID }}
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+
+      - name: Run Cypress frontend checks
+        run: npx cypress run --spec "cypress/integration/frontend_checks.cy.js"
