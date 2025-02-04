@@ -3,6 +3,8 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
         // Log in to WordPress Admin
         cy.visit('https://woocommerce.woodys.extend.com/wp-login.php');
 
+        cy.wait(1000);
+
         cy.get('#user_login').type(Cypress.env('WP_ADMIN_USERNAME'));
         cy.get('#user_pass').type(Cypress.env('WP_ADMIN_PASSWORD'));
         cy.get('#wp-submit').click();
@@ -35,11 +37,24 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
 
         // Verify settings saved
         cy.contains('Settings saved').should('exist');
+
+        // wait 1 second
+        cy.wait(1000);
+
     });
 
     it('Navigates to product protection settings and updates fields', () => {
         // Visit Product Protection Settings Page
         cy.visit('https://woocommerce.woodys.extend.com/wp-admin/admin.php?page=helloextend-protection-settings&tab=product_protection');
+
+        cy.wait(1000);
+
+        // if it goes back to wp-login, then login again
+        if (cy.url().should('include', '/wp-login.php')) {
+            cy.get('#user_login').type(Cypress.env('WP_ADMIN_USERNAME'));
+            cy.get('#user_pass').type(Cypress.env('WP_ADMIN_PASSWORD'));
+            cy.get('#wp-submit').click();
+        }
 
         // Check #enable_helloextend if unchecked
         cy.get('#enable_helloextend').then(($el) => {
@@ -84,11 +99,24 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
 
         // Verify that settings were saved
         cy.contains('Settings saved.').should('exist');
+
+        // wait 1 second
+        cy.wait(1000);
+
     });
 
     it('Navigates to Shipping Protection settings and updates fields', () => {
         // Visit Shipping Protection Settings Page
         cy.visit('https://woocommerce.woodys.extend.com/wp-admin/admin.php?page=helloextend-protection-settings&tab=shipping_protection');
+
+        cy.wait(1000);
+
+        // if it goes back to wp-login, then login again
+        if (cy.url().should('include', '/wp-login.php')) {
+            cy.get('#user_login').type(Cypress.env('WP_ADMIN_USERNAME'));
+            cy.get('#user_pass').type(Cypress.env('WP_ADMIN_PASSWORD'));
+            cy.get('#wp-submit').click();
+        }
 
         // Check and enable Shipping Protection checkbox
         cy.get('#enable_helloextend_sp').then(($el) => {
@@ -105,5 +133,9 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
 
         // Verify that settings were saved
         cy.contains('Settings saved.').should('exist');
+
+        // wait 1 second
+        cy.wait(1000);
+
     });
 });

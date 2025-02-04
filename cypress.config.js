@@ -3,6 +3,7 @@ const { defineConfig } = require("cypress");
 module.exports = defineConfig({
   e2e: {
     baseUrl: "https://woocommerce.woodys.extend.com",
+    experimentalSessionAndOrigin: true,
     specPattern: 'cypress/integration/**/*.cy.{js,jsx,ts,tsx}',
     fixturesFolder: 'cypress/fixtures',
     screenshotsFolder: 'cypress/screenshots',
