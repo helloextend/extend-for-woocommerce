@@ -19,3 +19,6 @@
 # Cypress files
 /cypress/screenshots/
 /cypress/videos/
+
+# Cypress environment variables
+/cypress.env.json
