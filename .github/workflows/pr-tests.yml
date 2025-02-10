@@ -41,7 +41,7 @@ jobs:
         run: npm install cypress@10.11.0
 
       - name: Run Cypress tests for plugin settings
-        run: npx cypress run --spec "cypress/integration/plugin_settings.cy.js"
+        run: npx cypress run --spec "cypress/integration/01_plugin_settings.cy.js"
         env:
           WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
           WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
@@ -50,4 +50,4 @@ jobs:
           CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
 
       - name: Run Cypress frontend checks
-        run: npx cypress run --spec "cypress/integration/frontend_checks.cy.js"
+        run: npx cypress run --spec "cypress/integration/02_frontend_checks.cy.js"
