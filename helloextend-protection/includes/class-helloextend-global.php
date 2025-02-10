@@ -498,4 +498,31 @@ class HelloExtend_Protection_Global
         }
         return $token;
     }
+
+        /**
+     * Gets the first category that isn't ignored
+     * @param array $categories Categories attached to the product
+     * @param array $ignored_categories Categories marked as ignored in admin
+     * @return string The category name
+     * 
+     * @since 1.0.0
+     */
+    public static function get_first_valid_category($categories): string {
+        $ignored_categories = (array) get_option('helloextend_protection_for_woocommerce_ignored_categories');
+
+        // If ignored categories doesn't exist or is empty, return first category
+        if (is_null($ignored_categories) || count($ignored_categories) == 0) {
+            return $categories[0]->name;
+        }
+
+        // Find the first category that is not ignored and return it
+        foreach ($categories as $category) {
+            if (!in_array($category->term_id, $ignored_categories)) {
+                return $category->name;
+            }
+        }
+
+        // If all categories are ignored, return the first one in the array
+        return $categories[0]->name;
+    }
 }

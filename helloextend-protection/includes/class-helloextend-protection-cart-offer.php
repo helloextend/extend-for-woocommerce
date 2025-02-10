@@ -194,7 +194,7 @@ class HelloExtend_Protection_Cart_Offer
             $item_sku    = $cart_item['data']->get_sku() ? $cart_item['data']->get_sku() : $item_id;
             $referenceId = $this->settings['helloextend_use_skus'] ? $item_sku : $item_id;
             $categories  = get_the_terms($item_id, 'product_cat');
-            $category    = $categories[0]->name;
+            $category    = HelloExtend_Protection_Global::get_first_valid_category($categories);
 
             echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($referenceId)."' data-category='".esc_attr($category)."'></div>";
         }
