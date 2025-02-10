@@ -9,7 +9,6 @@ module.exports = defineConfig({
     screenshotsFolder: 'cypress/screenshots',
     videosFolder: 'cypress/videos',
     supportFile: false,
-    projectId: process.env.CYPRESS_CLOUD_PROJECT_ID,
     env: {
       WP_ADMIN_USERNAME: process.env.WP_ADMIN_USERNAME,
       WP_ADMIN_PASSWORD: process.env.WP_ADMIN_PASSWORD,
