@@ -10,13 +10,12 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-
       - name: Checkout PR branch
         uses: actions/checkout@v4
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
-      - name: Zip the plugin folder
+      - name: Zip the updated plugin folder
         run: zip -r helloextend-protection.zip helloextend-protection
 
       - name: Upload plugin via WordPress REST API
@@ -26,7 +25,7 @@ jobs:
             -F "plugin=@helloextend-protection.zip")
           echo "Upload Response: $RESPONSE"
 
-      - name: Install and activate plugin Woody's store
+      - name: Install and activate plugin in Woody's WooCommerce Store
         run: |
           RESPONSE=$(curl -X POST "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/install" \
             -u "${{ secrets.WP_ADMIN_AUTH }}")
@@ -38,8 +37,26 @@ jobs:
             -u "${{ secrets.WP_ADMIN_AUTH }}")
           echo "Cleanup Response: $RESPONSE"
 
-      - name: Install Cypress
+      - name: Install Cypress@10.11.0
         run: npm install cypress@10.11.0
 
-      - name: Run Cypress tests
-        run: npx cypress run
+      - name: Run Cypress tests for plugin settings
+        run: npx cypress run --spec "cypress/integration/01_plugin_settings.cy.js"
+        env:
+          WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
+          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
+          STORE_ID: ${{ secrets.STORE_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
+
+      - name: Run Cypress frontend checks
+        run: npx cypress run --spec "cypress/integration/02_frontend_checks.cy.js"
+
+      - name: Run Cypress checkout tests
+        run: npx cypress run --spec "cypress/integration/03_order_processing_checks.cy.js"
+        env:
+          WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
+          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
+          STORE_ID: ${{ secrets.STORE_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
