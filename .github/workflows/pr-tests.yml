@@ -54,3 +54,9 @@ jobs:
 
       - name: Run Cypress checkout tests
         run: npx cypress run --spec "cypress/integration/03_order_processing_checks.cy.js"
+        env:
+          WP_ADMIN_USERNAME: ${{ secrets.WP_ADMIN_USERNAME }}
+          WP_ADMIN_PASSWORD: ${{ secrets.WP_ADMIN_PASSWORD }}
+          STORE_ID: ${{ secrets.STORE_ID }}
+          CLIENT_ID: ${{ secrets.CLIENT_ID }}
+          CLIENT_SECRET: ${{ secrets.CLIENT_SECRET }}
