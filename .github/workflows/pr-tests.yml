@@ -51,3 +51,6 @@ jobs:
 
       - name: Run Cypress frontend checks
         run: npx cypress run --spec "cypress/integration/02_frontend_checks.cy.js"
+
+      - name: Run Cypress checkout tests
+        run: npx cypress run --spec "cypress/integration/03_checkout.cy.js"
