@@ -91,9 +91,9 @@ add_action('woocommerce_checkout_order_processed', 'helloextend_save_shipping_pr
 add_action('woocommerce_after_order_itemmeta', 'add_helloextend_protection_contract', 10, 2);
 
 // Hook into new category page
-add_action('product_cat_add_form_fields', 'add_helloextend_ignore_product_category_field', 10);
+add_action('product_cat_add_form_fields', 'helloextend_add_ignore_product_category_field', 10);
 // Hook into edit category page
-add_action('product_cat_edit_form_fields', 'edit_helloextend_ignore_product_category_field', 10);
+add_action('product_cat_edit_form_fields', 'helloextend_edit_ignore_product_category_field', 10);
 
 // Save when category is saved
 add_action('created_term', 'helloextend_save_category', 10, 1);
@@ -459,30 +459,31 @@ function add_helloextend_protection_contract($item_id, $item)
  * Adds "Ignore Category in Extend" field to the category create form
  * @return void
  */
-function add_helloextend_ignore_product_category_field( ) {
+function helloextend_add_ignore_product_category_field( ) {
+    // <script>
+    //     (($) => {
+    //         $(\'#helloextend-ignore-display\').on(\'click\', (e) => {
+    //             $(\'input[name="helloextend-ignore-value"]\').attr(\'value\', e.currentTarget.checked ? 1 : 0);
+    //         });
+    //     })(jQuery);
+    // </script>
     
     echo '
     <div class="form-field term-helloextend-category-ignore-wrap">
         <label for="helloextend-ignore-display">Ignore Category in Extend</label>
         <input id="helloextend-ignore-display" type="checkbox"/>
         <input hidden="true" name="helloextend-ignore-value" value="0"/>
-        <script>
-            (($) => {
-                $(\'#helloextend-ignore-display\').on(\'click\', (e) => {
-                    $(\'input[name="helloextend-ignore-value"]\').attr(\'value\', e.currentTarget.checked ? 1 : 0);
-                });
-            })(jQuery);
-        </script>
         <p id="helloextend-ignore-description">When enabled, this category will not be used to retrieve offers from Extend</p>
     </div>
     ';
+
 }
 
 /**
  * Adds "Ignore Category in Extend" field to category edit form
  * @return void
  */
-function edit_helloextend_ignore_product_category_field( ) {
+function helloextend_edit_ignore_product_category_field( ) {
     $term_id        = $_GET['tag_ID'];
 
     $ignored_categories = get_option('helloextend_protection_for_woocommerce_ignored_categories');
@@ -491,6 +492,16 @@ function edit_helloextend_ignore_product_category_field( ) {
         $is_ignored = 1;
     }
     
+    // <script>
+    //     (($) => {
+    //         let isIgnored = '. $is_ignored .';
+    //         $("#helloextend-ignore-display").attr(\'checked\', Boolean(isIgnored));
+    //         $(\'input[name="helloextend-ignore-value"]\').attr("value", isIgnored);
+    //         $("#helloextend-ignore-display").on(\'click\', (e) => {
+    //             $(\'input[name="helloextend-ignore-value"]\').attr("value", e.currentTarget.checked ? 1 : 0);
+    //         });
+    //     })(jQuery);
+    // </script>
     echo '
     <tr class="form-field form-required term-helloextend-ignore-wrap">
         <th scope="row">
@@ -498,21 +509,14 @@ function edit_helloextend_ignore_product_category_field( ) {
         </th>
         <td>
             <input id="helloextend-ignore-display" type="checkbox"/>
-            <input hidden="true" name="helloextend-ignore-value"/>
-            <script>
-                (($) => {
-                    let isIgnored = '. $is_ignored .';
-                    $("#helloextend-ignore-display").attr(\'checked\', Boolean(isIgnored));
-                    $(\'input[name="helloextend-ignore-value"]\').attr("value", isIgnored);
-                    $("#helloextend-ignore-display").on(\'click\', (e) => {
-                        $(\'input[name="helloextend-ignore-value"]\').attr("value", e.currentTarget.checked ? 1 : 0);
-                    });
-                })(jQuery);
-            </script>
+            <input hidden="true" name="helloextend-ignore-value" value="' . $is_ignored . '"/>
+            <script src=""></script>
             <p class="description" id="helloextend-ignore-description">When enabled, this category will not be used to retrieve offers from Extend</p>
         </td>
     </tr>
     ';
+    wp_enqueue_script('helloextend_set_ignore_value_script', plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js' , array('jquery'));
+
 }
 
 /**
