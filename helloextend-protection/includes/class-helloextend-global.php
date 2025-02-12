@@ -507,7 +507,7 @@ class HelloExtend_Protection_Global
      * 
      * @since 1.0.0
      */
-    public static function get_first_valid_category($categories): string {
+    public static function helloextend_get_first_valid_category($categories): string {
         $ignored_categories = (array) get_option('helloextend_protection_for_woocommerce_ignored_categories');
 
         // If ignored categories doesn't exist or is empty, return first category

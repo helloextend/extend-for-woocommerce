@@ -92,7 +92,7 @@ class HelloExtend_Protection_PDP_Offer
         $sku                         = $product->get_sku();
         
         $categories                  = get_the_terms($id, 'product_cat');
-        $first_category              = HelloExtend_Protection_Global::get_first_valid_category($categories);
+        $first_category              = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
 
         $price                       = (int) floatval($product->get_price() * 100);
         $type                        = $product->get_type();
