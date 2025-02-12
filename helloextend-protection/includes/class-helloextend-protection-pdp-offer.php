@@ -90,8 +90,10 @@ class HelloExtend_Protection_PDP_Offer
         $helloextend_use_skus             = $this->settings['helloextend_use_skus'];
         $id                          = $product->get_id();
         $sku                         = $product->get_sku();
+        
         $categories                  = get_the_terms($id, 'product_cat');
-        $first_category              = $categories[0]->name;
+        $first_category              = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
+
         $price                       = (int) floatval($product->get_price() * 100);
         $type                        = $product->get_type();
         $env                         = $this->settings['helloextend_environment'];
