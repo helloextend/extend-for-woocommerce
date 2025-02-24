@@ -24,7 +24,7 @@ $output .= '<h4 style="margin-bottom: 0px;">'.__('Errors', 'helloextend-protecti
 $output .= '<h4 style="margin-bottom: 0px;">'.__('Notices', 'helloextend-protection').'</h4><pre>HelloExtend_Protection_Logger::helloextend_log_notice( $message );</pre>';
 $output .= '<h4 style="margin-bottom: 0px;">'.__('Debugs', 'helloextend-protection').'</h4><pre>HelloExtend_Protection_Logger::helloextend_log_debug( $message );</pre>';
 
-$output .= __('Errors, debugs and notices behave in exactly the same way but you can filter the error log to show only errors or only notices. Once you have logged an error or notice you can return to this page to see a log of all your errors, debugs and notices.', 'helloextend-protection') . '<br /><br />';
+$output .= 'Errors, debugs and notices behave in exactly the same way but you can filter the error log to show only errors or only notices. Once you have logged an error or notice you can return to this page to see a log of all your errors, debugs and notices.<br /><br />';
 
 
 /*
@@ -43,4 +43,25 @@ $output .= '<pre>$message = \'' . __('There was an error with', 'helloextend-pro
 
 HelloExtend_Protection_Logger::helloextend_log_error( $message );</pre>';
 
-_e($output);
+
+$allowedtags = array(
+	'hr' => array(
+		'style' => true,
+	),
+	'h3'=>array(
+		'style' =>true,
+		'class' =>true
+	),
+	'h4'=>array(
+		'style' =>true,
+		'class' =>true
+	),
+	'pre'=>array(
+		'style' =>true,
+		'class' =>true
+	)
+);
+
+echo wp_kses($output, $allowedtags);
+
+

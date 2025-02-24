@@ -21,7 +21,7 @@
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
  * License URI:       http://www.gnu.org/licenses/gpl-2.0.txt
- * Text Domain:       helloextend-protection-for-woocommerce
+ * Text Domain:       helloextend-protection
  * Domain Path:       /languages
  */
 
@@ -125,8 +125,16 @@ function helloextend_run()
 function helloextend_render_settings_page()
 {
     if (!helloextend_is_woocommerce_activated()) {
+        $allowedtags = array(
+	        'a' => array(
+		        'href' => true,
+		        'target' => true
+            )
+        );
+
         HelloExtend_Protection_Logger::helloextend_log_error('Extend Protection requires the WooCommerce plugin to be installed and active');
-        echo '<div class="error"><p><strong>' . sprintf(__('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.', 'helloextend-protection'), '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>') . '</strong></p></div>';
+	    /* translators: woocommerce download link. */
+        echo '<div class="error"><p><strong>' . wp_kses(sprintf('Extend Protection requires the WooCommerce plugin to be installed and active. You can download %s here.' , '<a href="https://wordpress.org/plugins/woocommerce/" target="_blank">WooCommerce</a>'), $allowedtags) . '</strong></p></div>';
     }
 
     echo '<div style="padding-top:30px">';
@@ -141,14 +149,14 @@ function helloextend_render_settings_page()
 	<div class="wrap">
 		<h2>Extend Protection Settings</h2>
 		<h2 class="nav-tab-wrapper">
-			<a href="?page=helloextend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || sanitize_text_field($_GET['tab']) === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
-			<a href="?page=helloextend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
-			<a href="?page=helloextend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
-			<a href="?page=helloextend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field($_GET['tab']) === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
+			<a href="?page=helloextend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || sanitize_text_field(wp_unslash($_GET['tab'])) === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
+			<a href="?page=helloextend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
+			<a href="?page=helloextend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
+			<a href="?page=helloextend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
 		</h2>
 		<div class="tab-content">
             <?php
-            $current_tab = isset($_GET['tab']) ? sanitize_text_field($_GET['tab']): 'general';
+            $current_tab = isset($_GET['tab']) ? sanitize_text_field(wp_unslash($_GET['tab'])): 'general';
 
             switch ($current_tab) {
                 case 'product_protection':
@@ -197,7 +205,8 @@ function helloextend_render_documentation_page()
 function helloextend_protection_style()
 {
     // Register stylesheets
-    wp_register_style('helloextend_protection_style', plugins_url('helloextend-protection/css/helloextend.css'));
+	$lastmodtime= filemtime(plugins_url('helloextend-protection/css/helloextend.css'));
+    wp_register_style('helloextend_protection_style', plugins_url('helloextend-protection/css/helloextend.css'), array(), $lastmodtime);
     wp_enqueue_style('helloextend_protection_style');
 }
 
@@ -237,11 +246,13 @@ if (!function_exists('helloextend_write_log')) {
 
     function helloextend_write_log($log)
     {
-        if (is_array($log) || is_object($log)) {
-            error_log(print_r($log, true));
+	    // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	    if (is_array($log) || is_object($log)) {
+	        error_log(print_r($log, true));
         } else {
             error_log($log);
         }
+	    // phpcs:enable
     }
 }
 
@@ -325,13 +336,15 @@ function helloextend_logger_includes()
 function helloextend_product_protection_id(): ?int
 {
     global $wpdb;
-
+	// phpcs:disable WordPress.DB.DirectDatabaseQuery
+	/* translators: Meta Value. */
     $product_id = $wpdb->get_var(
         $wpdb->prepare(
-            "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value='%s' ORDER BY meta_id DESC LIMIT 1",
+            "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value=%s ORDER BY meta_id DESC LIMIT 1",
             HELLOEXTEND_PRODUCT_PROTECTION_SKU
         )
     );
+    // phpcs:enable
 
     if ($product_id) {
         return $product_id;
@@ -347,13 +360,14 @@ function helloextend_add_shipping_protection_fee()
     }
 
     if (isset($_POST['fee_amount']) && isset($_POST['fee_label'])) {
-        $fee_amount = floatval(number_format( sanitize_text_field($_POST['fee_amount']) / 100, 2));
-        $fee_label  = sanitize_text_field($_POST['fee_label']);
+        $fee_amount = floatval(number_format( sanitize_text_field(wp_unslash($_POST['fee_amount'])) / 100, 2));
+        $fee_label  = sanitize_text_field(wp_unslash($_POST['fee_label']));
+        $shipping_quote_id = ( !empty($_POST['shipping_quote_id'] ))  ? (sanitize_key( wp_unslash( $_POST['shipping_quote_id']))) : null;
 
-        if ($fee_amount && $fee_label) {
+        if ($fee_amount && $fee_label && $shipping_quote_id) {
             WC()->session->set('shipping_fee', true);
             WC()->session->set('shipping_fee_value', $fee_amount);
-            WC()->session->set('shipping_quote_id', sanitize_key($_POST['shipping_quote_id']));
+            WC()->session->set('shipping_quote_id', $shipping_quote_id);
         } else {
             echo ' No shipping protection fee added because of an error ';
         }
@@ -446,7 +460,7 @@ function add_helloextend_protection_contract($item_id, $item)
 
                 foreach ($contracts as $product_covered => $contract_id) {
                     if ($helloextend_meta_data['covered_product_id'] == $product_covered) {
-                        echo '<tr><td><a href="' . esc_url($url . '?contractId=' . $contract_id . '&accessToken=' . $token) . '">' . $contract_id . '</a></td></tr>';
+                        echo '<tr><td><a href="' . esc_url($url . '?contractId=' . $contract_id . '&accessToken=' . $token) . '">' . esc_html($contract_id) . '</a></td></tr>';
                     }
                 }
                 echo '</tbody></table>';

@@ -580,7 +580,7 @@ class HelloExtend_Protection_Admin
 
         // handle the scheduled jobs if the helloextend_product_sync settigns are being saved
         if (isset($_REQUEST['page']) && isset($_REQUEST['tab']) && isset($_REQUEST['settings-updated'])) {
-            if (sanitize_text_field($_REQUEST['page']) == 'extend' && sanitize_text_field($_REQUEST['tab']) == 'catalog_sync' && sanitize_text_field($_REQUEST['settings-updated']) == 'true') {
+            if (sanitize_text_field(wp_unslash($_REQUEST['page'])) == 'extend' && sanitize_text_field(wp_unslash($_REQUEST['tab'])) == 'catalog_sync' && sanitize_text_field(wp_unslash($_REQUEST['settings-updated'])) == 'true') {
 
                 // check if helloextend_automated_product_sync = never : on save if schedule is set to never, reset the cron
                 $helloextend_automated_product_sync = $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_automated_product_sync'];
@@ -787,6 +787,18 @@ class HelloExtend_Protection_Admin
         $products_with_sku       = new WP_Query($args);
         $total_products_with_sku = $products_with_sku->post_count;
         $percentage_with_sku     = round(($total_products_with_sku / $total_products) * 100);
+	    $allowed_note_tags = array(
+		    'input' => array(
+			    'type' => true,
+			    'name' => true,
+			    'id' => true,
+			    'value' => true
+		    ),
+		    'label'=>array(
+                'class' => true,
+                'for' => true
+            )
+	    );
 
         $note = "<em>Note: $percentage_with_sku% of your $total_products products have SKUs. </em>";
         printf(
@@ -794,7 +806,7 @@ class HelloExtend_Protection_Admin
                            id="helloextenduse_skus" value="1" %s> <label for="helloextenduse_skus">If SKUs are not present, we\'ll use IDs instead. (%s)</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_skus'])
                 && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_skus'] === '1') ? 'checked' : '',
-            $note
+            wp_kses($note, $allowed_note_tags)
         );
     }
 
@@ -853,7 +865,7 @@ class HelloExtend_Protection_Admin
             foreach ($helloextend_automated_sync_dropdown_values as $auto_sync) {
                 $selected = (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_automated_product_sync'])
                     && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_automated_product_sync'] === $auto_sync) ? 'selected' : '';
-                echo '<option value="' . esc_attr($auto_sync) . '" ' . esc_attr($selected) . '>' . ucfirst(esc_attr($auto_sync)) . '</option>';
+                echo '<option value="' . esc_attr($auto_sync) . '" ' . esc_attr($selected) . '>' . esc_attr(ucfirst($auto_sync)) . '</option>';
             }
             ?>
 		</select>
@@ -866,7 +878,7 @@ class HelloExtend_Protection_Admin
         $helloextend_atc_button_selector  = $product_protection_settings['helloextend_atc_button_selector'] ?? 'button.single_add_to_cart_button';
         printf(
             '<input class="regular-text" type="text" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_atc_button_selector]" 
-                           id="helloextendatc_button_selector" value="' . $helloextend_atc_button_selector . '">',
+                           id="helloextendatc_button_selector" value="' . esc_attr($helloextend_atc_button_selector) . '">',
             isset($this->helloextend_protection_for_woocommerce_product_protection_settings['helloextend_atc_button_selector'])
                 ? esc_attr($this->helloextend_protection_for_woocommerce_product_protection_settings['helloextend_atc_button_selector']) : ''
         );
@@ -1130,7 +1142,7 @@ class HelloExtend_Protection_Admin
             && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'] <> 'Never'
             && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'] <> ''
         ) {
-            echo '<span id="last_sync_field">' . date('Y-m-d h:i:s A', $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync']) . '</span>';
+            echo '<span id="last_sync_field">' . esc_attr(wp_date('Y-m-d h:i:s A', $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'])) . '</span>';
         } else {
             echo '<span id="last_sync_field">Never</span>';
         }
@@ -1139,7 +1151,7 @@ class HelloExtend_Protection_Admin
                            id="helloextendlast_product_sync" value="%s">',
             (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'])
                 && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'] != '')
-                ? $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync'] : 'Never'
+                ? esc_attr($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_last_product_sync']) : 'Never'
         );
     }
 

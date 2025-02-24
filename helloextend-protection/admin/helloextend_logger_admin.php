@@ -23,7 +23,7 @@ Require log-table.php which creates the output of the error log page...
 function helloextend_logger_admin()
 {
 
-    echo '<h2 class="helloextend_logger-title">' . __('Error Log', 'helloextend-protection') . '</h2>';
+    echo '<h2 class="helloextend_logger-title">' . esc_html('Error Log') . '</h2>';
 
     /* Import the main log table file... */
     include_once HELLOEXTEND_LOGGER_DIR . 'admin/helloextend_logger_log-table.php';
@@ -46,10 +46,11 @@ function helloextend_logger_load_log_table_scripts()
 
 function helloextend_logger_log_table_scripts()
 {
-
-    wp_register_style('mainStyle', HELLOEXTEND_LOGGER_URI . 'css/helloextend_logger.css');
+	$lastmodtime= filemtime(HELLOEXTEND_LOGGER_URI . 'css/helloextend_logger.css');
+    wp_register_style('mainStyle', HELLOEXTEND_LOGGER_URI . 'css/helloextend_logger.css', array(), $lastmodtime);
 
     /* Enqueue script for the error log table and pass translatable strings to it... */
+	// phpcs:ignore
     wp_register_script('logTable', HELLOEXTEND_LOGGER_URI . 'js/helloextend_logger_logTable.js', array( 'jquery' ), '', true);
 
     $data_array = array(

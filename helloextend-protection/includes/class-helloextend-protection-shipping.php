@@ -129,7 +129,9 @@ class HelloExtend_Protection_Shipping
         $items = json_encode($items);
 
         if ($this->settings['enable_helloextend_debug'] == 1 ) {
-            HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG : Shipping Protection Cart Item Payload :' . print_r($items, true));
+	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	        HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG : Shipping Protection Cart Item Payload :' . print_r($items, true));
+	        // phpcs:enable
         }
 
         if ($enable_helloextend_sp == 1 ) {

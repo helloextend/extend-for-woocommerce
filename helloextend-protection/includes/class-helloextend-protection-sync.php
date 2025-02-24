@@ -137,7 +137,7 @@ class HelloExtend_Protection_Sync
         if (strtolower($this->settings['helloextend_last_product_sync']) != 'never' && ! is_null($this->settings['helloextend_last_product_sync']) ) {
             $args['date_query'] = array(
                 array(
-                    'after'     => date('Y-m-d h:i:s', strtolower($this->settings['helloextend_last_product_sync'])),
+                    'after'     => gmdate('Y-m-d h:i:s', strtolower($this->settings['helloextend_last_product_sync'])),
                     'inclusive' => 'true',
                 ),
             );
@@ -173,14 +173,18 @@ class HelloExtend_Protection_Sync
             }
 
             if ($this->settings['enable_helloextend_debug'] == 1 ) {
-                HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG: batchdata for batch #' . $batch_current . ' >>> ' . print_r($batch_data, true));
+	            // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	            HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG: batchdata for batch #' . $batch_current . ' >>> ' . print_r($batch_data, true));
+	            // phpcs:enable
             }
             // batch_data is the payload we send to extend
             $request_args = $this->buildRequest($batch_data);
             $response     = wp_remote_request($this->settings['api_host'] . '/stores/' . $this->settings['store_id'] . '/products?batch=true', $request_args);
 
             if ($this->settings['enable_helloextend_debug'] == 1 ) {
+	            // phpcs:disable WordPress.PHP.DevelopmentFunctions
                 HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG response: ' . print_r($response, true));
+	            // phpcs:enable
             }
 
             if (is_wp_error($response) ) {
@@ -290,7 +294,9 @@ class HelloExtend_Protection_Sync
         }
 
         if ($this->settings['enable_helloextend_debug'] == 1 ) {
-            HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG : Catalog Sync Payload :' . print_r($payload, true));
+	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	        HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG : Catalog Sync Payload :' . print_r($payload, true));
+	        // phpcs:enable
         }
 
         return $payload;
@@ -302,32 +308,36 @@ class HelloExtend_Protection_Sync
     public function log_syncs( $response, $payload, $batchnumber )
     {
         $this->check_directory();
-
+	    global $wp_filesystem;
+		
         // Step 2 : generate a file based on timestamp and write into it
-        $log_file = fopen($this->directory . '/' . 'sync-' . date('m-d-y') . '.log', 'a');
-        fwrite($log_file, "\n" . 'Batch number : ' . $batchnumber);
-        fwrite($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------');
-        fwrite($log_file, "\n" . 'Payload: ');
-        fwrite($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------');
-        fwrite($log_file, print_r($payload, true));
-        fwrite($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------');
-        fwrite($log_file, "\n" . 'Response: ');
-        fwrite($log_file, print_r($response, true));
-        fwrite($log_file, "\n" . '****************************************************************************************************************************');
-        fclose($log_file);
+	    // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	    $log_file =  $this->directory . '/' . 'sync-' . gmdate('m-d-y') . '.log';
+	    $wp_filesystem->put_contents($log_file, "\n" . 'Batch number : ' . $batchnumber, FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------', FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, "\n" . 'Payload: ', FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------', FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, print_r($payload, true));
+	    $wp_filesystem->put_contents($log_file, "\n" . '----------------------------------------------------------------------------------------------------------------------------', FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, "\n" . 'Response: ', FS_CHMOD_FILE);
+	    $wp_filesystem->put_contents($log_file, print_r($response, true), FS_CHMOD_FILE);
+		$wp_filesystem->put_contents($log_file, "\n" . '****************************************************************************************************************************', FS_CHMOD_FILE);
+	    // phpcs:enable
     }
 
     public function log_sync_summary( $summary )
     {
+	    global $wp_filesystem;
         $this->check_directory();
-        $sync_time_stamp = '---[' . date('m-d-y H:i:s') . " ]----------\n";
+        $sync_time_stamp = '---[' . gmdate('m-d-y H:i:s') . " ]----------\n";
 
         // generate a file based on timestamp and write into it
-        $log_file = fopen($this->directory . '/' . 'sync-summary-' . date('m-d-y') . '.log', 'a');
-        fwrite($log_file, $sync_time_stamp);
-        fwrite($log_file, print_r($summary, true));
-        fwrite($log_file, "\n");
-        fclose($log_file);
+	    $log_file = $this->directory . '/' . 'sync-summary-' . gmdate('m-d-y') . '.log';
+	    $wp_filesystem->put_contents($log_file, $sync_time_stamp,  FS_CHMOD_FILE);
+	    // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	    $wp_filesystem->put_contents($log_file, print_r($summary, true), FS_CHMOD_FILE);
+	    // phpcs:enable
+	    $wp_filesystem->put_contents($log_file, "\n", FS_CHMOD_FILE);
     }
 
     /*
@@ -347,13 +357,13 @@ class HelloExtend_Protection_Sync
         update_option('helloextend_protection_for_woocommerce_catalog_sync_settings', $sync_options);
         HelloExtend_Protection_Logger::helloextend_log_notice(
             "Catalog sync completed. 
-        Please refer to the log in <a href='" . site_url() . 'wp-content/extend/sync/sync-' . date('m-d-y') . ".log'>wp-content/extend/sync/sync-" . date('m-d-y') . '.log</a>'
+        Please refer to the log in <a href='" . site_url() . 'wp-content/extend/sync/sync-' . gmdate('m-d-y') . ".log'>wp-content/extend/sync/sync-" . gmdate('m-d-y') . '.log</a>'
         );
 
         if (defined('DOING_AJAX') ) {
             wp_send_json_success(
                 array(
-                    'time'          => date('Y-m-d h:i:s A', $sync_time),
+                    'time'          => gmdate('Y-m-d h:i:s A', $sync_time),
                     'sync_unixtime' => $sync_time,
                 )
             );
@@ -431,7 +441,9 @@ class HelloExtend_Protection_Sync
                 $response     = wp_remote_request($this->settings['api_host'] . '/stores/' . $this->settings['store_id'] . '/products?batch=true', $request_args);
 
                 if ($this->settings['enable_helloextend_debug'] == 1 ) {
-                    HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG response: ' . print_r($response, true));
+	                // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	                HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG response: ' . print_r($response, true));
+	                // phpcs:enable
                 }
 
                 if (is_wp_error($response) ) {
@@ -589,7 +601,7 @@ class HelloExtend_Protection_Sync
         if (strtolower($this->settings['helloextend_last_product_sync']) != 'never' && ! is_null($this->settings['helloextend_last_product_sync']) ) {
             $args['date_query'] = array(
                 array(
-                    'after'     => date('Y-m-d h:i:s', strtolower($this->settings['helloextend_last_product_sync'])),
+                    'after'     => gmdate('Y-m-d h:i:s', strtolower($this->settings['helloextend_last_product_sync'])),
                     'inclusive' => 'true',
                 ),
             );
@@ -602,13 +614,15 @@ class HelloExtend_Protection_Sync
     */
     private function check_directory()
     {
-        // Create the log directory if it doesn't exist.
-        if (! file_exists($this->directory) ) {
-            mkdir($this->directory, 0755, true);
+	    global $wp_filesystem;
+
+        // Create the log directory if it doesn't exist. 
+        if (! $wp_filesystem->exists($this->directory) ) {
+            $wp_filesystem->mkdir($this->directory, 0755, true);
         }
 
         // Step 1 : delete older log files (3 weeks)
-        $files           = scandir($this->directory);
+        $files           = $wp_filesystem->list_files($this->directory); //scandir($this->directory);
         $three_weeks_ago = strtotime('-3 weeks');
 
         // Loop through each file and check if it's a log file and older than 3 weeks.
@@ -619,7 +633,7 @@ class HelloExtend_Protection_Sync
                 // Check the file's modification time.
                 if (filemtime($file_path) < $three_weeks_ago ) {
                     // Delete the file if it's older than 3 weeks.
-                    unlink($file_path);
+	                $wp_filesystem->delete($file_path); //unlink($file_path);
                 }
             }
         }
