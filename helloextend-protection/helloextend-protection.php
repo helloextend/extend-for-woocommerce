@@ -474,14 +474,7 @@ function add_helloextend_protection_contract($item_id, $item)
  * @return void
  */
 function helloextend_add_ignore_product_category_field( ) {
-    // <script>
-    //     (($) => {
-    //         $(\'#helloextend-ignore-display\').on(\'click\', (e) => {
-    //             $(\'input[name="helloextend-ignore-value"]\').attr(\'value\', e.currentTarget.checked ? 1 : 0);
-    //         });
-    //     })(jQuery);
-    // </script>
-    
+
     echo '
     <div class="form-field term-helloextend-category-ignore-wrap">
         <label for="helloextend-ignore-display">Ignore Category in Extend</label>
@@ -498,24 +491,14 @@ function helloextend_add_ignore_product_category_field( ) {
  * @return void
  */
 function helloextend_edit_ignore_product_category_field( ) {
-    $term_id        = $_GET['tag_ID'];
-
+    $term_id        = isset($_GET['tag_ID']) ? wp_unslash(sanitize_key($_GET['tag_ID'])) : null;
     $ignored_categories = get_option('helloextend_protection_for_woocommerce_ignored_categories');
     $is_ignored = 0;
+
     if ($ignored_categories && array_search($term_id, $ignored_categories) > -1) {
         $is_ignored = 1;
     }
     
-    // <script>
-    //     (($) => {
-    //         let isIgnored = '. $is_ignored .';
-    //         $("#helloextend-ignore-display").attr(\'checked\', Boolean(isIgnored));
-    //         $(\'input[name="helloextend-ignore-value"]\').attr("value", isIgnored);
-    //         $("#helloextend-ignore-display").on(\'click\', (e) => {
-    //             $(\'input[name="helloextend-ignore-value"]\').attr("value", e.currentTarget.checked ? 1 : 0);
-    //         });
-    //     })(jQuery);
-    // </script>
     echo '
     <tr class="form-field form-required term-helloextend-ignore-wrap">
         <th scope="row">
@@ -523,13 +506,13 @@ function helloextend_edit_ignore_product_category_field( ) {
         </th>
         <td>
             <input id="helloextend-ignore-display" type="checkbox"/>
-            <input hidden="true" name="helloextend-ignore-value" value="' . $is_ignored . '"/>
-            <script src=""></script>
+            <input hidden="true" name="helloextend-ignore-value" value="' . (int) $is_ignored . '"/>
             <p class="description" id="helloextend-ignore-description">When enabled, this category will not be used to retrieve offers from Extend</p>
         </td>
     </tr>
     ';
-    wp_enqueue_script('helloextend_set_ignore_value_script', plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js' , array('jquery'));
+    $js_file_version = filemtime(plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js');
+    wp_enqueue_script('helloextend_set_ignore_value_script', plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js' , array('jquery'), $js_file_version, true);
 
 }
 
