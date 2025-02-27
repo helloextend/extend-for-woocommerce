@@ -280,8 +280,8 @@ class HelloExtend_Protection_Global
     public static function add_to_cart_helloextend()
     {
         $warranty_product_id = wc_get_product_id_by_sku('helloextend-product-protection');
-        $quantity            = sanitize_key($_REQUEST['quantity']);
-        $helloextend_data         = $_REQUEST['extendData'];
+        $quantity            = isset($_REQUEST['quantity']) ? (int) sanitize_key($_REQUEST['quantity']) : null;
+        $helloextend_data    = isset($_REQUEST['extendData']) ? array_map('sanitize_text_field', wp_unslash($_REQUEST['extendData'])): null;
 
         if (!isset($warranty_product_id) || !isset($quantity) || !isset($helloextend_data)) {
             return;

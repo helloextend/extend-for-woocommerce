@@ -77,7 +77,7 @@ function helloextend_loggerDeleteSingle()
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
 
-                        alert(errorThrown);
+                        alert('error :' + errorThrown);
 
                     }
 
@@ -125,7 +125,7 @@ function helloextend_loggerDeleteAll()
 
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
-                        alert('error: ' +errorThrown);
+                        alert('Error: ' +errorThrown);
                     }
 
                 }
@@ -176,7 +176,7 @@ function helloextend_loggerLogFilter()
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
 
-                        alert(errorThrown);
+                        alert('Error : '+ errorThrown);
 
                     }
 
@@ -228,7 +228,7 @@ function helloextend_loggerAbToggle()
                     },
                     error: function ( MLHttpRequest, textStatus, errorThrown ) {
 
-                        alert(errorThrown);
+                        alert('Error: ' + errorThrown);
 
                     }
 

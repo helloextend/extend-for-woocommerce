@@ -196,7 +196,9 @@ class HelloExtend_Protection_Orders
         $shipping_protection_quote_id = get_post_meta($order_id, '_shipping_protection_quote_id', true);
         // check if shipping protection meta exists
         if ($shipping_protection_quote_id) {
-            HelloExtend_Protection_Logger::helloextend_log_notice('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
+	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	        HelloExtend_Protection_Logger::helloextend_log_notice('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
+	        // phpcs:enable
 
             // Push shipping protection line item into helloextend_line_items array
             $helloextend_line_items[] = array(
@@ -240,7 +242,9 @@ class HelloExtend_Protection_Orders
         );
 
         if ($this->settings['enable_helloextend_debug'] == 1) {
-            HelloExtend_Protection_Logger::helloextend_log_debug('Debug: Extend Order Data: ' . print_r(json_encode($helloextend_order_data, JSON_PRETTY_PRINT), true));
+	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
+	        HelloExtend_Protection_Logger::helloextend_log_debug('Debug: Extend Order Data: ' . print_r(json_encode($helloextend_order_data, JSON_PRETTY_PRINT), true));
+	        // phpcs:enable
         }
 
         // Get Token from Global function

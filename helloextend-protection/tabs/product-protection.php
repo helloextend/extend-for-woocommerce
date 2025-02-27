@@ -26,7 +26,7 @@ if (helloextend_is_woocommerce_activated() ) {
         echo '<form method="post"  action=""><input type="submit" name="helloextend-product-protection-create" class="button button-primary" value="Create Item" /></form>';
 
     } else {
-        echo ' exists! (SKU: <em>' . HELLOEXTEND_PRODUCT_PROTECTION_SKU . '</em> / ID: <em>' . esc_html($post_id) . '</em>) &#9989;';
+        echo ' exists! (SKU: <em>' . esc_html(HELLOEXTEND_PRODUCT_PROTECTION_SKU) . '</em> / ID: <em>' . esc_html($post_id) . '</em>) &#9989;';
     }
     echo '</span>';
 }

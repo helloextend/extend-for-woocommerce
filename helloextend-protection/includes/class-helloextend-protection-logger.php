@@ -160,7 +160,7 @@ class HelloExtend_Protection_Logger
     {
 
         /* Check that the nonce is correct to avoid safety issues... */
-        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'helloextend_logger_nonce') ) {
+        if (!isset( $_POST['nonce']) || !wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'helloextend_logger_nonce') ) {
 
             exit('Wrong nonce - delete single');
 
@@ -170,11 +170,11 @@ class HelloExtend_Protection_Logger
 
         // Sanitize wordpress ajax post
 
-        $error_code =  sanitize_key( wp_unslash( $_POST['error_code'] ) );
-        $log_type   = sanitize_text_field( wp_unslash( $_POST['log_type'] ) );
+        $error_code =  isset($_POST['error_code']) ? sanitize_key( wp_unslash( $_POST['error_code'] ) ) : null;
+        $log_type   = isset($_POST['log_type']) ? sanitize_text_field( wp_unslash( $_POST['log_type'] ) ): null;
 
         /* Get the correct log from the wp_options table... */
-        $logs = get_option('custom_' . $log_type . '_log', true);
+        $logs = get_option('helloextend_' . $log_type . '_log', true);
 
         /* Unset the correct error/notice from the array... */
         foreach ( $logs[ $log_type . 's' ] as $key => $log ) {
@@ -187,25 +187,31 @@ class HelloExtend_Protection_Logger
         }
 
         /* Update the log in the wp_options table... */
-        $update = update_option('custom_' . $log_type . '_log', $logs);
+        $update = update_option('helloextend_' . $log_type . '_log', $logs);
 
         /* Build the response... */
         if ($update ) {
 
             $return  = '<div class="updated  ajax-response">';
+	        /* translators: 1: Log Type, 2: Error Code. */
             $return .= sprintf(__('%1$s %2$d has been successfully deleted', 'helloextend-protection'), $log_type, $error_code);
             $return .= '.</div>';
 
         } else {
 
             $return  = '<div class="error  ajax-response">';
+	        /* translators: 1: Log Type, 2: Error Code. */
             $return .= sprintf(__('%1$s %2$d could not be deleted', 'helloextend-protection'), $log_type, $error_code);
             $return .= '.</div>';
 
         }
 
         /* Send the response back to the ajax call... */
-        die($return);
+	    $allowedtags = array(
+ 		    'div'=>array('class' =>true),
+	    );
+
+        die(wp_kses($return, $allowedtags));
 
     }
 
@@ -216,7 +222,7 @@ class HelloExtend_Protection_Logger
     public static function helloextend_logger_delete_all()
     {
         /* Check that the nonce is correct to avoid safety issues... */
-        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ) , 'helloextend_logger_nonce') ) {
+        if (!isset( $_POST['nonce'] ) || !wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ) , 'helloextend_logger_nonce') ) {
             exit('Wrong nonce - delete all');
         }
 
@@ -247,8 +253,11 @@ class HelloExtend_Protection_Logger
         }
 
         /* Send response back to ajax call... */
-        die($return);
+	    $allowedtags = array(
+		    'div'=>array('class' =>true),
+	    );
 
+	    die(wp_kses($return, $allowedtags));
     }
 
     /*
@@ -347,7 +356,7 @@ class HelloExtend_Protection_Logger
     public static function helloextend_logger_get_these_logs( $type )
     {
 
-        $logs = get_option('custom_' . $type . '_log', true);
+        $logs = get_option('helloextend_' . $type . '_log', true);
 
         /* Get one step further down the array... */
         if ($logs ) {
@@ -408,7 +417,7 @@ class HelloExtend_Protection_Logger
         Check that the nonce is correct to avoid safety issues...
         The nonce is passed via a POST from the ajax call...
         */
-        if (! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'helloextend_logger_nonce') ) {
+        if (!isset( $_POST['nonce'] ) || ! wp_verify_nonce( sanitize_text_field( wp_unslash ( $_POST['nonce'] ) ), 'helloextend_logger_nonce') ) {
             exit('Wrong nonce filter log');
         }
 
@@ -416,7 +425,7 @@ class HelloExtend_Protection_Logger
         The filter is posted by the ajax call to tell this function which
         type of logs it wants...
         */
-        $filter = sanitize_text_field( wp_unslash( $_POST['filter'] ) );
+        $filter = isset($_POST['filter']) ? sanitize_text_field( wp_unslash( $_POST['filter'] ) ) : null;
 
         /* If there is no filter get all logs... */
         if ($filter == 'all' ) {
@@ -427,11 +436,32 @@ class HelloExtend_Protection_Logger
         }
 
         /* Format the logs... */
-        $return = self::helloextend_logger_format_logs($logs, sanitize_text_field( wp_unslash ($_POST['nonce'] ) ) );
+	    $nonce_logs =  isset( $_POST['nonce'] ) ? sanitize_text_field( wp_unslash ($_POST['nonce'] ) ) : null;
+        $return = self::helloextend_logger_format_logs($logs, $nonce_logs );
 
         /* Send output back to ajax call... */
-        die($return);
+	    $allowedtags = array(
+		    'a' => array(
+			    'href' => true,
+			    'title' => true,
+			    'data-nonce' =>true,
+			    'class' =>true,
+			    'rel' =>true,
+			    'data-error-code' =>true
+		    ),
+		    'table'=>array('class' =>true),
+		    'thead'=>array('class' =>true),
+		    'tbody'=>array('class' =>true),
+		    'tr' =>array(
+			    'id' =>true,
+			    'class' =>true),
+		    'th' =>array('class' =>true),
+		    'td' =>array('class' =>true),
+		    'div' =>array('class' => true)
+	    );
 
+	    die(wp_kses($return, $allowedtags));
+      
     }
 
     /*
@@ -506,7 +536,7 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_logger_ab_toggle()
     {
-        $value  = sanitize_text_field( wp_unslash( $_POST['update'] ) );
+        $value  = isset($_POST['update']) ? sanitize_text_field( wp_unslash( $_POST['update'] ) ) : null;
         $update = update_option('helloextend_logger_ab_show', $value);
         die();
     }
