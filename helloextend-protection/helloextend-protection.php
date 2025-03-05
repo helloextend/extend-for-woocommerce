@@ -98,6 +98,13 @@ add_action('product_cat_edit_form_fields', 'helloextend_edit_ignore_product_cate
 // Save when category is saved
 add_action('created_term', 'helloextend_save_category', 10, 1);
 add_action('edited_term', 'helloextend_save_category', 10, 1);
+
+//add email paragraph for SP
+add_action('woocommerce_email_before_order_table', 'add_protection_message_to_email', 10, 4);
+
+// Add text to the order received (thank you) page
+add_action('woocommerce_thankyou', 'add_protection_message_to_thankyou_page', 20);
+
 /* end add_action */
 
 
@@ -152,7 +159,7 @@ function helloextend_render_settings_page()
 			<a href="?page=helloextend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || sanitize_text_field(wp_unslash($_GET['tab'])) === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
 			<a href="?page=helloextend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
 			<a href="?page=helloextend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
-			<a href="?page=helloextend-protection-settings&tab=catalog_sync" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'catalog_sync') ? 'nav-tab-active' : ''; ?>">Catalog Sync</a>
+<!--			<a href="?page=helloextend-protection-settings&tab=catalog_sync" class="nav-tab --><?php //echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'catalog_sync') ? 'nav-tab-active' : ''; ?><!--">Catalog Sync</a>-->
 		</h2>
 		<div class="tab-content">
             <?php
@@ -522,7 +529,8 @@ function helloextend_edit_ignore_product_category_field( ) {
  * @return void
  */
 function helloextend_save_category($term_id) {
-    $helloextend_ignore = (bool) $_POST['helloextend-ignore-value'];
+
+    $helloextend_ignore = isset($_POST['helloextend-ignore-value']) ? (bool) $_POST['helloextend-ignore-value'] : null;
     
     $ignored_categories = get_option('helloextend_protection_for_woocommerce_ignored_categories');
     if (!$ignored_categories) {
@@ -547,5 +555,41 @@ function helloextend_save_category($term_id) {
 
     update_option('helloextend_protection_for_woocommerce_ignored_categories', $ignored_categories);
 }
+
+/**
+ * Add a paragraph to the email receipt when a SP protection is added to the order
+ * @return void
+ */
+function add_protection_message_to_email($order, $sent_to_admin, $plain_text, $email) {
+	foreach ($order->get_fees() as $fee_id => $fee){
+		if ($fee->get_name() == "Extend Shipping Protection"){
+			echo '<div style="display: inline-flex; margin: 20px 0px;">';
+			echo '<img src="'.esc_url(plugins_url() . '/helloextend-protection/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
+            echo '<p>Your order includes Extend shipping protection. If your package is lost, damaged, or stolen, we’ll replace it for free.</p></div>';
+			break;
+		}
+	}
+}
+
+/**
+ * Add text to the order received (thank you) page when SP is purchased
+ * @return void
+ */
+function add_protection_message_to_thankyou_page($order_id) {
+    if (!$order_id) {
+        return;
+    }
+    $order = wc_get_order($order_id);
+
+        foreach ($order->get_fees() as $fee_id => $fee){
+            if ($fee->get_name() == "Extend Shipping Protection"){
+	            echo '<div style="display: inline-flex; margin: 20px 0px;">';
+                echo '<img src="'.esc_url(plugins_url() . '/helloextend-protection/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
+	            echo '<p>Your order includes Extend shipping protection. If your package is lost, damaged, or stolen, we’ll replace it for free.</p></div>';
+	            break;
+            }
+        }
+}
+
 
 helloextend_run();
