@@ -65,11 +65,11 @@ class HelloExtend_Protection_Activator
             try {
                 $product_id     = $product->get_id();
                 //check if image exists
-                if (file_exists(plugin_dir_path('images/Extend_icon.png'))) {
+                if (file_exists(HELLOEXTEND_PLUGIN_DIR.'/images/Extend_icon.png')) {
 
-                    $upload         = wc_rest_upload_image_from_url(plugins_url() . '/helloextend-protection/images/Extend_icon.png');
+                    $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png');
                     if (is_wp_error($upload)) {
-                        HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . plugins_url() . '/helloextend-protection/images/Extend_icon.png : ' . $upload->get_error_message());
+                        HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png : ' . $upload->get_error_message());
                         return false;
                     }
 
