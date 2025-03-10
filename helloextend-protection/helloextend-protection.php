@@ -47,13 +47,18 @@ if (!defined('WPINC')) {
 define('HELLOEXTEND_PROTECTION_VERSION', '1.0.0');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 
+
+define( 'HELLOEXTEND_PLUGIN_FILE', __FILE__ );
+define( 'HELLOEXTEND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
+define( 'HELLOEXTEND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
+
 /**
  * The code that runs during plugin activation.
  * This action is documented in includes/class-helloextend-protection-activator.php
  */
 function helloextend_activate()
 {
-    include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-activator.php';
+	include_once HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-protection-activator.php';
     HelloExtend_Protection_Activator::activate();
 }
 
@@ -63,7 +68,7 @@ function helloextend_activate()
  */
 function helloextend_deactivate()
 {
-    include_once plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection-deactivator.php';
+    include_once HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-protection-deactivator.php';
     HelloExtend_Protection_Deactivator::deactivate();
 }
 
@@ -112,7 +117,7 @@ add_action('woocommerce_thankyou', 'add_protection_message_to_thankyou_page', 20
  * The core plugin class that is used to define internationalization,
  * admin-specific hooks, and public-facing site hooks.
  */
-require plugin_dir_path(__FILE__) . 'includes/class-helloextend-protection.php';
+require HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-protection.php';
 
 /**
  * Begins execution of the plugin.
@@ -145,7 +150,7 @@ function helloextend_render_settings_page()
     }
 
     echo '<div style="padding-top:30px">';
-    echo ' <img src="' . esc_url(plugins_url() . '/helloextend-protection/images/Extend_logo_slogan.svg') . '" alt="Extend Logo with Slogan" style="width: 170px;">
+    echo ' <img src="' . esc_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_logo_slogan.svg') . '" alt="Extend Logo with Slogan" style="width: 170px;">
 			<p>Extend generates new revenue for your store, increases overall purchase conversions, and provides customers with streamlined product protection and peace of mind. <a href="https://extend.com/merchants">Learn more</a><br/>
             <a href="https://merchants.extend.com" class="button button-primary action action-extend-external" target="_blank">Set up my Extend account</a> or <a href="https://merchants.extend.com" class="helloextend-account-link" target="_blank"> I already have an Extend account, I\'m ready to edit my settings</a> </p>';
     echo '</div>';
@@ -204,7 +209,7 @@ function helloextend_render_documentation_page()
         <div>
             <h3><a href="#" id="offer_placement">1 - Understanding Offer Placement on PDP</a></h3>
             <div>
-                <img src="' . esc_url(plugins_url() . '/helloextend-protection/images/woocommerce_hooks.jpg') . '" >
+               <img src="' . esc_url(HELLOEXTEND_PLUGIN_URL . '/images/woocommerce_hooks.jpg') . '" >
             </div>
     </div>';
 }
@@ -212,8 +217,8 @@ function helloextend_render_documentation_page()
 function helloextend_protection_style()
 {
     // Register stylesheets
-	$lastmodtime= filemtime(plugins_url('helloextend-protection/css/helloextend.css'));
-    wp_register_style('helloextend_protection_style', plugins_url('helloextend-protection/css/helloextend.css'), array(), $lastmodtime);
+	$lastmodtime= filemtime(HELLOEXTEND_PLUGIN_URL. 'css/helloextend.css');
+    wp_register_style('helloextend_protection_style',  HELLOEXTEND_PLUGIN_URL.'css/helloextend.css', array(), $lastmodtime);
     wp_enqueue_style('helloextend_protection_style');
 }
 
@@ -301,9 +306,9 @@ function helloextend_product_protection_create()
             //check if image exists
             if (file_exists(plugin_dir_path('images/Extend_icon.png'))) {
 
-                $upload         = wc_rest_upload_image_from_url(plugins_url() . '/helloextend-protection/images/Extend_icon.png');
+                $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png');
                 if (is_wp_error($upload)) {
-                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . plugins_url() . '/helloextend-protection/images/Extend_icon.png : ' . $upload->get_error_message());
+                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png : ' . $upload->get_error_message());
                     return false;
                 }
 
@@ -316,7 +321,7 @@ function helloextend_product_protection_create()
                 //set the product image
                 set_post_thumbnail($product_id, $product_img_id);
             } else {
-                HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . plugin_dir_path('images/Extend_icon.png'));
+                HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'/images/Extend_icon.png');
             }
         } catch (\Exception $e) {
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
@@ -328,10 +333,10 @@ function helloextend_product_protection_create()
 function helloextend_logger_constants()
 {
     /* Set constant path to the plugin directory. */
-    define('HELLOEXTEND_LOGGER_DIR', trailingslashit(plugin_dir_path(__FILE__)));
+    define('HELLOEXTEND_LOGGER_DIR', trailingslashit(HELLOEXTEND_PLUGIN_DIR));
 
     /* Set constant path to the plugin URL. */
-    define('HELLOEXTEND_LOGGER_URI', trailingslashit(plugin_dir_url(__FILE__)));
+    define('HELLOEXTEND_LOGGER_URI', trailingslashit(HELLOEXTEND_PLUGIN_URL));
 }
 
 function helloextend_logger_includes()
@@ -564,7 +569,7 @@ function add_protection_message_to_email($order, $sent_to_admin, $plain_text, $e
 	foreach ($order->get_fees() as $fee_id => $fee){
 		if ($fee->get_name() == "Extend Shipping Protection"){
 			echo '<div style="display: inline-flex; margin: 20px 0px;">';
-			echo '<img src="'.esc_url(plugins_url() . '/helloextend-protection/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
+			echo '<img src="'.esc_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
             echo '<p>Your order includes Extend shipping protection. If your package is lost, damaged, or stolen, we’ll replace it for free.</p></div>';
 			break;
 		}
@@ -584,7 +589,7 @@ function add_protection_message_to_thankyou_page($order_id) {
         foreach ($order->get_fees() as $fee_id => $fee){
             if ($fee->get_name() == "Extend Shipping Protection"){
 	            echo '<div style="display: inline-flex; margin: 20px 0px;">';
-                echo '<img src="'.esc_url(plugins_url() . '/helloextend-protection/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
+                echo '<img src="'.esc_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon_shipping_protection_160x160.png').'" alt="Extend logo" width="60" height="60" style="margin-right: 10px;" />';
 	            echo '<p>Your order includes Extend shipping protection. If your package is lost, damaged, or stolen, we’ll replace it for free.</p></div>';
 	            break;
             }
