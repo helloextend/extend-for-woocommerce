@@ -1,7 +1,7 @@
 === Extend Protection For WooCommerce ===
 Plugin Name: Extend Protection For WooCommerce
 Plugin URI: https://www.extend.com/
-Contributors: whereispolaris, extendengineering
+Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.7
