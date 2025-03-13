@@ -60,7 +60,7 @@ You need to have WooCommerce 7.0 or greater installed and activated. You also ne
 == External services ==
 
 Extend Protection For WooCommerce relies on the Extend API to send and receive contract information. It also uses the Extend SDK to render offers. The plugin communicates with the following services:
-- [Extend API](https://docs.extend.com/reference/ordersupsert-1): used to create and manage protection plans, contracts, claims, and upsell leads. In the plugin you will see the URL `api.helloextend.com` and `api-demo.helloextend.com`, which is the API endpoint for Extend's API.
+- [Extend API](https://docs.extend.com/reference/ordersupsert-1): used to create and manage protection plans, contracts, claims, and upsell leads. In the plugin you will see the URL `https://api.helloextend.com` and `https://api-demo.helloextend.com`, which is the API endpoint for Extend's API.
 - [Extend SDK](https://helloextend.github.io/extend-sdk-client): The plugin also uses Extend's SDK via `sdk.helloextend.com` to render protection offers in the frontend.
 - [Extend Merchant Portal](https://merchants.extend.com/): is available for users to manage products, plans, contracts, claims, and upsell leads. It also provides enhanced reporting & dashboards: customer segmentation, catalog analysis, trends, and performance.
 
