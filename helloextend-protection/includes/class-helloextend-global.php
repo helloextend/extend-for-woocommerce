@@ -141,7 +141,6 @@ class HelloExtend_Protection_Global
         $helloextend_protection_general_settings             = (array) get_option('helloextend_protection_for_woocommerce_general_settings');
         $helloextend_protection_product_protection_settings  = (array) get_option('helloextend_protection_for_woocommerce_product_protection_settings');
         $helloextend_protection_shipping_protection_settings = (array) get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
-        $helloextend_protection_catalog_sync_settings        = (array) get_option('helloextend_protection_for_woocommerce_catalog_sync_settings');
 
         $settings['enable_helloextend'] = array_key_exists('enable_helloextend', $helloextend_protection_product_protection_settings)
             ? $helloextend_protection_product_protection_settings['enable_helloextend'] : 0;
@@ -254,25 +253,6 @@ class HelloExtend_Protection_Global
         if (empty($settings['warranty_product_id'])) {
             HelloExtend_Protection_Logger::helloextend_log_error('Error: Warranty product is not created.');
         }
-
-        /* catalog sync settings */
-        $settings['helloextend_use_skus'] = array_key_exists('helloextend_use_skus', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_use_skus'] : 0;
-
-        $settings['helloextend_automated_product_sync'] = array_key_exists('helloextend_automated_product_sync', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_automated_product_sync'] : 0;
-
-        $settings['helloextend_last_product_sync'] = array_key_exists('helloextend_last_product_sync', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_last_product_sync'] : null;
-
-        $settings['helloextend_use_special_price'] = array_key_exists('helloextend_use_special_price', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_use_special_price'] : 0;
-
-        $settings['helloextend_sync_batch'] = array_key_exists('helloextend_sync_batch', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_sync_batch'] : 100;
-
-        $settings['helloextend_sync_on_update'] = array_key_exists('helloextend_sync_on_update', $helloextend_protection_catalog_sync_settings)
-            ? $helloextend_protection_catalog_sync_settings['helloextend_sync_on_update'] : 0;
 
         return $settings;
     }
