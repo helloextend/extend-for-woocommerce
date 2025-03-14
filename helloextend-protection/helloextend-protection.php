@@ -164,7 +164,6 @@ function helloextend_render_settings_page()
 			<a href="?page=helloextend-protection-settings&tab=general" class="nav-tab <?php echo (empty($_GET['tab']) || sanitize_text_field(wp_unslash($_GET['tab'])) === 'general') ? 'nav-tab-active' : ''; ?>">General Settings</a>
 			<a href="?page=helloextend-protection-settings&tab=product_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'product_protection') ? 'nav-tab-active' : ''; ?>">Product Protection</a>
 			<a href="?page=helloextend-protection-settings&tab=shipping_protection" class="nav-tab <?php echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'shipping_protection') ? 'nav-tab-active' : ''; ?>">Shipping Protection</a>
-<!--			<a href="?page=helloextend-protection-settings&tab=catalog_sync" class="nav-tab --><?php //echo (isset($_GET['tab']) && sanitize_text_field(wp_unslash($_GET['tab'])) === 'catalog_sync') ? 'nav-tab-active' : ''; ?><!--">Catalog Sync</a>-->
 		</h2>
 		<div class="tab-content">
             <?php
@@ -177,9 +176,7 @@ function helloextend_render_settings_page()
                 case 'shipping_protection':
                     include_once 'tabs/shipping-protection.php';
                     break;
-                case 'catalog_sync':
-                    include_once 'tabs/catalog-sync.php';
-                    break;
+
                 default:
                     include_once 'tabs/general-settings.php';
             }

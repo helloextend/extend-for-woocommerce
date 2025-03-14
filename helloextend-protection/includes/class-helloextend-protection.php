@@ -89,7 +89,6 @@ class HelloExtend_Protection
     private HelloExtend_Protection_Cart_Offer $cart_offer;
     private HelloExtend_Protection_Orders $orders;
     private HelloExtend_Protection_Shipping $shipping_protection;
-    private HelloExtend_Protection_Sync $sync;
 
     /**
      * Define the core functionality of the plugin.
@@ -198,11 +197,6 @@ class HelloExtend_Protection
          */
         include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-shipping.php';
 
-        /**
-         * The class responsible for handling the Product Sync
-         */
-        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-sync.php';
-
         $this->loader = new HelloExtend_Protection_Loader();
 
     }
@@ -236,7 +230,6 @@ class HelloExtend_Protection
     {
 
         $plugin_admin = new HelloExtend_Protection_Admin($this->get_helloextend_protection(), $this->get_version());
-        $this->sync   = new HelloExtend_Protection_Sync($this->get_helloextend_protection(), $this->get_version());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -256,7 +249,6 @@ class HelloExtend_Protection
         wp_register_script('helloextend_product_integration_script', $this->url . '../js/helloextend-pdp-offers.js', [ 'jquery', 'helloextend_global_script' ], '1.0.0', true);
         wp_register_script('helloextend_cart_integration_script', $this->url . '../js/helloextend-cart-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
         wp_register_script('helloextend_shipping_integration_script', $this->url . '../js/helloextend-shipping-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
-        wp_register_script('helloextend_sync_script', $this->url . '../js/helloextend-sync.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
 
         $this->global_hooks = new HelloExtend_Protection_Global($this->get_helloextend_protection(), $this->get_version());
     }
