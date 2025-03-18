@@ -66,16 +66,16 @@ class HelloExtend_Protection_Global
     public function hooks()
     {
         // add to cart for users without permissions
-        add_action('wp_ajax_nopriv_add_to_cart_helloextend', [$this, 'add_to_cart_helloextend'], 10);
+        add_action('wp_ajax_nopriv_add_to_cart_helloextend', [$this, 'helloextend_add_to_cart'], 10);
 
         // add to cart for users with permissions
-        add_action('wp_ajax_add_to_cart_helloextend', [$this, 'add_to_cart_helloextend'], 10);
+        add_action('wp_ajax_add_to_cart_helloextend', [$this, 'helloextend_add_to_cart'], 10);
 
         // get cart for users without permissions
-        add_action('wp_ajax_nopriv_get_cart_helloextend', [$this, 'get_cart_helloextend'], 10);
+        add_action('wp_ajax_nopriv_get_cart_helloextend', [$this, 'helloextend_get_cart'], 10);
 
         // get cart for users with permissions
-        add_action('wp_ajax_get_cart_helloextend', [$this, 'get_cart_helloextend'], 10);
+        add_action('wp_ajax_get_cart_helloextend', [$this, 'helloextend_get_cart'], 10);
 
         // change mini cart item price for warranty items
         add_filter('woocommerce_cart_item_price', [$this, 'cart_item_price'], 10, 3);
@@ -96,7 +96,7 @@ class HelloExtend_Protection_Global
         add_action('woocommerce_before_calculate_totals', [$this, 'update_price']);
 
         // Initialize global ExtendWooCommerce
-        add_action('wp_head', [$this, 'init_global_helloextend']);
+        add_action('wp_head', [$this, 'helloextend_init_global']);
     }
 
     /**
@@ -105,10 +105,10 @@ class HelloExtend_Protection_Global
      * @since  1.0.0
      * @return void
      */
-    public static function get_cart_helloextend()
+    public static function helloextend_get_cart()
     {
         $cart     = WC()->cart->get_cart();
-        $settings = self::get_helloextend_settings();
+        $settings = self::helloextend_get_settings();
 
         foreach ($cart as $cart_item_key => $cart_item) {
 
@@ -134,7 +134,7 @@ class HelloExtend_Protection_Global
      * @since  1.0.0
      * @return array The extended WooCommerce settings.
      */
-    public static function get_helloextend_settings()
+    public static function helloextend_get_settings()
     {
         static $settings;
 
@@ -257,7 +257,7 @@ class HelloExtend_Protection_Global
         return $settings;
     }
 
-    public static function add_to_cart_helloextend()
+    public static function helloextend_add_to_cart()
     {
         $warranty_product_id = wc_get_product_id_by_sku('helloextend-product-protection');
         $quantity            = isset($_REQUEST['quantity']) ? (int) sanitize_key($_REQUEST['quantity']) : null;
@@ -383,13 +383,13 @@ class HelloExtend_Protection_Global
         return $data;
     }
 
-    public function init_global_helloextend()
+    public function helloextend_init_global()
     {
         if (is_admin()) {
             return;
         }
 
-        $settings       = self::get_helloextend_settings();
+        $settings       = self::helloextend_get_settings();
         $environment    = $settings['helloextend_environment'];
         $store_id       = $settings['store_id'];
         $environment    = ($environment == 'live') ? $environment : 'demo';
@@ -424,9 +424,9 @@ class HelloExtend_Protection_Global
      *
      * @since 1.0.0
      */
-    public static function get_helloextend_token()
+    public static function helloextend_get_token()
     {
-        $settings = self::get_helloextend_settings();
+        $settings = self::helloextend_get_settings();
         $client_id      = $settings['client_id'];
         $client_secret  = $settings['client_secret'];
         $token          = $settings['token'];

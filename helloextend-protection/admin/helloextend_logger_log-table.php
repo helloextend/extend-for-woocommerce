@@ -38,31 +38,31 @@ $logs = HelloExtend_Protection_Logger::helloextend_logger_get_all_logs();
 
             <a class="helloextend_logger-log-filter" filter="all" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php esc_html('All'); ?>
+            <?php echo esc_html('All'); ?>
 
             </a> |
 
             <a class="helloextend_logger-log-filter" filter="error" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php esc_html('Errors'); ?>
+            <?php echo esc_html('Errors'); ?>
 
             </a> |
 
             <a class="helloextend_logger-log-filter" filter="notice" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php esc_html('Notices'); ?>
+            <?php echo esc_html('Notices'); ?>
 
             </a> |
 
             <a class="helloextend_logger-log-filter" filter="debug" nonce="<?php echo esc_attr($nonce); ?>">
 
-            <?php  esc_html('Debugs'); ?>
+            <?php  echo esc_html('Debugs'); ?>
 
             </a>
 
         <?php } ?>
 
-        <a class="helloextend_logger-delete-all" data-nonce="<?php echo esc_attr($nonce); ?>"><?php esc_html('Clear Log'); ?></a>
+        <a class="helloextend_logger-delete-all" data-nonce="<?php echo esc_attr($nonce); ?>"><?php echo esc_html('Clear Log'); ?></a>
 
         <table class="helloextend_logger-table">
 

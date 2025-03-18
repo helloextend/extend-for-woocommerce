@@ -65,7 +65,7 @@ class HelloExtend_Protection_Orders
         $this->helloextend_protection = $helloextend_protection;
         $this->version           = $version;
         /* retrieve environment variables */
-        $this->settings = HelloExtend_Protection_Global::get_helloextend_settings();
+        $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action('woocommerce_checkout_order_processed', [$this, 'create_update_order'], 10, 1);
@@ -75,7 +75,7 @@ class HelloExtend_Protection_Orders
     }
 
     /**
-     * get_helloextend_plans_and_products($order_items)
+     * helloextend_get_plans_and_products($order_items)
      * - builds line items array that will be put in order payload
      *
      * @param  $order
@@ -83,7 +83,7 @@ class HelloExtend_Protection_Orders
      * @return array
      * @since  1.0.0
      */
-    public function get_helloextend_plans_and_products($order, $fulfill_now = false)
+	    public function helloextend_get_plans_and_products($order, $fulfill_now = false)
     {
 
         $helloextend_plans = array();
@@ -173,22 +173,22 @@ class HelloExtend_Protection_Orders
         }
         $order_data = $order->get_data();
 
-        // if contract creation is set to order create, call get_helloextend_plans_and_products
+        // if contract creation is set to order create, call helloextend_get_plans_and_products
         $contract_creation_event = $this->settings['helloextend_product_protection_contract_create_event'];
 
         $helloextend_line_items = array();
 
         if ($contract_creation_event == 'Order Create') {
             // Will pass fulfill as true to the line items array to fulfill the contract immediately
-            $helloextend_line_items = $this->get_helloextend_plans_and_products($order, true);
+            $helloextend_line_items = $this->helloextend_get_plans_and_products($order, true);
         } else {
             // Check if the current action hook is woocommerce_order_status_completed
             $called_action_hook = current_filter();
             if ($called_action_hook == 'woocommerce_order_status_completed') {
-                $helloextend_line_items = $this->get_helloextend_plans_and_products($order, true);
+                $helloextend_line_items = $this->helloextend_get_plans_and_products($order, true);
             } else {
                 // Does not fulfill product protection line items
-                $helloextend_line_items = $this->get_helloextend_plans_and_products($order);
+                $helloextend_line_items = $this->helloextend_get_plans_and_products($order);
             }
         }
 
@@ -248,7 +248,7 @@ class HelloExtend_Protection_Orders
         }
 
         // Get Token from Global function
-        $token = HelloExtend_Protection_Global::get_helloextend_token();
+        $token = HelloExtend_Protection_Global::helloextend_get_token();
 
         // Log the token
         if ($this->settings['enable_helloextend_debug'] == 1) {

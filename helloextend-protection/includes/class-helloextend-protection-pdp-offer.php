@@ -71,7 +71,7 @@ class HelloExtend_Protection_PDP_Offer
         $this->path     = plugin_dir_path(__FILE__);
 
         /* retrieve environment variables */
-        $this->settings = HelloExtend_Protection_Global::get_helloextend_settings();
+        $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
 
         /* Initializes product_offer on the PDP Offer Location selected in wp-admin > Extend */
         add_action($this->settings['helloextend_pdp_offer_location'], [ $this, 'product_offer' ]);

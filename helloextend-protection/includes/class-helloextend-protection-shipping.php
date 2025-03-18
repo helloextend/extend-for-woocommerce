@@ -54,7 +54,7 @@ class HelloExtend_Protection_Shipping
     public function __construct()
     {
 
-        $this->settings = HelloExtend_Protection_Global::get_helloextend_settings();
+        $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
         $this->hooks();
     }
 
