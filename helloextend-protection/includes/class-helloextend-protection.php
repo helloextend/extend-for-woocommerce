@@ -229,7 +229,7 @@ class HelloExtend_Protection
     private function define_admin_hooks()
     {
 
-        $plugin_admin = new HelloExtend_Protection_Admin($this->get_helloextend_protection(), $this->get_version());
+        $plugin_admin = new HelloExtend_Protection_Admin($this->helloextend_get_protection(), $this->get_version());
 
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_styles');
         $this->loader->add_action('admin_enqueue_scripts', $plugin_admin, 'enqueue_scripts');
@@ -250,7 +250,7 @@ class HelloExtend_Protection
         wp_register_script('helloextend_cart_integration_script', $this->url . '../js/helloextend-cart-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
         wp_register_script('helloextend_shipping_integration_script', $this->url . '../js/helloextend-shipping-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
 
-        $this->global_hooks = new HelloExtend_Protection_Global($this->get_helloextend_protection(), $this->get_version());
+        $this->global_hooks = new HelloExtend_Protection_Global($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -262,7 +262,7 @@ class HelloExtend_Protection
      */
     private function define_pdp_offer_hooks()
     {
-        $this->pdp_offer = new HelloExtend_Protection_PDP_Offer($this->get_helloextend_protection(), $this->get_version());
+        $this->pdp_offer = new HelloExtend_Protection_PDP_Offer($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -274,7 +274,7 @@ class HelloExtend_Protection
      */
     private function define_cart_offer_hooks()
     {
-        $this->cart_offer = new HelloExtend_Protection_Cart_Offer($this->get_helloextend_protection(), $this->get_version());
+        $this->cart_offer = new HelloExtend_Protection_Cart_Offer($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -286,7 +286,7 @@ class HelloExtend_Protection
      */
     private function define_shipping_protection_offer_hooks()
     {
-        $this->shipping_protection_offer = new HelloExtend_Protection_Shipping($this->get_helloextend_protection(), $this->get_version());
+        $this->shipping_protection_offer = new HelloExtend_Protection_Shipping($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -298,7 +298,7 @@ class HelloExtend_Protection
      */
     private function define_orders_hooks()
     {
-        $this->orders = new HelloExtend_Protection_Orders($this->get_helloextend_protection(), $this->get_version());
+        $this->orders = new HelloExtend_Protection_Orders($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -311,7 +311,7 @@ class HelloExtend_Protection
     private function define_public_hooks()
     {
 
-        $plugin_public = new HelloExtend_Protection_Public($this->get_helloextend_protection(), $this->get_version());
+        $plugin_public = new HelloExtend_Protection_Public($this->helloextend_get_protection(), $this->get_version());
 
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_styles');
         $this->loader->add_action('wp_enqueue_scripts', $plugin_public, 'enqueue_scripts');
@@ -335,7 +335,7 @@ class HelloExtend_Protection
      * @return string    The name of the plugin.
      * @since  1.0.0
      */
-    public function get_helloextend_protection()
+    public function helloextend_get_protection()
     {
         return $this->helloextend_protection;
     }

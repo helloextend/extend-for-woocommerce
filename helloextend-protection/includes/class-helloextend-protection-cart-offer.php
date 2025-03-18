@@ -54,7 +54,7 @@ class HelloExtend_Protection_Cart_Offer
     public function __construct()
     {
         $this->hooks();
-        $this->settings = HelloExtend_Protection_Global::get_helloextend_settings();
+        $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
     }
 
     /**
