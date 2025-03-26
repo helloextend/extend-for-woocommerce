@@ -22,3 +22,10 @@
 
 # Cypress environment variables
 /cypress.env.json
+
+.DS_Store
+
+# Local dev resources to ignore:
+.idea/
+.vscode/
+

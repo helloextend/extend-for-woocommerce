@@ -168,7 +168,7 @@ class HelloExtend_Protection_Logger
 
         /* Get information about the error to delete from the ajax POST... */
 
-        // Sanitize wordpress ajax post
+        // Sanitize WordPress ajax post
 
         $error_code =  isset($_POST['error_code']) ? sanitize_key( wp_unslash( $_POST['error_code'] ) ) : null;
         $log_type   = isset($_POST['log_type']) ? sanitize_text_field( wp_unslash( $_POST['log_type'] ) ): null;
