@@ -30,22 +30,11 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class HelloExtend_Protection_i18n
+class Helloextend_Protection_i18n
 {
 
-    /**
-     * Load the plugin text domain for translation.
-     *
-     * @since 1.0.0
-     */
-    public function load_plugin_textdomain()
-    {
-
-        load_plugin_textdomain(
-            'helloextend-protection',
-            false,
-            dirname(dirname(plugin_basename(__FILE__))) . '/languages/'
-        );
-
+    public function __construct() {
+        // No need for load_plugin_textdomain anymore, WP handles this automatically.
     }
 }
+
