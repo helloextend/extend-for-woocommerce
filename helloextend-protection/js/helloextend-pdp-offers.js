@@ -9,6 +9,8 @@
 
         const $atcButton = jQuery(atc_button_selector)
 
+        const quantity = parseInt(document.querySelector('input[name="quantity"]').value || 1)
+
         let supportedProductType = true;
         let reference_id = '';
 
@@ -48,7 +50,7 @@
                 if (plan) {
                     var planCopy = { ...plan, covered_product_id: variation_id }
                     var data = {
-                        quantity: 1,
+                        quantity: quantity,
                         plan: planCopy,
                         price: (plan.price / 100).toFixed(2)
                     }
@@ -67,7 +69,7 @@
                                 if (plan && product) {
                                     var planCopy = { ...plan, covered_product_id: variation_id }
                                     var data = {
-                                        quantity: 1,
+                                        quantity: quantity,
                                         plan: planCopy,
                                         price: (plan.price / 100).toFixed(2)
                                     }
