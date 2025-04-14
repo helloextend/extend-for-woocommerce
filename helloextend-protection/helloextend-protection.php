@@ -298,28 +298,28 @@ function helloextend_product_protection_create()
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
         }
 
-        // upload image and associate to product
         try {
-            $product_id     = $product->get_id();
-            //check if image exists
-            if (file_exists(plugin_dir_path('images/Extend_icon.png'))) {
+            $product_id = $product->get_id();
+            $image_path = HELLOEXTEND_PLUGIN_DIR . 'images/Extend_icon.png';
+            $image_url  = HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon.png';
 
-                $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon.png');
+            if (file_exists($image_path)) {
+                $upload = wc_rest_upload_image_from_url($image_url);
+
                 if (is_wp_error($upload)) {
-                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon.png : ' . $upload->get_error_message());
+                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload Extend logo from ' . $image_url . ' : ' . $upload->get_error_message());
                     return false;
                 }
 
                 $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
                 if (is_wp_error($product_img_id)) {
-                    HelloExtend_Protection_Logger::helloextend_log_error('Could not retrieve product image id : ');
+                    HelloExtend_Protection_Logger::helloextend_log_error('Could not retrieve product image ID.');
                     return false;
                 }
 
-                //set the product image
                 set_post_thumbnail($product_id, $product_img_id);
             } else {
-                HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'/images/Extend_icon.png');
+                HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . $image_path);
             }
         } catch (\Exception $e) {
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
@@ -361,10 +361,13 @@ function helloextend_get_or_create_shipping_protection_product($fee_amount) {
         wp_set_object_terms($product_id, 'simple', 'product_type');
 
         // Upload image and associate to product
-        if (file_exists(plugin_dir_path('images/Extend_icon_shipping_protection.png'))) {
-            $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon_shipping_protection.png');
+        $image_path = HELLOEXTEND_PLUGIN_DIR . 'images/Extend_shipping_icon.png';
+        $image_url  = HELLOEXTEND_PLUGIN_URL . 'images/Extend_shipping_icon.png';
+
+        if (file_exists($image_path)) {
+            $upload         = wc_rest_upload_image_from_url($image_url);
             if (is_wp_error($upload)) {
-                HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon_shipping_protection.png : ' . $upload->get_error_message());
+                HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_shipping_icon.png : ' . $upload->get_error_message());
                 return false;
             }
 
@@ -377,7 +380,7 @@ function helloextend_get_or_create_shipping_protection_product($fee_amount) {
             //set the product image
             set_post_thumbnail($product_id, $product_img_id);
         } else {
-            HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'images/Extend_icon_shipping_protection.png');
+            HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'images/Extend_shipping_icon.png');
         }
 
         return $product_id;
