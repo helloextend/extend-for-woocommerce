@@ -44,8 +44,9 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.0.0');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.1.0');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
+define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
 
 define( 'HELLOEXTEND_PLUGIN_FILE', __FILE__ );
@@ -303,9 +304,9 @@ function helloextend_product_protection_create()
             //check if image exists
             if (file_exists(plugin_dir_path('images/Extend_icon.png'))) {
 
-                $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png');
+                $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon.png');
                 if (is_wp_error($upload)) {
-                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . '/images/Extend_icon.png : ' . $upload->get_error_message());
+                    HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon.png : ' . $upload->get_error_message());
                     return false;
                 }
 
@@ -324,6 +325,65 @@ function helloextend_product_protection_create()
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
         }
     }
+}
+
+function helloextend_get_or_create_shipping_protection_product($fee_amount) {
+    $query = new WP_Query([
+        'post_type'  => 'product',
+        'meta_key'   => '_helloextend_shipping_protection_product',
+        'meta_value' => '1',
+        'post_status'=> 'any',
+        'numberposts'=> 1
+    ]);
+
+    if (!empty($query->posts)) {
+        $product_id = $query->posts[0]->ID;
+        update_post_meta($product_id, '_price', $fee_amount);
+        update_post_meta($product_id, '_regular_price', $fee_amount);
+        return $product_id;
+    }
+
+    $product_id = wp_insert_post([
+        'post_title'   => 'Extend Shipping Protection',
+        'post_content' => 'Optional shipping protection offered at checkout.',
+        'post_status'  => 'publish',
+        'post_type'    => 'product',
+    ]);
+
+    if (!is_wp_error($product_id)) {
+        update_post_meta($product_id, '_virtual', 'yes');
+        update_post_meta($product_id, '_price', $fee_amount);
+        update_post_meta($product_id, '_regular_price', $fee_amount);
+        update_post_meta($product_id, '_visibility', 'hidden');
+        update_post_meta($product_id, '_catalog_visibility', 'hidden');
+        update_post_meta($product_id, '_helloextend_shipping_protection_product', 1);
+        update_post_meta($product_id, '_sku', HELLOEXTEND_SHIPPING_PROTECTION_SKU);
+        wp_set_object_terms($product_id, 'simple', 'product_type');
+
+        // Upload image and associate to product
+        if (file_exists(plugin_dir_path('images/Extend_icon_shipping_protection.png'))) {
+            $upload         = wc_rest_upload_image_from_url(HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon_shipping_protection.png');
+            if (is_wp_error($upload)) {
+                HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_icon_shipping_protection.png : ' . $upload->get_error_message());
+                return false;
+            }
+
+            $product_img_id = wc_rest_set_uploaded_image_as_attachment($upload, $product_id);
+            if (is_wp_error($product_img_id)) {
+                HelloExtend_Protection_Logger::helloextend_log_error('Could not retrieve product image id : ');
+                return false;
+            }
+
+            //set the product image
+            set_post_thumbnail($product_id, $product_img_id);
+        } else {
+            HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'images/Extend_icon_shipping_protection.png');
+        }
+
+        return $product_id;
+    }
+
+    return false;
 }
 
 /* extend logger */
@@ -400,28 +460,64 @@ function helloextend_remove_shipping_protection_fee()
 
 function helloextend_set_shipping_fee()
 {
-    if (is_admin() && !defined('DOING_AJAX') || !is_checkout()) {
+    if ((is_admin() && !defined('DOING_AJAX')) || !is_checkout()) {
         return;
     }
 
-    $fee_label  = __('Extend Shipping Protection', 'helloextend-protection');
+    $fee_label = __('Extend Shipping Protection', 'helloextend-protection');
+    $shipping_fee = WC()->session->get('shipping_fee');
+    $remove_fee = WC()->session->get('shipping_fee_remove');
+    $fee_amount = WC()->session->get('shipping_fee_value');
 
-    if (1 == WC()->session->get('shipping_fee')) {
+    $options = get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
+    $add_as_sku = isset($options['helloextend_sp_add_sku']) && $options['helloextend_sp_add_sku'];
 
-        $fee_amount = WC()->session->get('shipping_fee_value');
+    if ($shipping_fee == 1) {
+        if ($add_as_sku) {
 
-        WC()->cart->add_fee($fee_label, $fee_amount);
-    } elseif (1 == WC()->session->get('shipping_fee_remove')) {
-        $fees = WC()->cart->get_fees();
-        foreach ($fees as $key => $fee) {
-            if ($fees[$key]->name == $fee_label) {
-                unset($fees[$key]);
+            $product_id = helloextend_get_or_create_shipping_protection_product($fee_amount);
+            if (!$product_id) {
+                HelloExtend_Protection_Logger::helloextend_log_error('Could not create or retrieve shipping protection product');
+                return;
             }
+            // Avoid duplicate product in cart
+            $already_in_cart = false;
+            foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
+                if ($values['product_id'] == $product_id) {
+                    $already_in_cart = true;
+                    break;
+                }
+            }
+
+            if (!$already_in_cart) {
+                WC()->cart->add_to_cart($product_id, 1);
+            }
+        } else {
+            WC()->cart->add_fee($fee_label, $fee_amount);
         }
-        WC()->cart->fees_api()->set_fees($fees);
+    } elseif ($remove_fee == 1) {
+        if ($add_as_sku) {
+            // Remove the product from cart
+            foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
+                $product = $values['data'];
+                if ($product && get_post_meta($product->get_id(), '_helloextend_shipping_protection_product', true)) {
+                    WC()->cart->remove_cart_item($cart_item_key);
+                }
+            }
+        } else {
+            $fees = WC()->cart->get_fees();
+            foreach ($fees as $key => $fee) {
+                if ($fee->name == $fee_label) {
+                    unset($fees[$key]);
+                }
+            }
+            WC()->cart->fees_api()->set_fees($fees);
+        }
+
         WC()->session->set('shipping_fee_remove', false);
     }
 }
+
 
 function helloextend_save_shipping_protection_quote_id($order_id)
 {
@@ -457,7 +553,7 @@ function helloextend_add_protection_contract($item_id, $item)
             $url         = 'https://customers.extend.com/en-US/warranty_terms';
         }
 
-        $token = HelloExtend_Protection_Global::get_helloextend_token();
+        $token = HelloExtend_Protection_Global::helloextend_get_token();
 
         // Get product object
         if (method_exists($item, 'get_product')) {

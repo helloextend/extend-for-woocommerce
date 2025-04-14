@@ -79,7 +79,12 @@ For more information on our terms of service and privacy policy, visit the links
 
 == Changelog ==
 
-= 1.0 =
+= 1.1.0 2025-04-15 =
+* Fix — PDP offers now pass correct quantity from input element. If the input element does not exists, it defaults to 1.
+* Feature — Adds the ability to add Shipping Protection as a line item instead of a checkout fee.
+
+= 1.0.0 2025-03-27 =
 * Extend Protection For WooCommerce plugin launch.
 * Initial release. Supports product and shipping protection.
+
 

@@ -192,6 +192,9 @@ class HelloExtend_Protection_Global
             $settings['enable_helloextend_sp'] = array_key_exists('enable_helloextend_sp', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['enable_helloextend_sp'] : 0;
 
+            $settings['helloextend_sp_add_sku'] = array_key_exists('helloextend_sp_add_sku', $helloextend_protection_shipping_protection_settings)
+                ? $helloextend_protection_shipping_protection_settings['helloextend_sp_add_sku'] : 0;
+
             $settings['helloextend_sp_offer_location'] = array_key_exists('helloextend_sp_offer_location', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['helloextend_sp_offer_location']
                 : 'woocommerce_review_order_after_shipping';
