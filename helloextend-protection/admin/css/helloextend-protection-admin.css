@@ -52,3 +52,7 @@
     background-color: #4caf50;
     transition: width 0.3s;
 }
+
+.helloextend-category-remove {
+    cursor: pointer;
+}

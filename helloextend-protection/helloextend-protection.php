@@ -214,7 +214,7 @@ function helloextend_render_documentation_page()
 function helloextend_protection_style()
 {
     // Register stylesheets
-	$lastmodtime= filemtime(HELLOEXTEND_PLUGIN_URL. 'css/helloextend.css');
+	$lastmodtime= ''; //filemtime(HELLOEXTEND_PLUGIN_URL. 'css/helloextend.css');
     wp_register_style('helloextend_protection_style',  HELLOEXTEND_PLUGIN_URL.'css/helloextend.css', array(), $lastmodtime);
     wp_enqueue_style('helloextend_protection_style');
 }
@@ -520,7 +520,7 @@ function helloextend_edit_ignore_product_category_field( ) {
         </td>
     </tr>
     ';
-    $js_file_version = filemtime(plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js');
+    $js_file_version = ''; //filemtime(plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js');
     wp_enqueue_script('helloextend_set_ignore_value_script', plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js' , array('jquery'), $js_file_version, true);
 
 }

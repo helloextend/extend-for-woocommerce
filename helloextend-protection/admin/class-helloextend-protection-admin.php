@@ -88,6 +88,9 @@ class HelloExtend_Protection_Admin
         add_action('admin_init', array($this, 'helloextend_protection_for_woocommerce_settings_page_init'));
         add_action('admin_enqueue_scripts', 'helloextend_protection_style');
 
+        add_action('wp_ajax_helloextend_remove_ignored_category', array($this, 'helloextend_remove_ignored_category'), 10);
+        add_action('wp_ajax_nopriv_helloextend_remove_ignored_category', array($this, 'helloextend_remove_ignored_category'), 10);
+
         // add_action('admin_enqueue_scripts', 'helloextend_admin_enqueue_scripts');
 
         /* retrieve environment variables */
@@ -167,6 +170,9 @@ class HelloExtend_Protection_Admin
         if ($current_screen->id == 'extend_page_helloextend-docs'){
             wp_enqueue_script($this->helloextend_protection, plugin_dir_url(__FILE__) . 'js/helloextend-protection-admin.js', array('jquery'), $this->version, false);
         }
+
+        $js_file_version = filemtime(plugin_dir_url(__FILE__) . 'js/helloextend-protection-remove-ignored-category.js');
+        wp_enqueue_script('helloextend_remove_ignored_category_script', plugin_dir_url(__FILE__) . 'js/helloextend-protection-remove-ignored-category.js', array('jquery'), $js_file_version, true);
     }
 
     /**
@@ -241,6 +247,17 @@ class HelloExtend_Protection_Admin
             );
 
             add_settings_section(
+                'helloextend_protection_for_woocommerce_settings_setting_section', //id
+                'Product Protection Categories',
+                array($this, 'helloextend_protection_for_woocommerce_settings_section_info'), // callback
+                'helloextend-protection-for-woommerce-settings-aadmin-product-protection', //page
+                array(
+                    'before_section' => '<div style="margin-top: 40px;">',
+                    'after_section' => '</div>'
+                )
+            );
+
+            add_settings_section(
                 'helloextend_setting_contract_section',
                 'Product Protection Contracts',
                 array($this, 'helloextend_setting_contract_section_info'),
@@ -279,6 +296,13 @@ class HelloExtend_Protection_Admin
                 'Product Protection Settings',
                 array($this, 'helloextend_protection_for_woocommerce_settings_section_info'),
                 'helloextend-protection-for-woocommerce-settings-admin-product-protection'
+            );
+
+            add_settings_section(
+                'helloextend_protection_for_woocommerce_settings_setting_section', //id
+                'Product Protection Categories',
+                array($this, 'helloextend_protection_for_woocommerce_settings_section_info'), // callback
+                'helloextend-protection-for-woommerce-settings-aadmin-product-protection'
             );
 
             add_settings_section(
@@ -370,6 +394,16 @@ class HelloExtend_Protection_Admin
             'helloextend_protection_for_woocommerce_settings_setting_section' // section
         );
 
+        // Ignored categories
+        add_settings_field(
+            'helloextend_ignored_categories',
+            'Excluded Product Categories',
+            array($this, 'helloextend_ignored_categories_callback'),
+            'helloextend-protection-for-woocommerce-settings-admin-product-protection',
+            'helloextend_protection_for_woocommerce_settings_setting_section'
+        );
+
+        // Contracts
         add_settings_field(
             'helloextend_product_protection_contract_create', // id
             'Create Contracts', // title
@@ -850,6 +884,33 @@ class HelloExtend_Protection_Admin
         );
     }
 
+    public function helloextend_ignored_categories_callback()
+    {
+        $ignored_category_ids = (array) get_option('helloextend_protection_for_woocommerce_ignored_categories');
+        
+        global $wpdb;
+        $query = "SELECT term_id, name FROM $wpdb->terms WHERE ";
+
+        for ($i = 0; $i < count($ignored_category_ids); $i++) {
+            $query = $query . "term_id = " . $ignored_category_ids[$i];
+
+            if (isset($ignored_category_ids[$i + 1])) {
+                $query = $query . " OR ";
+            }
+        }
+
+        $ignored_category_results = $wpdb->get_results($wpdb->prepare($query), "OBJECT");
+        
+        $ignored_categories_markup = "";
+
+        foreach ($ignored_category_results as $category) {
+            $ignored_categories_markup .= "<div data-category-id=\"" . $category->term_id . "\">" . $category->name . " <a class=\"helloextend-category-remove\">×</a> </div>";
+        }
+        printf(
+            $ignored_categories_markup
+        );
+    }
+
     public function helloextend_automated_product_sync_callback()
     {
         $helloextend_automated_sync_dropdown_values = array('never', 'hourly', 'daily', 'weekly');
@@ -1210,5 +1271,23 @@ class HelloExtend_Protection_Admin
     function helloextend_setting_catalog_sync_section_info()
     {
         echo '<hr>';
+    }
+
+    function helloextend_remove_ignored_category()
+    {
+        $id_to_be_removed = $_POST["categoryId"];
+        $ignored_category_ids = (array) get_option("helloextend_protection_for_woocommerce_ignored_categories");
+
+        $new_ignored_category_ids = array_filter($ignored_category_ids, function($item) use ($id_to_be_removed) {
+            return $item != $id_to_be_removed;
+        });
+
+        if (count($new_ignored_category_ids) < count($ignored_category_ids)) {
+            set_option("helloextend_protection_for_woocommerce_ignored_categories", $new_ignored_category_ids);
+            wp_send_json_success(array( "deleted" => true ));
+        } else {
+            wp_send_json_error(array( "deteted" => false ));
+        }
+
     }
 }
