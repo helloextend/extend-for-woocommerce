@@ -901,11 +901,13 @@ class HelloExtend_Protection_Admin
 
         $ignored_category_results = $wpdb->get_results($wpdb->prepare($query), "OBJECT");
         
-        $ignored_categories_markup = "";
+        $ignored_categories_markup = "<div class=\"helloextend-ignored-categories-container\">";
 
         foreach ($ignored_category_results as $category) {
-            $ignored_categories_markup .= "<div data-category-id=\"" . $category->term_id . "\">" . $category->name . " <a class=\"helloextend-category-remove\">×</a> </div>";
+            $ignored_categories_markup .= "<div class=\"helloextend-category-button button-secondary\" data-category-id=\"" . $category->term_id . "\">" . $category->name . " <a class=\"helloextend-category-remove\">&#10005;</a> </div>";
         }
+
+        $ignored_categories_markup .= "</div>";
         printf(
             $ignored_categories_markup
         );
