@@ -12,6 +12,9 @@
             },
             success: (data, message, xhr) => {
                 $(`div[data-category-id="${categoryId}"]`).remove();
+                if ($('.helloextend-category-button').length == 0) {
+                    $('.helloextend-ignored-categories-container').prepend('None');
+                }
             },
             failure: (e) => {
                 console.error('failure', e);
