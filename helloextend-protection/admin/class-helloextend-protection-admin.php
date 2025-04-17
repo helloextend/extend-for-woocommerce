@@ -622,32 +622,32 @@ class HelloExtend_Protection_Admin
                 switch ($helloextend_automated_product_sync) {
                     case 'never':
                         // Remove scheduled events.
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        wp_clear_scheduled_hook('sync_products_weekly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_hourly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_daily');
+                        wp_clear_scheduled_hook('helloextend_sync_products_weekly');
                         break;
 
                     case 'daily':
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_weekly');
-                        if (!wp_next_scheduled('sync_products_daily')) {
-                            wp_schedule_event(time(), 'daily', 'sync_products_daily');
+                        wp_clear_scheduled_hook('helloextend_sync_products_hourly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_weekly');
+                        if (!wp_next_scheduled('helloextend_sync_products_daily')) {
+                            wp_schedule_event(time(), 'daily', 'helloextend_sync_products_daily');
                         }
                         break;
 
                     case 'hourly':
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        wp_clear_scheduled_hook('sync_products_weekly');
-                        if (!wp_next_scheduled('sync_products_hourly')) {
-                            wp_schedule_event(time(), 'hourly', 'sync_products_hourly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_daily');
+                        wp_clear_scheduled_hook('helloextend_sync_products_weekly');
+                        if (!wp_next_scheduled('helloextend_sync_products_hourly')) {
+                            wp_schedule_event(time(), 'hourly', 'helloextend_sync_products_hourly');
                         }
                         break;
 
                     case 'weekly':
-                        wp_clear_scheduled_hook('sync_products_hourly');
-                        wp_clear_scheduled_hook('sync_products_daily');
-                        if (!wp_next_scheduled('sync_products_weekly')) {
-                            wp_schedule_event(time(), 'weekly', 'sync_products_weekly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_hourly');
+                        wp_clear_scheduled_hook('helloextend_sync_products_daily');
+                        if (!wp_next_scheduled('helloextend_sync_products_weekly')) {
+                            wp_schedule_event(time(), 'weekly', 'helloextend_sync_products_weekly');
                         }
                         break;
 

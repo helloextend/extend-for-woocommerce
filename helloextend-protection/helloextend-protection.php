@@ -93,7 +93,7 @@ add_action('woocommerce_cart_calculate_fees', 'helloextend_set_shipping_fee');
 add_action('woocommerce_checkout_order_processed', 'helloextend_save_shipping_protection_quote_id', 5, 2);
 
 // Hook into WooCommerce order details display on admin screen
-add_action('woocommerce_after_order_itemmeta', 'add_helloextend_protection_contract', 10, 2);
+add_action('woocommerce_after_order_itemmeta', 'helloextend_add_protection_contract', 10, 2);
 
 // Hook into new category page
 add_action('product_cat_add_form_fields', 'helloextend_add_ignore_product_category_field', 10);
@@ -105,10 +105,10 @@ add_action('created_term', 'helloextend_save_category', 10, 1);
 add_action('edited_term', 'helloextend_save_category', 10, 1);
 
 //add email paragraph for SP
-add_action('woocommerce_email_before_order_table', 'add_protection_message_to_email', 10, 4);
+add_action('woocommerce_email_before_order_table', 'helloextend_add_protection_message_to_email', 10, 4);
 
 // Add text to the order received (thank you) page
-add_action('woocommerce_thankyou', 'add_protection_message_to_thankyou_page', 20);
+add_action('woocommerce_thankyou', 'helloextend_add_protection_message_to_thankyou_page', 20);
 
 /* end add_action */
 
@@ -440,7 +440,7 @@ function helloextend_save_shipping_protection_quote_id($order_id)
  *  display the contract information for relevant items in the admin order
 */
 
-function add_helloextend_protection_contract($item_id, $item)
+function helloextend_add_protection_contract($item_id, $item)
 {
     // Get the order object && the contracts meta if any
     $order            = $item->get_order();
@@ -562,7 +562,7 @@ function helloextend_save_category($term_id) {
  * Add a paragraph to the email receipt when a SP protection is added to the order
  * @return void
  */
-function add_protection_message_to_email($order, $sent_to_admin, $plain_text, $email) {
+function helloextend_add_protection_message_to_email($order, $sent_to_admin, $plain_text, $email) {
 	foreach ($order->get_fees() as $fee_id => $fee){
 		if ($fee->get_name() == "Extend Shipping Protection"){
 			echo '<div style="display: inline-flex; margin: 20px 0px;">';
@@ -577,7 +577,7 @@ function add_protection_message_to_email($order, $sent_to_admin, $plain_text, $e
  * Add text to the order received (thank you) page when SP is purchased
  * @return void
  */
-function add_protection_message_to_thankyou_page($order_id) {
+function helloextend_add_protection_message_to_thankyou_page($order_id) {
     if (!$order_id) {
         return;
     }

@@ -30,7 +30,7 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-class HelloExtend_Protection_i18n
+class Helloextend_Protection_i18n
 {
 
     /**
@@ -49,3 +49,4 @@ class HelloExtend_Protection_i18n
 
     }
 }
+
