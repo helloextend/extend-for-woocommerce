@@ -1283,7 +1283,7 @@ class HelloExtend_Protection_Admin
         });
 
         if (count($new_ignored_category_ids) < count($ignored_category_ids)) {
-            set_option("helloextend_protection_for_woocommerce_ignored_categories", $new_ignored_category_ids);
+            update_option("helloextend_protection_for_woocommerce_ignored_categories", $new_ignored_category_ids);
             wp_send_json_success(array( "deleted" => true ));
         } else {
             wp_send_json_error(array( "deteted" => false ));
