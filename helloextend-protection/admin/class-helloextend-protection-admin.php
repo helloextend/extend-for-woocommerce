@@ -914,9 +914,22 @@ class HelloExtend_Protection_Admin
             $ignored_categories_markup .= "None";
         }
 
-        $ignored_categories_markup .= "</div>";
+        $ignored_categories_markup .= "<br><label>Product Protection offers may be disabled for a Product Category via the Category edit page</label></div>";
+
+        $allowed_categories_tags = array(
+            'div' => array(
+                'class' => true,
+                'data-category-id' => true
+            ),
+            'a' => array(
+                'class' => true
+            ),
+            'label' => true,
+            'br' => true
+        );
+        
         printf(
-            $ignored_categories_markup
+            wp_kses($ignored_categories_markup, $allowed_categories_tags)
         );
     }
 
@@ -1284,7 +1297,12 @@ class HelloExtend_Protection_Admin
 
     function helloextend_remove_ignored_category()
     {
-        $id_to_be_removed = $_POST["categoryId"];
+        if (isset($_POST["categoryId"])) {
+            $id_to_be_removed = sanitize_text_field(wp_unslash($_POST["categoryId"]));
+        } else {
+            $id_to_be_removed = null;
+        }
+
         $ignored_category_ids = (array) get_option("helloextend_protection_for_woocommerce_ignored_categories");
 
         $new_ignored_category_ids = array_filter($ignored_category_ids, function($item) use ($id_to_be_removed) {
