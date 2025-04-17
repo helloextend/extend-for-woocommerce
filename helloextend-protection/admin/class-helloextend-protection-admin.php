@@ -892,19 +892,26 @@ class HelloExtend_Protection_Admin
         $query = "SELECT term_id, name FROM $wpdb->terms WHERE ";
 
         for ($i = 0; $i < count($ignored_category_ids); $i++) {
-            $query = $query . "term_id = " . $ignored_category_ids[$i];
+            $query = $query . sprintf("term_id = %d", $ignored_category_ids[$i]);
 
             if (isset($ignored_category_ids[$i + 1])) {
                 $query = $query . " OR ";
             }
         }
 
-        $ignored_category_results = $wpdb->get_results($wpdb->prepare($query), "OBJECT");
+        $ignored_category_results = $wpdb->get_results($wpdb->prepare(
+            // phpcs:ignore WordPress.DB.PreparedSQL.NotPrepared
+            $query), "OBJECT");
         
         $ignored_categories_markup = "<div class=\"helloextend-ignored-categories-container\">";
-
-        foreach ($ignored_category_results as $category) {
-            $ignored_categories_markup .= "<div class=\"helloextend-category-button button-secondary\" data-category-id=\"" . $category->term_id . "\">" . $category->name . " <a class=\"helloextend-category-remove\">&#10005;</a> </div>";
+        if (count($ignored_category_results) > 0) {
+    
+            foreach ($ignored_category_results as $category) {
+                $ignored_categories_markup .= sprintf("<div class=\"helloextend-category-button button\" data-category-id=\"%d\">%s <a class=\"helloextend-category-remove\">&#10005;</a> </div>", $category->term_id, $category->name);
+            }
+    
+        } else {
+            $ignored_categories_markup .= "None";
         }
 
         $ignored_categories_markup .= "</div>";
