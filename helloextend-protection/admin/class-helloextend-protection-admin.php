@@ -891,10 +891,10 @@ class HelloExtend_Protection_Admin
         global $wpdb;
         $query = "SELECT term_id, name FROM $wpdb->terms WHERE ";
 
-        for ($i = 0; $i < count($ignored_category_ids); $i++) {
-            $query = $query . sprintf("term_id = %d", $ignored_category_ids[$i]);
+        foreach ($ignored_category_ids  as $category_id ) {
+            $query = $query . sprintf("term_id = %d", $category_id);
 
-            if (isset($ignored_category_ids[$i + 1])) {
+            if (next($ignored_category_ids)) {
                 $query = $query . " OR ";
             }
         }
@@ -1310,6 +1310,8 @@ class HelloExtend_Protection_Admin
         });
 
         if (count($new_ignored_category_ids) < count($ignored_category_ids)) {
+            HelloExtend_Protection_Logger::helloextend_log_notice(sprintf("Category ID %d was removed from ignore list", $id_to_be_removed));;
+
             update_option("helloextend_protection_for_woocommerce_ignored_categories", $new_ignored_category_ids);
             wp_send_json_success(array( "deleted" => true ));
         } else {
