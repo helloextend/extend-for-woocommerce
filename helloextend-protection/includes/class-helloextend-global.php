@@ -493,19 +493,20 @@ class HelloExtend_Protection_Global
     public static function helloextend_get_first_valid_category($categories): string {
         $ignored_categories = (array) get_option('helloextend_protection_for_woocommerce_ignored_categories');
 
-        // If ignored categories doesn't exist or is empty, return first category
-        if (is_null($ignored_categories) || count($ignored_categories) == 0) {
-            return $categories[0]->name;
+        if (empty($categories) || !is_array($categories)) {
+            return 'Uncategorized'; // or any safe fallback
         }
 
-        // Find the first category that is not ignored and return it
+        if (is_null($ignored_categories) || count($ignored_categories) == 0) {
+            return $categories[0]->name ?? 'Uncategorized';
+        }
+
         foreach ($categories as $category) {
             if (!in_array($category->term_id, $ignored_categories)) {
-                return $category->name;
+                return $category->name ?? 'Uncategorized';
             }
         }
 
-        // If all categories are ignored, return the first one in the array
-        return $categories[0]->name;
+        return $categories[0]->name ?? 'Uncategorized';
     }
 }
