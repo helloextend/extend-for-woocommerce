@@ -52,3 +52,15 @@
     background-color: #4caf50;
     transition: width 0.3s;
 }
+
+.helloextend-category-button {
+    margin-right: 15px !important;
+    margin-bottom: 5px !important;
+    cursor: default !important;
+}
+
+.helloextend-category-remove {
+    color: black;
+    padding-left: 10px;
+    cursor: pointer;
+}

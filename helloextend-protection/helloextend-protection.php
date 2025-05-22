@@ -547,11 +547,16 @@ function helloextend_save_category($term_id) {
         $new_ignored_categories = array();
         foreach ($ignored_categories as $category_id) { 
             if ($category_id !== $term_id) {
-                array_push($new_ignored_categories, $ignored_categories[$i]);
+                array_push($new_ignored_categories, $category_id);
             }
         }
+        HelloExtend_Protection_Logger::helloextend_log_notice(sprintf("Category ID %d was removed from ignore list", $term_id));
+        
         $ignored_categories = $new_ignored_categories;
     } else if ($helloextend_ignore && !$category_in_array) {
+        
+        HelloExtend_Protection_Logger::helloextend_log_notice(sprintf("Category ID %d was added to ignore list", $term_id));
+
         array_push($ignored_categories, $term_id);
     }
 
