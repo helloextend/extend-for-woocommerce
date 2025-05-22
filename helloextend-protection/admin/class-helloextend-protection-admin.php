@@ -464,7 +464,7 @@ class HelloExtend_Protection_Admin
 
         add_settings_field(
             'helloextend_sp_add_sku', // id
-            'Add Shipping Protection As a Product SKU', // title
+            'Display Shipping Protection as a Line Item in Cart', // title
             array($this, 'helloextend_sp_add_sku_callback'), // callback
             'helloextend-protection-for-woocommerce-settings-admin-shipping-protection', // page
             'helloextend_setting_shipping_protection_section' // section
@@ -773,7 +773,7 @@ class HelloExtend_Protection_Admin
     public function helloextend_sp_add_sku_callback()
     {
         printf(
-            '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[helloextend_sp_add_sku]" id="helloextend_sp_add_sku" value="1" %s>',
+            '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[helloextend_sp_add_sku]" id="helloextend_sp_add_sku" value="1" %s> <label for="helloextend_sp_add_sku">Leave unchecked for Shipping Protection as a fee</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'])
                 && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'] === '1') ? 'checked' : ''
         );
