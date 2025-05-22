@@ -496,13 +496,13 @@ class HelloExtend_Protection_Admin
             'helloextend_setting_shipping_protection_section' // section
         );
 
-        // add_settings_field(
-        //     'enable_helloextend_sp', // id
-        //     'Enable Shipping Protection', // title
-        //     array( $this, 'enable_helloextend_sp_callback' ), // callback
-        //     'helloextend-protection-for-woocommerce-settings-admin-shipping-protection', // page
-        //     'helloextend_setting_shipping_protection_section' // section
-        // );
+        add_settings_field(
+            'helloextend_sp_add_sku', // id
+            'Display Shipping Protection as a Line Item in Cart', // title
+            array($this, 'helloextend_sp_add_sku_callback'), // callback
+            'helloextend-protection-for-woocommerce-settings-admin-shipping-protection', // page
+            'helloextend_setting_shipping_protection_section' // section
+        );
 
         add_settings_field(
             'helloextend_sp_offer_location', // id
@@ -594,6 +594,7 @@ class HelloExtend_Protection_Admin
         if (get_option('helloextend_protection_for_woocommerce_shipping_protection_settings') == null) {
             $settingsSP = [
                 'enable_helloextend_sp'               => '1',
+                'helloextend_sp_add_sku'              => '1',
                 'enable_sp_offer_location'       => 'woocommerce_review_order_before_payment',
                 'enable_sp_offer_location_other' => '',
             ];
@@ -669,6 +670,10 @@ class HelloExtend_Protection_Admin
 
         if (isset($input['enable_helloextend_sp'])) {
             $sanitary_values['enable_helloextend_sp'] = $input['enable_helloextend_sp'];
+        }
+
+        if (isset($input['helloextend_sp_add_sku'])) {
+            $sanitary_values['helloextend_sp_add_sku'] = $input['helloextend_sp_add_sku'];
         }
 
         if (isset($input['enable_helloextend_debug'])) {
@@ -796,6 +801,15 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[enable_helloextend_sp]" id="enable_helloextend_sp" value="1" %s>',
             (isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['enable_helloextend_sp'])
                 && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['enable_helloextend_sp'] === '1') ? 'checked' : ''
+        );
+    }
+
+    public function helloextend_sp_add_sku_callback()
+    {
+        printf(
+            '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[helloextend_sp_add_sku]" id="helloextend_sp_add_sku" value="1" %s> <label for="helloextend_sp_add_sku">Leave unchecked for Shipping Protection as a fee</label>',
+            (isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'])
+                && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'] === '1') ? 'checked' : ''
         );
     }
 

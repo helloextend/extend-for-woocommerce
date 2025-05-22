@@ -250,9 +250,14 @@ class HelloExtend_Protection_Orders
         // Get Token from Global function
         $token = HelloExtend_Protection_Global::helloextend_get_token();
 
-        // Log the token
-        if ($this->settings['enable_helloextend_debug'] == 1) {
-            HelloExtend_Protection_Logger::helloextend_log_debug('Token: ' . $token);
+        // If token exists, log successful token
+        if ($this->settings['enable_helloextend_debug'] == 1 && $token) {
+            HelloExtend_Protection_Logger::helloextend_log_debug('Access token created successfully');
+        }
+        // If token does not exist, log error
+        if ($this->settings['enable_helloextend_debug'] == 1 && !$token) {
+            HelloExtend_Protection_Logger::helloextend_log_error('Error:Access token was not created, exiting order creation');
+            return;
         }
 
         $request_args = array(
