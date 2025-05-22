@@ -367,7 +367,7 @@ function helloextend_get_or_create_shipping_protection_product($fee_amount) {
         if (file_exists($image_path)) {
             $upload         = wc_rest_upload_image_from_url($image_url);
             if (is_wp_error($upload)) {
-                HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . HELLOEXTEND_PLUGIN_URL . 'images/Extend_shipping_icon.png : ' . $upload->get_error_message());
+                HelloExtend_Protection_Logger::helloextend_log_error('Could not upload extend logo from ' . $image_url . $upload->get_error_message());
                 return false;
             }
 
@@ -380,7 +380,7 @@ function helloextend_get_or_create_shipping_protection_product($fee_amount) {
             //set the product image
             set_post_thumbnail($product_id, $product_img_id);
         } else {
-            HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . HELLOEXTEND_PLUGIN_DIR.'images/Extend_shipping_icon.png');
+            HelloExtend_Protection_Logger::helloextend_log_error('Extend_icon file path incorrect: ' . $image_path);
         }
 
         return $product_id;
