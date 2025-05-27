@@ -192,6 +192,9 @@ class HelloExtend_Protection_Global
             $settings['enable_helloextend_sp'] = array_key_exists('enable_helloextend_sp', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['enable_helloextend_sp'] : 0;
 
+            $settings['helloextend_sp_add_sku'] = array_key_exists('helloextend_sp_add_sku', $helloextend_protection_shipping_protection_settings)
+                ? $helloextend_protection_shipping_protection_settings['helloextend_sp_add_sku'] : 0;
+
             $settings['helloextend_sp_offer_location'] = array_key_exists('helloextend_sp_offer_location', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['helloextend_sp_offer_location']
                 : 'woocommerce_review_order_after_shipping';
@@ -490,19 +493,20 @@ class HelloExtend_Protection_Global
     public static function helloextend_get_first_valid_category($categories): string {
         $ignored_categories = (array) get_option('helloextend_protection_for_woocommerce_ignored_categories');
 
-        // If ignored categories doesn't exist or is empty, return first category
-        if (is_null($ignored_categories) || count($ignored_categories) == 0) {
-            return $categories[0]->name;
+        if (empty($categories) || !is_array($categories)) {
+            return 'Uncategorized'; // or any safe fallback
         }
 
-        // Find the first category that is not ignored and return it
+        if (is_null($ignored_categories) || count($ignored_categories) == 0) {
+            return $categories[0]->name ?? 'Uncategorized';
+        }
+
         foreach ($categories as $category) {
             if (!in_array($category->term_id, $ignored_categories)) {
-                return $category->name;
+                return $category->name ?? 'Uncategorized';
             }
         }
 
-        // If all categories are ignored, return the first one in the array
-        return $categories[0]->name;
+        return $categories[0]->name ?? 'Uncategorized';
     }
 }

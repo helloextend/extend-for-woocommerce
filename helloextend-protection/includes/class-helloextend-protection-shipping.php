@@ -75,7 +75,7 @@ class HelloExtend_Protection_Shipping
 
     /**
      * This method adds to xml export an SKU tag in order to identify
-     * Route Protection to ShipStation integration
+     * Extend Protection to ShipStation integration
      *
      * @param  $order_xml
      * @return mixed
@@ -107,6 +107,7 @@ class HelloExtend_Protection_Shipping
 
         // add offer element
         $enable_helloextend_sp          = $this->settings['enable_helloextend_sp'];
+        $helloextend_sp_add_sku        = $this->settings['helloextend_sp_add_sku'];
         $env                       = $this->settings['helloextend_environment'];
         $cart_items                = WC()->cart->get_cart();
         $ajax_url                  = admin_url('admin-ajax.php');
@@ -140,7 +141,7 @@ class HelloExtend_Protection_Shipping
             wp_localize_script(
                 'helloextend_shipping_integration_script',
                 'ExtendShippingIntegration',
-                compact('env', 'items', 'enable_helloextend_sp', 'ajax_url', 'update_order_review_nonce')
+                compact('env', 'items', 'enable_helloextend_sp', 'helloextend_sp_add_sku', 'ajax_url', 'update_order_review_nonce')
             );
             echo '<tr><td colspan="2"><div id="helloextend-shipping-offer" style="height: 120px;"></div></td></tr>';
         } else {
