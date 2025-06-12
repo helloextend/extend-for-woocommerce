@@ -368,39 +368,45 @@ class HelloExtend_Protection_Orders
 			$error_message = $response->get_error_message();
 			HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request failed: ' . $error_message.', cannot cancel extend order');
 		} else {
-			$response_code = wp_remote_retrieve_response_code( $response ); //200 is good
-			if ($response_code==200){
+			$response_code = wp_remote_retrieve_response_code( $response );
+			if ( $response_code >= 200 && $response_code < 300 ) {
 				// if GET was successful retrieve the response and find order uuid
-				$data = json_decode( wp_remote_retrieve_body( $response ) );
-				$extend_order_uuid = null;
+				$data               = json_decode( wp_remote_retrieve_body( $response ) );
+				$extend_order_uuid  = null;
 				if ( isset( $data->orders ) && is_array( $data->orders ) && ! empty( $data->orders[0]->id ) ) {
 					$extend_order_uuid = $data->orders[0]->id;
 				}
 				if ( $extend_order_uuid ) {
-					//HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelling extend order: ' . $extend_order_uuid);
-
-						//POST cancel the order (uuid)
-						//{{API_HOST}}/orders/{{orderId}}/cancel
-						$cancel_request_args = array(
-							'method'  => 'POST',
-							'headers' => array(
-								'Content-Type'          => 'application/json',
-								'Accept'                => 'application/json; version=latest',
-								'X-Extend-Access-Token' => $token,
-							),
+					//POST cancel the order (uuid)
+					//{{API_HOST}}/orders/{{orderId}}/cancel
+					$cancel_request_args = array(
+						'method'  => 'POST',
+						'headers' => array(
+							'Content-Type'          => 'application/json',
+							'Accept'                => 'application/json; version=latest',
+							'X-Extend-Access-Token' => $token,
+						),
+					);
+					$cancel_response      = wp_remote_request(
+						$this->settings['api_host'] . '/orders/' . $extend_order_uuid . '/cancel',
+						$cancel_request_args
+					);
+					$cancel_response_code = wp_remote_retrieve_response_code( $cancel_response );
+					if ( $cancel_response_code >= 200 && $cancel_response_code < 300 ) {
+						HelloExtend_Protection_Logger::helloextend_log_notice(
+							'Order ID ' . $order->get_id() . ' : Cancelled Extend order UUID: ' . $extend_order_uuid
 						);
-						$cancel_response = wp_remote_request($this->settings['api_host'] . '/orders/'.$extend_order_uuid.'/cancel', $cancel_request_args);
-						$cancel_response_code = wp_remote_retrieve_response_code( $cancel_response ); //200 is good
-						if ($cancel_response_code==200){
-							HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelled extend order UUID :'.$extend_order_uuid);
-						}else{
-							HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Could not cancel extend order');
-						}
+					} else {
+						HelloExtend_Protection_Logger::helloextend_log_error(
+							'Order ID ' . $order->get_id() . ' : Could not cancel Extend order (status ' .
+							$cancel_response_code . ')'
+						);
 					}
 				}
-			}else{
-				HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request return code:'.$response_code);
+			} else {
+				HelloExtend_Protection_Logger::helloextend_log_error(
+					'Order ID ' . $order->get_id() . ' : GET request returned status ' . $response_code
+				);
 			}
-		}
 	}
 }
