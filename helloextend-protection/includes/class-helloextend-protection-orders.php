@@ -371,11 +371,13 @@ class HelloExtend_Protection_Orders
 			$response_code = wp_remote_retrieve_response_code( $response ); //200 is good
 			if ($response_code==200){
 				// if GET was successful retrieve the response and find order uuid
-				$data      = json_decode(wp_remote_retrieve_body($response));
-				if ($data){
-					$extend_order_uuid = $data->orders[0]->id ?: null ;
-					if($extend_order_uuid){
-						//HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelling extend order: '.$extend_order_uuid);
+				$data = json_decode( wp_remote_retrieve_body( $response ) );
+				$extend_order_uuid = null;
+				if ( isset( $data->orders ) && is_array( $data->orders ) && ! empty( $data->orders[0]->id ) ) {
+					$extend_order_uuid = $data->orders[0]->id;
+				}
+				if ( $extend_order_uuid ) {
+					//HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelling extend order: ' . $extend_order_uuid);
 
 						//POST cancel the order (uuid)
 						//{{API_HOST}}/orders/{{orderId}}/cancel
