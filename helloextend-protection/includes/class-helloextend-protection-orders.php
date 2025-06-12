@@ -359,10 +359,10 @@ class HelloExtend_Protection_Orders
 			),
 		);
 
-		$endpoint = add_query_arg(
-			array( 'transactionId' => rawurlencode( (string) $order->get_id() ) ),
-			$this->settings['api_host'] . '/orders/search'
-		);
+        $endpoint = add_query_arg(
+            array( 'transactionId' => (string) $order->get_id() ),
+            $this->settings['api_host'] . '/orders/search'
+        );
 		$response = wp_remote_request( $endpoint, $request_args );
 		if (is_wp_error($response)) {
 			$error_message = $response->get_error_message();
