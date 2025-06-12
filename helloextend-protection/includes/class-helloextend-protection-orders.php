@@ -328,12 +328,13 @@ class HelloExtend_Protection_Orders
 	 * @param string $order_id The ID of the order.
 	 * @since 1.0.0
 	 */
-	public function cancel_order(string $order_id, array $order = null)
+	// Accept a WC_Order object or null.
+	// Using `mixed` keeps compatibility with PHP <8 (no union types).
+	public function cancel_order(string $order_id, $order = null) /* @param WC_Order|null $order */
 	{
 		if ($order === null) {
 			$order = wc_get_order($order_id);
 		}
-
 		// Get Token from Global function
 		$token = HelloExtend_Protection_Global::helloextend_get_token();
 
