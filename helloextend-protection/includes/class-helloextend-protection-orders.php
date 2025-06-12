@@ -72,6 +72,9 @@ class HelloExtend_Protection_Orders
 
         // Hook the callback function to the order completed action
         add_action('woocommerce_order_status_completed', [$this, 'create_update_order'], 10, 1);
+
+	    // Hook the callback function to the order cancelled action
+	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
     }
 
     /**
@@ -318,4 +321,79 @@ class HelloExtend_Protection_Orders
             WC()->session->set('shipping_quote_id', null);
         }
     }
+
+	/**
+	 * Cancel Orders/Contracts in Extend
+	 *
+	 * @param string $order_id The ID of the order.
+	 * @since 1.0.0
+	 */
+	public function cancel_order(string $order_id, array $order = null)
+	{
+		if ($order === null) {
+			$order = wc_get_order($order_id);
+		}
+
+		// Get Token from Global function
+		$token = HelloExtend_Protection_Global::helloextend_get_token();
+
+		// If token exists, log successful token
+		if ($this->settings['enable_helloextend_debug'] == 1 && $token) {
+			HelloExtend_Protection_Logger::helloextend_log_debug('Access token created successfully');
+		}
+		// If token does not exist, log error
+		if ($this->settings['enable_helloextend_debug'] == 1 && !$token) {
+			HelloExtend_Protection_Logger::helloextend_log_error('Error:Access token was not created, exiting order cancel');
+			return;
+		}
+
+		// GET the order uuid
+		// {{API_HOST}}/orders/search?transactionId={{transactionId}}
+		$request_args = array(
+			'method'  => 'GET',
+			'headers' => array(
+				'Content-Type'          => 'application/json',
+				'Accept'                => 'application/json; version=latest',
+				'X-Extend-Access-Token' => $token,
+			),
+		);
+
+        $response = wp_remote_request($this->settings['api_host'] . '/orders/search?transactionId='.$order->get_id(), $request_args);
+		if (is_wp_error($response)) {
+			$error_message = $response->get_error_message();
+			HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request failed: ' . $error_message.', cannot cancel extend order');
+		} else {
+			$response_code = wp_remote_retrieve_response_code( $response ); //200 is good
+			if ($response_code==200){
+				// if GET was successful retrieve the response and find order uuid
+				$data      = json_decode(wp_remote_retrieve_body($response));
+				if ($data){
+					$extend_order_uuid = $data->orders[0]->id ?: null ;
+					if($extend_order_uuid){
+						//HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelling extend order: '.$extend_order_uuid);
+
+						//POST cancel the order (uuid)
+						//{{API_HOST}}/orders/{{orderId}}/cancel
+						$cancel_request_args = array(
+							'method'  => 'POST',
+							'headers' => array(
+								'Content-Type'          => 'application/json',
+								'Accept'                => 'application/json; version=latest',
+								'X-Extend-Access-Token' => $token,
+							),
+						);
+						$cancel_response = wp_remote_request($this->settings['api_host'] . '/orders/'.$extend_order_uuid.'/cancel', $cancel_request_args);
+						$cancel_response_code = wp_remote_retrieve_response_code( $cancel_response ); //200 is good
+						if ($cancel_response_code==200){
+							HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Cancelled extend order UUID :'.$extend_order_uuid);
+						}else{
+							HelloExtend_Protection_Logger::helloextend_log_error('Order  ID ' . $order->get_id() . ' : Could not cancel extend order');
+						}
+					}
+				}
+			}else{
+				HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request return code:'.$response_code);
+			}
+		}
+	}
 }
