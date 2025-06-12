@@ -332,9 +332,15 @@ class HelloExtend_Protection_Orders
 	// Using `mixed` keeps compatibility with PHP <8 (no union types).
 	public function cancel_order(string $order_id, $order = null) /* @param WC_Order|null $order */
 	{
-		if ($order === null) {
-			$order = wc_get_order($order_id);
-		}
+        $order = wc_get_order($order_id);
+
+        if ( ! $order instanceof WC_Order ) {
+                HelloExtend_Protection_Logger::helloextend_log_error(
+                    'Cannot cancel Extend order – WooCommerce order ' . $order_id . ' not found.'
+                );
+                return;
+            }
+
 		// Get Token from Global function
 		$token = HelloExtend_Protection_Global::helloextend_get_token();
 
