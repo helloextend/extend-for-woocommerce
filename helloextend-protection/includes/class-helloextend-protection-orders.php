@@ -359,7 +359,11 @@ class HelloExtend_Protection_Orders
 			),
 		);
 
-        $response = wp_remote_request($this->settings['api_host'] . '/orders/search?transactionId='.$order->get_id(), $request_args);
+		$endpoint = add_query_arg(
+			array( 'transactionId' => rawurlencode( (string) $order->get_id() ) ),
+			$this->settings['api_host'] . '/orders/search'
+		);
+		$response = wp_remote_request( $endpoint, $request_args );
 		if (is_wp_error($response)) {
 			$error_message = $response->get_error_message();
 			HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request failed: ' . $error_message.', cannot cancel extend order');
