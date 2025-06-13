@@ -72,6 +72,9 @@ class HelloExtend_Protection_Orders
 
         // Hook the callback function to the order completed action
         add_action('woocommerce_order_status_completed', [$this, 'create_update_order'], 10, 1);
+
+	    // Hook the callback function to the order cancelled action
+	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
     }
 
     /**
@@ -316,6 +319,105 @@ class HelloExtend_Protection_Orders
             WC()->session->set('shipping_fee', false);
             WC()->session->set('shipping_fee_value', null);
             WC()->session->set('shipping_quote_id', null);
+        }
+    }
+
+	/**
+	 * Cancel Orders/Contracts in Extend
+	 *
+	 * @param string $order_id The ID of the order.
+	 * @since 1.0.0
+	 */
+	// Accept a WC_Order object or null.
+	// Using `mixed` keeps compatibility with PHP <8 (no union types).
+	public function cancel_order(string $order_id, $order = null) /* @param WC_Order|null $order */
+	{
+        $order = wc_get_order($order_id);
+
+        if ( ! $order instanceof WC_Order ) {
+                HelloExtend_Protection_Logger::helloextend_log_error(
+                    'Cannot cancel Extend order – WooCommerce order ' . $order_id . ' not found.'
+                );
+                return;
+            }
+
+		// Get Token from Global function
+		$token = HelloExtend_Protection_Global::helloextend_get_token();
+
+		// If token exists, log successful token
+		if ($this->settings['enable_helloextend_debug'] == 1 && $token) {
+			HelloExtend_Protection_Logger::helloextend_log_debug('Access token created successfully');
+		}
+		// If token does not exist, log error
+		if ($this->settings['enable_helloextend_debug'] == 1 && !$token) {
+			HelloExtend_Protection_Logger::helloextend_log_error('Error:Access token was not created, exiting order cancel');
+			return;
+		}
+
+		// GET the order uuid
+		// {{API_HOST}}/orders/search?transactionId={{transactionId}}
+		$request_args = array(
+			'method'  => 'GET',
+			'headers' => array(
+				'Content-Type'          => 'application/json',
+				'Accept'                => 'application/json; version=latest',
+				'X-Extend-Access-Token' => $token,
+			),
+		);
+
+        $endpoint = add_query_arg(
+            array( 'transactionId' => (string) $order->get_id() ),
+            $this->settings['api_host'] . '/orders/search'
+        );
+		$response = wp_remote_request( $endpoint, $request_args );
+		if (is_wp_error($response)) {
+			$error_message = $response->get_error_message();
+			HelloExtend_Protection_Logger::helloextend_log_error(' Order ID ' . $order->get_id() . ' : GET request failed: ' . $error_message.', cannot cancel extend order');
+		} else {
+			$response_code = wp_remote_retrieve_response_code( $response );
+			if ( $response_code >= 200 && $response_code < 300 ) {
+				// if GET was successful retrieve the response and find order uuid
+				$data               = json_decode( wp_remote_retrieve_body( $response ) );
+				$extend_order_uuid  = null;
+				if ( isset( $data->orders ) && is_array( $data->orders ) && ! empty( $data->orders[0]->id ) ) {
+					$extend_order_uuid = $data->orders[0]->id;
+				}
+				if ( $extend_order_uuid ) {
+					//POST cancel the order (uuid)
+					//{{API_HOST}}/orders/{{orderId}}/cancel
+					$cancel_request_args = array(
+						'method'  => 'POST',
+						'headers' => array(
+							'Content-Type'          => 'application/json',
+							'Accept'                => 'application/json; version=latest',
+							'X-Extend-Access-Token' => $token,
+						),
+					);
+					$cancel_response      = wp_remote_request(
+						$this->settings['api_host'] . '/orders/' . $extend_order_uuid . '/cancel',
+						$cancel_request_args
+					);
+					$cancel_response_code = wp_remote_retrieve_response_code( $cancel_response );
+					if ( $cancel_response_code >= 200 && $cancel_response_code < 300 ) {
+						HelloExtend_Protection_Logger::helloextend_log_notice(
+							'Order ID ' . $order->get_id() . ' : Cancelled Extend order UUID: ' . $extend_order_uuid
+						);
+					} else {
+						HelloExtend_Protection_Logger::helloextend_log_error(
+							'Order ID ' . $order->get_id() . ' : Could not cancel Extend order (status ' .
+							$cancel_response_code . ')'
+						);
+					}
+				}else{
+                    return;
+                }
+
+			} else {
+				HelloExtend_Protection_Logger::helloextend_log_error(
+					'Order ID ' . $order->get_id() . ' : GET request returned status ' . $response_code
+				);
+                return;
+            }
         }
     }
 }

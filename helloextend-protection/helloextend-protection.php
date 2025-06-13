@@ -561,17 +561,25 @@ function helloextend_add_protection_contract($item_id, $item)
         // Get product object
         if (method_exists($item, 'get_product')) {
             $product = $item->get_product();
+            if ( $product && $product instanceof WC_Product ) {
+                // Check if the product SKU matches product protection
+                if ($product->get_sku() === HELLOEXTEND_PRODUCT_PROTECTION_SKU) {
+                  echo '<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>';
 
-            // Check if the product SKU matches product protection
-            if ($product->get_sku() === 'helloextend-product-protection') {
-                echo '<table cellspacing="0" class="display_meta"><tbody><tr><th>Extend Product Protection contracts : </th><th></th></tr>';
-
-                foreach ($contracts as $product_covered => $contract_id) {
-                    if ($helloextend_meta_data['covered_product_id'] == $product_covered) {
-                        echo '<tr><td><a href="' . esc_url($url . '?contractId=' . $contract_id . '&accessToken=' . $token) . '">' . esc_html($contract_id) . '</a></td></tr>';
+                    foreach ($contracts as $product_covered => $contract_id) {
+                        if ( isset( $helloextend_meta_data['covered_product_id'] ) && $helloextend_meta_data['covered_product_id'] == $product_covered ) {
+                            $link = add_query_arg(
+                                array(
+                                    'contractId'  => rawurlencode( $contract_id ),
+                                    'accessToken' => rawurlencode( $token ),
+                                    ),
+                                $url
+                                );
+                            echo '<tr><td><a href="' . esc_url( $link ) . '">' . esc_html( $contract_id ) . '</a></td></tr>';
+                        }
                     }
+                    echo '</tbody></table>';
                 }
-                echo '</tbody></table>';
             }
         }
     }
