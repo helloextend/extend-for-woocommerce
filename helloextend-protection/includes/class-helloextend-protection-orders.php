@@ -408,11 +408,16 @@ class HelloExtend_Protection_Orders
 							$cancel_response_code . ')'
 						);
 					}
-				}
+				}else{
+                    return;
+                }
+
 			} else {
 				HelloExtend_Protection_Logger::helloextend_log_error(
 					'Order ID ' . $order->get_id() . ' : GET request returned status ' . $response_code
 				);
-			}
-	}
+                return;
+            }
+        }
+    }
 }
