@@ -40,7 +40,8 @@
                     }
                 };
                 
-                ExtendWooCommerce.extendAjaxLog('notice', 'SimpleOffer add to cart with data: ', JSON.stringify(data));
+                if (ExtendWooCommerce.debugLogEnabled)
+                    ExtendWooCommerce.extendAjaxLog('debug', 'SimpleOffer add to cart with data: ', JSON.stringify(data));
                 
                 // Add the plan to the cart.
                 ExtendWooCommerce.addPlanToCart(data).then(() => {
@@ -77,9 +78,9 @@
                 const category = $offer.data('category');
                 const quantity = $lineItemElement.find(SELECTORS.QUANTITY).val();
                 
-                const [ dollars, cents ] = $lineItemElement.find(SELECTORS.PRICE).text().trim().replace(/[$,]/g, '').split('.');
-                while (cents.length < 2) cents += '0';
-                const price = `${dollars}${cents}`;
+                const [ dollars, cents = '00' ] = $lineItemElement.find(SELECTORS.PRICE).text().trim().replace(/[$,]/g, '').split('.');
+                const normalizedCents = cents.padEnd(2, '0');
+                const price = `${dollars}${normalizedCents}`;
                 
                 renderExtendOffer($offer[0], { referenceId, category, price }, quantity);
             }
