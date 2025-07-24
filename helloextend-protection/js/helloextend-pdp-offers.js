@@ -29,7 +29,8 @@
         function handleAddToCartLogic(variation_id)  {
 
             $atcButton.on('click', function extendHandler(e) {
-                e.preventDefault()
+                e.preventDefault();
+                e.stopImmediatePropagation();
 
                 let isDisabled = $atcButton.hasClass("disabled");
 
@@ -55,7 +56,6 @@
                         price: (plan.price / 100).toFixed(2)
                     }
                     ExtendWooCommerce.addPlanToCart(data)
-
                         .then(() => {
                             triggerAddToCart();
                         })

@@ -1,136 +1,98 @@
 // This script is used to handle the rendering and functionality of Extend offers in a WooCommerce cart.
-
-// Wait until the document is fully loaded before running the script.
-jQuery(document).ready(function() {
-    // Check if necessary objects (ExtendWooCommerce and ExtendCartIntegration) exist.
-    // If not, stop the execution of the script.
-    if(!ExtendWooCommerce || !ExtendCartIntegration) {
-        return;
-    }
-
-    // For each cart item:
-    jQuery('.cart_item').each(function(ix, val){
-        // Find the title and image of the product.
-        var title = jQuery(val).find('.product-name');
-        var image = jQuery(val).find('.product-thumbnail')
-
-        // If the title includes 'Extend Protection Plan', disable pointer events for the image.
-        // This could be used to prevent clicking on the image.
-        if(title.text().indexOf('Extend Protection Plan') > -1){
-            image.css('pointer-events', 'none')
-        }
-    })
-
-    // For each Extend offer in the cart:
-    document.querySelectorAll('.cart-extend-offer').forEach(function(val, ix){
-        // Get the reference ID and quantity of the covered item
-        let ref_id =  val.dataset.covered;
-        let category = val.dataset.category;
-        let qty = jQuery(val).parents('.cart_item').find('input.qty').val();
-        let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,]/g, '');
-        let extendPrice = Math.round(parseFloat(price).toFixed(2) * 100);
-
-        // If the warranty is already in the cart or if Extend offers are disabled, stop processing this item.
-        if(ExtendWooCommerce.warrantyAlreadyInCart(ref_id, window.ExtendCartIntegration.cart) || ExtendCartIntegration.helloextend_enable_cart_offers !== '1'){
-            return;
-        }
-
-        Extend.buttons.renderSimpleOffer(val, {
-            referenceId: ref_id,
-            price: extendPrice,
-            category: category,
-            onAddToCart: function({ plan, product }) {
-
-                // On adding to the cart, if both plan and product exist:
-                if (plan && product) {
-                    // ExtendWooCommerce.extendAjaxLog('1 - OnAddToCart simple offer call with :', 'notice')
-                    ExtendWooCommerce.extendAjaxLog(plan, 'notice');
-                    ExtendWooCommerce.extendAjaxLog(product.toString(), 'notice');
-
-                    // Create a copy of the plan, adding the reference ID of the covered product.
-                    var planCopy = { ...plan, covered_product_id: ref_id }
-
-                    var data = {
-                        quantity: qty,
-                        plan: planCopy
-                    };
-
-                    // Add the plan to the cart.
-                    ExtendWooCommerce.addPlanToCart(data)
-                        .then(() => {
-                            // After adding the plan, enable the 'Update cart' button and trigger a click on it.
-                            jQuery("[name='update_cart']").removeAttr('disabled');
-                            jQuery("[name='update_cart']").trigger("click");
-                        })
-                } else {
-                    ExtendWooCommerce.extendAjaxLog('onAddToCart failed: plan or product missing', 'error');
-                }
-            },
-        });
-    })
-});
-
-// When the cart totals are updated, re-render the Extend offers.
-jQuery(document.body).on('updated_cart_totals', function () {
+(($) => {
 
     // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
     if (!ExtendWooCommerce || !ExtendCartIntegration) {
         return;
     }
 
-    // Iterate over each element with class 'cart-extend-offer'
-    jQuery('.cart-extend-offer').each(function (ix, val) {
-        let ref_id = jQuery(val).data('covered'); // Get the 'covered' data attribute value
-        let category = val.dataset.category; // Get the 'category' data attribute value
-        let qty = jQuery(val).parents('.cart_item').find('input.qty').val(); // Get the quantity value from the corresponding input field
-        let price = jQuery(val).parents('.cart_item').find('.product-price').text().trim().replace(/[$,\.]/g, '')
-        let extendPrice = parseFloat(price)
-
-        // Check if an Extend button instance exists for the current element
-        if (Extend.buttons.instance('#' + val.id)) {
-            Extend.buttons.instance('#' + val.id).destroy(); // Destroy the existing Extend button instance
-        }
-
-        // Retrieve the cart data from ExtendWooCommerce
-        ExtendWooCommerce.getCart()
-            .then(cart => {
-
-                // Check if the warranty is already in the cart or if Extend cart offers are disabled
-                if (ExtendWooCommerce.warrantyAlreadyInCart(ref_id, cart) || ExtendCartIntegration.helloextend_cart_offers_enabled === 'no') {
-                    return; // Skip further processing
+    const SELECTORS = {
+        CART_ITEM: '.cart_item',
+        TITLE: '.product-name',
+        IMAGE: '.product-thumbnail',
+        PRICE: '.product-price',
+        QUANTITY: 'input.qty',
+        EXTEND_OFFER: '.cart-extend-offer',
+        UPDATE_CART: "[name='update_cart']"
+    }
+    
+    /**
+     * Renders the cart offer for a given offer container element and params
+     * @param {HTMLElement} element Offer container element
+     * @param {object} params Offer params: referenceId, price, category
+     * @param {number} quantity Quantity of warranties to be added
+     */
+    function renderExtendOffer(element, params, quantity) {
+        
+        Extend.buttons.renderSimpleOffer(element, {
+            ...params,
+            onAddToCart: ({plan, product}) => {
+                if (!plan || !product) {
+                    ExtendWooCommerce.extendAjaxLog('error', 'SimpleOffer onAddToCart failed: plan or product missing');
+                    return;
                 }
-
-                /** initialize offer */
-
-                // Render a simple offer using Extend.buttons.renderSimpleOffer()
-                Extend.buttons.renderSimpleOffer(val, {
-                    referenceId: ref_id,
-                    price: extendPrice,
-                    category: category,
-                    onAddToCart: function ({ plan, product }) {
-
-                        if (plan && product) {
-                            ExtendWooCommerce.extendAjaxLog('2 - OnAddToCart simple offer call with :', 'notice')
-                            ExtendWooCommerce.extendAjaxLog(plan.toString(), 'notice');
-                            ExtendWooCommerce.extendAjaxLog(product.toString(), 'notice');
-
-                            var planCopy = { ...plan, covered_product_id: ref_id }; // Create a copy of the plan object with the 'covered_product_id' property set to ref_id
-
-                            var data = {
-                                quantity: qty,
-                                plan: planCopy
-                            };
-
-                            // Add the plan to the cart using ExtendWooCommerce.addPlanToCart()
-                            ExtendWooCommerce.addPlanToCart(data)
-                                .then(() => {
-                                    // Enable the 'update_cart' button and trigger a click event
-                                    jQuery("[name='update_cart']").removeAttr('disabled');
-                                    jQuery("[name='update_cart']").trigger("click");
-                                });
-                        }
-                    },
+                
+                const data = {
+                    quantity,
+                    plan: {
+                        ...plan,
+                        covered_product_id: product.id
+                    }
+                };
+                
+                if (ExtendWooCommerce.debugLogEnabled)
+                    ExtendWooCommerce.extendAjaxLog('debug', 'SimpleOffer add to cart with data: ', JSON.stringify(data));
+                
+                // Add the plan to the cart.
+                ExtendWooCommerce.addPlanToCart(data).then(() => {
+                    // After adding the plan, enable the 'Update cart' button and trigger a click on it.
+                    $(SELECTORS.UPDATE_CART).removeAttr('disabled');
+                    $(SELECTORS.UPDATE_CART).trigger("click");
                 });
-            });
+            }
+        }); 
+    }
+    
+    /**
+     * Initializes cart offers
+     * @param {Object} cart Cart object
+     */
+    function initCartOffers(cart) {
+        $(SELECTORS.CART_ITEM).each((index, lineItemElement) => {
+            const $lineItemElement = $(lineItemElement);
+            const $title = $lineItemElement.find(SELECTORS.TITLE);
+            const $image = $lineItemElement.find(SELECTORS.IMAGE);
+            
+            if ($title.text().toLowerCase().includes('extend protection plan')) {
+                $image.css('pointer-events', 'none');
+            } else {
+                const $offer = $lineItemElement.find(SELECTORS.EXTEND_OFFER);
+                
+                const referenceId = $offer.data('covered');
+                
+                if (ExtendWooCommerce.warrantyAlreadyInCart(referenceId, cart ? cart : window.ExtendCartIntegration.cart)
+                    || ExtendCartIntegration.helloextend_enable_cart_offers !== '1') {
+                    return;
+                }
+                
+                const category = $offer.data('category');
+                const quantity = $lineItemElement.find(SELECTORS.QUANTITY).val();
+                
+                const [ dollars, cents = '00' ] = $lineItemElement.find(SELECTORS.PRICE).text().trim().replace(/[$,]/g, '').split('.');
+                const normalizedCents = cents.padEnd(2, '0');
+                const price = `${dollars}${normalizedCents}`;
+                
+                renderExtendOffer($offer[0], { referenceId, category, price }, quantity);
+            }
+        });
+    }
+    
+    // Wait until the document is fully loaded before running the script.
+    $(document).ready(initCartOffers);
+    
+    // When the cart totals are updated, re-render the Extend offers.
+    $(document.body).on('updated_cart_totals', function () {
+        ExtendWooCommerce.getCart().then(initCartOffers);
     });
-});
+
+})(jQuery);

@@ -5,7 +5,7 @@
             if(!ExtendWooCommerce) { return;
             }
 
-            const { store_id: storeId, ajaxurl, environment  } = ExtendWooCommerce;
+            const { store_id: storeId, ajaxurl, environment, debug_log_enabled: debugLogEnabled } = ExtendWooCommerce;
 
             Extend.config(
                 {
@@ -19,7 +19,8 @@
                 addPlanToCart,
                 getCart,
                 warrantyAlreadyInCart,
-                extendAjaxLog
+                extendAjaxLog,
+                debugLogEnabled
             }
 
             async function addPlanToCart(opts)
@@ -69,9 +70,10 @@
                 return extendWarranties.length > 0;
             }
 
-            function extendAjaxLog(message , method)
+            function extendAjaxLog(method, ...message)
             {
 
+                message = message.join(' ');
                 /* Now use an ajax call to write logs from js files... */
                 $.ajax(
                     {

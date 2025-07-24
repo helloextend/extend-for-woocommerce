@@ -560,6 +560,20 @@ class HelloExtend_Protection_Logger
         $update              = update_option('helloextend_logger_new_logs', $new_logs);
 
     }
+
+    public static function helloextend_logger_ajax_call()
+    {
+        $method = isset($_POST['method']) ? wp_unslash(sanitize_text_field($_POST['method'])) : null;
+        $message = isset($_POST['message']) ? wp_unslash(sanitize_text_field($_POST['message'])) : null;
+
+        if ( $method == 'notice' ) {
+            self::helloextend_log_notice($message);
+        } else if ( $method == 'error' ) {
+            self::helloextend_log_error( $message );
+        } else if ( $method == 'debug' ) {
+            self::helloextend_log_debug( $message );
+        }
+    }
 }
 
 $helloextendProtectionLogger = new HelloExtend_Protection_Logger();
@@ -576,3 +590,5 @@ add_action('wp_ajax_helloextend_logger_ab_toggle', array( $helloextendProtection
 add_action('wp_ajax_nopriv_helloextend_logger_delete_single', array( $helloextendProtectionLogger, 'helloextend_logger_delete_single' ));
 add_action('wp_ajax_helloextend_logger_delete_single', array( $helloextendProtectionLogger, 'helloextend_logger_delete_single' ));
 
+add_action('wp_ajax_nopriv_helloextend_logger_ajax_call', array( $helloextendProtectionLogger, 'helloextend_logger_ajax_call' ), 10);
+add_action('wp_ajax_helloextend_logger_ajax_call', array( $helloextendProtectionLogger, 'helloextend_logger_ajax_call' ), 10);
