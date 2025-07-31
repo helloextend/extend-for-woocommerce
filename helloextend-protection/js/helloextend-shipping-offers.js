@@ -9,7 +9,7 @@
             function initShippingOffers()
             {
                 // Deconstructs ExtendProductIntegration variables
-                const { env, items, enable_helloextend_sp, ajax_url, update_order_review_nonce } = ExtendShippingIntegration;
+                const { env, items, enable_helloextend_sp, ajax_url, update_order_review_nonce, helloextend_sp_add_sku } = ExtendShippingIntegration;
                 let items_array = eval(items);
 
                 // If Extend shipping protection offers are not enabled, hide Extend offer div
@@ -44,6 +44,13 @@
                                         },
                                         success: function () {
                                             $('body').trigger('update_checkout');
+
+                                            // Need to trigger again for SP line item settings to get correct total
+                                            if (helloextend_sp_add_sku) {
+                                                setTimeout(() => {
+                                                    $('body').trigger('update_checkout');
+                                                }, 50);
+                                            }
                                         }
                                     }
                                 );
@@ -59,6 +66,13 @@
                                         },
                                         success: function () {
                                             $('body').trigger('update_checkout');
+
+                                            // Need to trigger again for SP line item settings to get correct total
+                                            if (helloextend_sp_add_sku) {
+                                                setTimeout(() => {
+                                                    $('body').trigger('update_checkout');
+                                                }, 50);
+                                            }
                                         }
                                     }
                                 );
@@ -78,6 +92,13 @@
                                         },
                                         success: function () {
                                             $('body').trigger('update_checkout');
+
+                                            // Need to trigger again for SP line item settings to get correct total
+                                            if (helloextend_sp_add_sku) {
+                                                setTimeout(() => {
+                                                    $('body').trigger('update_checkout');
+                                                }, 50);
+                                            }
                                         }
                                     }
                                 );

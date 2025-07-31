@@ -116,8 +116,7 @@ class HelloExtend_Protection_Global
             $_woo_product = wc_get_product($cart_item['product_id']);
 
             // retrieve id or sku based on settings, and default to id if sku is empty
-            $sku         = $_woo_product->get_sku() <> '' ? $_woo_product->get_sku() : $cart_item['product_id'];
-            $referenceId = $settings['helloextend_use_skus'] ? $sku : $cart_item['product_id'];
+            $referenceId = $cart_item['product_id'];
 
             // add sku to cart item and label it referenceId
             $cart[$cart_item_key]['referenceId']  = $referenceId;

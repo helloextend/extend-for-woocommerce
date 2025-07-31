@@ -192,7 +192,7 @@ class HelloExtend_Protection_Cart_Offer
         if (! isset($cart_item['extendData']) ) {
             $item_id     = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
             $item_sku    = $cart_item['data']->get_sku() ? $cart_item['data']->get_sku() : $item_id;
-            $referenceId = $this->settings['helloextend_use_skus'] ? $item_sku : $item_id;
+            $referenceId = $item_id;
             $categories  = get_the_terms($item_id, 'product_cat');
             $category    = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
 

@@ -88,7 +88,9 @@
     }
     
     // Wait until the document is fully loaded before running the script.
-    $(document).ready(initCartOffers);
+    $(document).ready(() => {
+        initCartOffers();
+    });
     
     // When the cart totals are updated, re-render the Extend offers.
     $(document.body).on('updated_cart_totals', function () {

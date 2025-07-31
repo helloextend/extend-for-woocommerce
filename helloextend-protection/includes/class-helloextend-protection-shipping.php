@@ -117,7 +117,7 @@ class HelloExtend_Protection_Shipping
         foreach ( $cart_items as $cart_item_key => $cart_item ) {
             $product = $cart_item['data'];
             if (! $product->is_virtual() ) {
-                $referenceId = ( $this->settings['helloextend_use_skus'] == 1 ) ? $product->get_sku() : $product->get_id();
+                $referenceId = $product->get_id();
                 $items[]     = array(
                  'referenceId'   => $referenceId,
                  'quantity'      => $cart_item['quantity'],

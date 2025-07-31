@@ -563,8 +563,8 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_logger_ajax_call()
     {
-        $method = isset($_POST['method']) ? wp_unslash(sanitize_text_field($_POST['method'])) : null;
-        $message = isset($_POST['message']) ? wp_unslash(sanitize_text_field($_POST['message'])) : null;
+        $method = isset($_POST['method']) ? sanitize_text_field(wp_unslash($_POST['method'])) : null;
+        $message = isset($_POST['message']) ? sanitize_text_field(wp_unslash($_POST['message'])) : null;
 
         if ( $method == 'notice' ) {
             self::helloextend_log_notice($message);
