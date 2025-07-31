@@ -87,7 +87,6 @@ class HelloExtend_Protection_PDP_Offer
         global $product;
 
         // Variables that are passed to the PDP JS Script
-        $helloextend_use_skus             = $this->settings['helloextend_use_skus'];
         $id                          = $product->get_id();
         $sku                         = $product->get_sku();
         
@@ -108,7 +107,7 @@ class HelloExtend_Protection_PDP_Offer
             wp_localize_script(
                 'helloextend_product_integration_script',
                 'ExtendProductIntegration',
-                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'helloextend_use_skus', 'atc_button_selector')
+                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector')
             );
             echo "<div class='helloextend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }

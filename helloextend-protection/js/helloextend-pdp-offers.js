@@ -5,25 +5,19 @@
         if (!ExtendWooCommerce || !ExtendProductIntegration) return;
 
         // Deconstructs ExtendProductIntegration variables
-        const { type: product_type, id: product_id, sku, first_category, price, helloextend_pdp_offers_enabled, helloextend_modal_offers_enabled, helloextend_use_skus, atc_button_selector } = ExtendProductIntegration;
+        const { type: product_type, id: product_id, sku, first_category, price, helloextend_pdp_offers_enabled, helloextend_modal_offers_enabled, atc_button_selector } = ExtendProductIntegration;
 
         const $atcButton = jQuery(atc_button_selector)
 
         const quantity = parseInt(document.querySelector('input[name="quantity"]').value || 1)
 
         let supportedProductType = true;
-        let reference_id = '';
+        let reference_id = product_id;
 
         // If PDP offers are not enabled, hide Extend offer div
         if (helloextend_pdp_offers_enabled === '0') {
             const extendOffer = document.querySelector('.helloextend-offer')
             extendOffer.style.display = 'none';
-        }
-
-        if (helloextend_use_skus == '1') {
-            reference_id = sku;
-        } else {
-            reference_id = product_id;
         }
 
         function handleAddToCartLogic(variation_id)  {
