@@ -207,7 +207,9 @@ class HelloExtend_Protection_Orders
         if ($shipping_protection_quote_id) {
 	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
             if ($this->settings['enable_helloextend_debug'] == 1) {
-                HelloExtend_Protection_Logger::helloextend_log_debug('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
+                HelloExtend_Protection_Logger::helloextend_log_debug(
+                    'Shipping Protection Meta Exists: ' . (string) $shipping_protection_quote_id
+                );
             }
 	        // phpcs:enable
 
