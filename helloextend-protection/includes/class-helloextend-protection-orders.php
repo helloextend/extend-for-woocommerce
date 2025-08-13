@@ -175,6 +175,12 @@ class HelloExtend_Protection_Orders
             $order = wc_get_order($order_id);
         }
         $order_data = $order->get_data();
+        $items = $order->get_items();
+        $product_id_array = array();
+        foreach($items as $item){
+            $product_id_array[] = $item->get_product_id();
+        }
+        $product_id_list = implode(',', $product_id_array);
 
         // if contract creation is set to order create, call helloextend_get_plans_and_products
         $contract_creation_event = $this->settings['helloextend_product_protection_contract_create_event'];
@@ -200,14 +206,60 @@ class HelloExtend_Protection_Orders
         // check if shipping protection meta exists
         if ($shipping_protection_quote_id) {
 	        // phpcs:disable WordPress.PHP.DevelopmentFunctions
-	        HelloExtend_Protection_Logger::helloextend_log_notice('Shipping Protection Meta Exists: ' . print_r($shipping_protection_quote_id, true));
+            if ($this->settings['enable_helloextend_debug'] == 1) {
+                HelloExtend_Protection_Logger::helloextend_log_debug(
+                    'Shipping Protection Meta Exists: ' . (string) $shipping_protection_quote_id
+                );
+            }
 	        // phpcs:enable
 
+            // on order completion send shipmentInfo to activate the contract, otherwise send an empty array to create the contract
+            $shipmentInfo = array();
+            $store_raw_country = get_option('woocommerce_default_country');
+            $split_country = explode(":", $store_raw_country);
+            $store_country = $split_country[0];
+            $store_state = $split_country[1];
+            $called_action_hook = current_filter();
+            if ($called_action_hook == 'woocommerce_order_status_completed') {
+                $arg = array(
+                    'limit'  => -1,
+                    'status' => 'publish',
+                    'return' => 'ids'
+                );
+                $shipmentInfo[] = array(
+                    "shipmentDate" => time(),
+                    "shippingProvider" => "custom",
+                    "trackingId" => "woocommerce-shipping",
+                    "productIds" => $product_id_list,
+                    "destination" => array(
+                        "address1" => $order_data['shipping']['address_1'],
+                        "address2" => $order_data['shipping']['address_2'] ? $order_data['shipping']['address_2'] : null,
+                        "city" => $order_data['shipping']['city'],
+                        "companyName" => '',
+                        "countryCode" => $order_data['shipping']['country'],
+                        "personName" => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
+                        "phone" => '',
+                        "postalCode" => $order_data['shipping']['postcode'],
+                        "provinceCode" => $order_data['shipping']['state']
+                    ),
+                    "source" => array(
+                        "address1" => get_option('woocommerce_store_address'),
+                        "address2" => get_option('woocommerce_store_address_2'),
+                        "city" => get_option('woocommerce_store_city'),
+                        "companyName" => '',
+                        "countryCode" => $store_country,
+                        "personName" => '',
+                        "phone" => get_option('woocommerce_store_phone'),
+                        "postalCode" =>get_option('woocommerce_store_postcode'),
+                        "provinceCode" => $store_state
+                    )
+                );
+            }
             // Push shipping protection line item into helloextend_line_items array
             $helloextend_line_items[] = array(
                 'lineItemTransactionId' => $order_id . '-shipping',
                 'quoteId'               => $shipping_protection_quote_id,
-                'shipmentInfo'          => array(),
+                'shipmentInfo'          => $shipmentInfo,
             );
         } else {
             if ($this->settings['enable_helloextend_debug'] == 1) {
