@@ -232,11 +232,11 @@ class HelloExtend_Protection_Orders
                     "destination" => array(
                         "address1" => $order_data['shipping']['address_1'],
                         "address2" => $order_data['shipping']['address_2'] ? $order_data['shipping']['address_2'] : null,
-                        "city" => $order_data['shipping']['country'],
+                        "city" => $order_data['shipping']['city'],
                         "companyName" => '',
                         "countryCode" => $order_data['shipping']['country'],
                         "personName" => $order_data['shipping']['first_name'] . ' ' . $order_data['shipping']['last_name'],
-                        "phone" => $order_data['shipping']['phone'] ? $order_data['shipping']['phone'] : null,
+                        "phone" => '',
                         "postalCode" => $order_data['shipping']['postcode'],
                         "provinceCode" => $order_data['shipping']['state']
                     ),
