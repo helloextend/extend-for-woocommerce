@@ -46,7 +46,7 @@ function helloextend_logger_load_log_table_scripts()
 
 function helloextend_logger_log_table_scripts()
 {
-	$lastmodtime= filemtime(HELLOEXTEND_LOGGER_URI . 'css/helloextend_logger.css');
+	$lastmodtime= filemtime(HELLOEXTEND_LOGGER_DIR . 'css/helloextend_logger.css');
     wp_register_style('mainStyle', HELLOEXTEND_LOGGER_URI . 'css/helloextend_logger.css', array(), $lastmodtime);
 
     /* Enqueue script for the error log table and pass translatable strings to it... */
