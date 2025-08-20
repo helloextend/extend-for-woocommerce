@@ -172,7 +172,8 @@ class HelloExtend_Protection_Admin
             wp_enqueue_script($this->helloextend_protection, plugin_dir_url(__FILE__) . 'js/helloextend-protection-admin.js', array('jquery'), $this->version, false);
         }
 
-        $js_file_version = filemtime(plugin_dir_path(__FILE__) . 'js/helloextend-protection-remove-ignored-category.js');
+        $js_path = plugin_dir_path(__FILE__) . 'js/helloextend-protection-remove-ignored-category.js';
+        $js_file_version = file_exists($js_path) ? filemtime($js_path) : $this->version;
         wp_enqueue_script('helloextend_remove_ignored_category_script', plugin_dir_url(__FILE__) . 'js/helloextend-protection-remove-ignored-category.js', array('jquery'), $js_file_version, true);
     }
 

@@ -215,7 +215,8 @@ function helloextend_render_documentation_page()
 function helloextend_protection_style()
 {
     // Register stylesheets
-	$lastmodtime= filemtime(HELLOEXTEND_PLUGIN_DIR . 'css/helloextend.css');
+    $css_path = HELLOEXTEND_PLUGIN_DIR . 'css/helloextend.css';
+	$lastmodtime= file_exists($css_path) ? filemtime($css_path) : HELLOEXTEND_PROTECTION_VERSION;
     wp_register_style('helloextend_protection_style',  HELLOEXTEND_PLUGIN_URL.'css/helloextend.css', array(), $lastmodtime);
     wp_enqueue_style('helloextend_protection_style');
 }
@@ -627,7 +628,8 @@ function helloextend_edit_ignore_product_category_field( ) {
         </td>
     </tr>
     ';
-    $js_file_version = filemtime(HELLOEXTEND_PLUGIN_DIR . 'admin/js/helloextend-protection-ignore-categories.js');
+    $js_path = HELLOEXTEND_PLUGIN_DIR . 'admin/js/helloextend-protection-ignore-categories.js';
+    $js_file_version = file_exists($js_path) ? filemtime($js_path) : HELLOEXTEND_PROTECTION_VERSION;
     wp_enqueue_script('helloextend_set_ignore_value_script', plugin_dir_url(__FILE__) . 'admin/js/helloextend-protection-ignore-categories.js' , array('jquery'), $js_file_version, true);
 
 }
