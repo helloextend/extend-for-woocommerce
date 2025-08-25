@@ -402,6 +402,21 @@ class HelloExtend_Protection_Global
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_global_script');
             wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
+
+            // Get the leadToken from URL parameters
+            $lead_token = $this->get_lead_token_from_url();
+            if ($lead_token) {
+                // Sanitize the token for safe JavaScript output
+                $safe_lead_token = esc_js($lead_token);
+
+                // Output JavaScript to console
+                echo "<script type='text/javascript'>\n";
+                echo "console.log('found leadToken: ', '" . $safe_lead_token . "');\n";
+                echo "</script>\n";
+
+                // next step: Run Post Purchase logic to handle lead Token
+                $this->helloextend_post_purchase($lead_token, $store_id, $environment, $ajaxurl);
+            }
         } else {
             HelloExtend_Protection_Logger::helloextend_log_error('Store Id missing or Extend Product Protection is disabled');
         }
@@ -507,5 +522,31 @@ class HelloExtend_Protection_Global
         }
 
         return $categories[0]->name ?? 'Uncategorized';
+    }
+
+    /**
+     * Get leadToken from URL parameters
+     *
+     * @return string|null The leadToken value or null if not found
+     */
+    private function get_lead_token_from_url() {
+        // Check if leadToken exists in GET parameters
+        if (isset($_GET['leadToken']) && !empty($_GET['leadToken'])) {
+            // Sanitize the input
+            return sanitize_text_field($_GET['leadToken']);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the Post Purchase Logic if the lead token is passed
+     *
+     * @since 1.0.0
+     */
+    private function helloextend_post_purchase($leadToken, $store_id, $environment, $ajaxurl)
+    {
+        wp_enqueue_script('helloextend_global_post_purchase_script');
+        wp_localize_script('helloextend_global_post_purchase_script', 'ExtendWooCommerce', compact('store_id', 'leadToken', 'ajaxurl', 'environment'));
     }
 }
