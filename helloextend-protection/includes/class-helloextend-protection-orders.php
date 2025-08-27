@@ -79,11 +79,32 @@ class HelloExtend_Protection_Orders
 
     public function get_product_image_url($product)
     {
-        $image_id = $product->get_image_id();
-        $image_url_array = wp_get_attachment_image_src($image_id, 'full');
-        // The URL is the first item in the returned array
+        // Only accept valid WooCommerce product objects
+        if (! $product instanceof \WC_Product) {
+            return null;
+        }
 
-        return $image_url_array[0];
+        // Try featured image first
+        $image_id = (int) $product->get_image_id();
+        // If no featured image, fall back to the first gallery image
+        if (empty($image_id) && method_exists($product, 'get_gallery_image_ids')) {
+            $gallery = (array) $product->get_gallery_image_ids();
+            $image_id = isset($gallery[0]) ? (int) $gallery[0] : 0;
+        }
+        // No image available
+        if (empty($image_id)) {
+            return null;
+        }
+
+        // Retrieve URL safely: prefer wp_get_attachment_image_url() on WP ≥4.4
+        if (function_exists('wp_get_attachment_image_url')) {
+            $url = wp_get_attachment_image_url($image_id, 'full');
+        } else {
+            $src = wp_get_attachment_image_src($image_id, 'full');
+            $url = (is_array($src) && isset($src[0])) ? $src[0] : null;
+        }
+
+        return $url ?: null;
     }
 
     /**
