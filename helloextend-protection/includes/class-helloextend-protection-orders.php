@@ -77,8 +77,17 @@ class HelloExtend_Protection_Orders
 	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
     }
 
+    public function get_product_image_url($product)
+    {
+        $image_id = $product->get_image_id();
+        $image_url_array = wp_get_attachment_image_src($image_id, 'full');
+        // The URL is the first item in the returned array
+
+        return $image_url_array[0];
+    }
+
     /**
-     * helloextend_get_plans_and_products($order_items)
+     * helloextend_get_plans_and_products($order, $fulfill_now = false)
      * - builds line items array that will be put in order payload
      *
      * @param  $order
@@ -86,7 +95,7 @@ class HelloExtend_Protection_Orders
      * @return array
      * @since  1.0.0
      */
-	    public function helloextend_get_plans_and_products($order, $fulfill_now = false)
+    public function helloextend_get_plans_and_products($order, $fulfill_now = false)
     {
 
         $helloextend_plans = array();
@@ -98,7 +107,7 @@ class HelloExtend_Protection_Orders
                 $helloextend_plans[] = array(
                     'id'                 => $helloextend_meta_data['planId'],
                     'purchasePrice'      => $helloextend_meta_data['price'],
-                    'covered_product_id' => $helloextend_meta_data['covered_product_id'],
+                    'covered_product_id' => $helloextend_meta_data['covered_product_id']
                 );
             }
         }
@@ -131,6 +140,9 @@ class HelloExtend_Protection_Orders
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to helloextend_line_items array
             if ($product_id != $helloextend_product_protection_id) {
+               
+                $image_url = $this->get_product_image_url($product);
+
                 $helloextend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product'               => array(
@@ -140,6 +152,7 @@ class HelloExtend_Protection_Orders
                         'listPrice'     => (int) floatval($product->get_regular_price() * 100),
                         'purchasePrice' => (int) floatval($product->get_price() * 100),
                         'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
+                        'imageUrl'      => $image_url
                     ),
                     'quantity'              => $item->get_quantity(),
                     'fulfilledQuantity'     => !$fulfill_now ? 0 : $item->get_quantity(), // Will only fulfill based on contract event
