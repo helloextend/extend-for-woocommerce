@@ -86,11 +86,30 @@ class HelloExtend_Protection_Orders
 
         // Try featured image first
         $image_id = (int) $product->get_image_id();
+        
         // If no featured image, fall back to the first gallery image
         if (empty($image_id) && method_exists($product, 'get_gallery_image_ids')) {
             $gallery = (array) $product->get_gallery_image_ids();
             $image_id = isset($gallery[0]) ? (int) $gallery[0] : 0;
         }
+        
+        // If still empty, try parent (for variations)
+        if (empty($image_id) && method_exists($product, 'get_parent_id')) {
+            $parent_id = (int) $product->get_parent_id();
+            if ($parent_id) {
+                $parent = wc_get_product($parent_id);
+                if ($parent instanceof \WC_Product) {
+                    // Parent’s featured image
+                    $image_id = (int) $parent->get_image_id();
+                    // Parent’s first gallery image as fallback
+                    if (empty($image_id) && method_exists($parent, 'get_gallery_image_ids')) {
+                        $gallery = (array) $parent->get_gallery_image_ids();
+                        $image_id = isset($gallery[0]) ? (int) $gallery[0] : 0;
+                    }
+                }
+            }
+        }
+
         // No image available
         if (empty($image_id)) {
             return null;
