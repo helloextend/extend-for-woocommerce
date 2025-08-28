@@ -77,8 +77,57 @@ class HelloExtend_Protection_Orders
 	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
     }
 
+    public function get_product_image_url($product)
+    {
+        // Only accept valid WooCommerce product objects
+        if (! $product instanceof \WC_Product) {
+            return null;
+        }
+
+        // Try featured image first
+        $image_id = (int) $product->get_image_id();
+        
+        // If no featured image, fall back to the first gallery image
+        if (empty($image_id) && method_exists($product, 'get_gallery_image_ids')) {
+            $gallery = (array) $product->get_gallery_image_ids();
+            $image_id = isset($gallery[0]) ? (int) $gallery[0] : 0;
+        }
+        
+        // If still empty, try parent (for variations)
+        if (empty($image_id) && method_exists($product, 'get_parent_id')) {
+            $parent_id = (int) $product->get_parent_id();
+            if ($parent_id) {
+                $parent = wc_get_product($parent_id);
+                if ($parent instanceof \WC_Product) {
+                    // Parent’s featured image
+                    $image_id = (int) $parent->get_image_id();
+                    // Parent’s first gallery image as fallback
+                    if (empty($image_id) && method_exists($parent, 'get_gallery_image_ids')) {
+                        $gallery = (array) $parent->get_gallery_image_ids();
+                        $image_id = isset($gallery[0]) ? (int) $gallery[0] : 0;
+                    }
+                }
+            }
+        }
+
+        // No image available
+        if (empty($image_id)) {
+            return null;
+        }
+
+        // Retrieve URL safely: prefer wp_get_attachment_image_url() on WP ≥4.4
+        if (function_exists('wp_get_attachment_image_url')) {
+            $url = wp_get_attachment_image_url($image_id, 'full');
+        } else {
+            $src = wp_get_attachment_image_src($image_id, 'full');
+            $url = (is_array($src) && isset($src[0])) ? $src[0] : null;
+        }
+
+        return $url ?: null;
+    }
+
     /**
-     * helloextend_get_plans_and_products($order_items)
+     * helloextend_get_plans_and_products($order, $fulfill_now = false)
      * - builds line items array that will be put in order payload
      *
      * @param  $order
@@ -86,7 +135,7 @@ class HelloExtend_Protection_Orders
      * @return array
      * @since  1.0.0
      */
-	    public function helloextend_get_plans_and_products($order, $fulfill_now = false)
+    public function helloextend_get_plans_and_products($order, $fulfill_now = false)
     {
 
         $helloextend_plans = array();
@@ -98,7 +147,7 @@ class HelloExtend_Protection_Orders
                 $helloextend_plans[] = array(
                     'id'                 => $helloextend_meta_data['planId'],
                     'purchasePrice'      => $helloextend_meta_data['price'],
-                    'covered_product_id' => $helloextend_meta_data['covered_product_id'],
+                    'covered_product_id' => $helloextend_meta_data['covered_product_id']
                 );
             }
         }
@@ -131,6 +180,9 @@ class HelloExtend_Protection_Orders
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to helloextend_line_items array
             if ($product_id != $helloextend_product_protection_id) {
+               
+                $image_url = $this->get_product_image_url($product);
+
                 $helloextend_line_items[] = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product'               => array(
@@ -140,6 +192,7 @@ class HelloExtend_Protection_Orders
                         'listPrice'     => (int) floatval($product->get_regular_price() * 100),
                         'purchasePrice' => (int) floatval($product->get_price() * 100),
                         'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
+                        'imageUrl'      => $image_url
                     ),
                     'quantity'              => $item->get_quantity(),
                     'fulfilledQuantity'     => !$fulfill_now ? 0 : $item->get_quantity(), // Will only fulfill based on contract event
