@@ -269,6 +269,10 @@ class HelloExtend_Protection_Global
             return;
         }
 
+        if ($helloextend_data['leadToken']) {
+            $helloextend_data['leadQuantity'] = $quantity;
+        }
+
         WC()->cart->add_to_cart($warranty_product_id, $quantity, 0, 0, ['extendData' => $helloextend_data]);
     }
 

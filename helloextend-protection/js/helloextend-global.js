@@ -29,7 +29,10 @@
                     ajaxurl, {
                         action: "add_to_cart_helloextend",
                         quantity: opts.quantity,
-                        extendData: opts.plan
+                        extendData: {
+                            ...opts.plan,
+                            leadToken: opts.leadToken
+                        }
                     }
                 ).promise()
             }
