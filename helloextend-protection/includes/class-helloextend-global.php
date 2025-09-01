@@ -355,6 +355,9 @@ class HelloExtend_Protection_Global
             $item->add_meta_data('Warranty Term', $term . ' Months');
             $item->add_meta_data('Plan Id', $sku);
             $item->add_meta_data('Covered Product', $covered_title);
+            if (isset($cart_item['extendData']['leadToken'])) {
+                $item->add_meta_data('Lead Token', $cart_item['extendData']['leadToken']);
+            }
         }
     }
 
