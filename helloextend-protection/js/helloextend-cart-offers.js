@@ -1,11 +1,6 @@
 // This script is used to handle the rendering and functionality of Extend offers in a WooCommerce cart.
 (($) => {
 
-    // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
-    if (!ExtendWooCommerce || !ExtendCartIntegration) {
-        return;
-    }
-
     const SELECTORS = {
         CART_ITEM: '.cart_item',
         TITLE: '.product-name',
@@ -63,7 +58,7 @@
             const $title = $lineItemElement.find(SELECTORS.TITLE);
             const $image = $lineItemElement.find(SELECTORS.IMAGE);
             
-            if ($title.text().toLowerCase().includes('extend protection plan')) {
+            if ($title.text().toLowerCase().includes('extend product protection')) {
                 $image.css('pointer-events', 'none');
             } else {
                 const $offer = $lineItemElement.find(SELECTORS.EXTEND_OFFER);
@@ -89,6 +84,11 @@
     
     // Wait until the document is fully loaded before running the script.
     $(document).ready(() => {
+        // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
+        if (!ExtendWooCommerce || !ExtendCartIntegration) {
+            return;
+        }
+        
         initCartOffers();
     });
     
