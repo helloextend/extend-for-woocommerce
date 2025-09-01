@@ -220,12 +220,11 @@ class HelloExtend_Protection_Cart_Offer
         // if it's not a warranty, add offer element
         if (! isset($cart_item['extendData']) ) {
             $item_id     = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-            $item_sku    = $cart_item['data']->get_sku() ? $cart_item['data']->get_sku() : $item_id;
-            $referenceId = $item_id;
-            $categories  = get_the_terms($item_id, 'product_cat');
+            $parent_id   = $cart_item['product_id'];
+            $categories  = get_the_terms($parent_id, 'product_cat');
             $category    = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
 
-            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($referenceId)."' data-category='".esc_attr($category)."'></div>";
+            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($item_id)."' data-category='".esc_attr($category)."'></div>";
         }
     }
 
