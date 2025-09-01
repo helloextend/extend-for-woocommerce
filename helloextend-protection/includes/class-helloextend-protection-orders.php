@@ -66,6 +66,7 @@ class HelloExtend_Protection_Orders
         $this->version           = $version;
         /* retrieve environment variables */
         $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
+        $this->helloextend_product_protection_id = $this->settings['warranty_product_id'];
 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action('woocommerce_checkout_order_processed', [$this, 'create_update_order'], 10, 1);
@@ -77,7 +78,7 @@ class HelloExtend_Protection_Orders
 	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
     }
 
-    public function get_product_image_url($product)
+    private function get_product_image_url($product)
     {
         // Only accept valid WooCommerce product objects
         if (! $product instanceof \WC_Product) {
@@ -126,6 +127,51 @@ class HelloExtend_Protection_Orders
         return $url ?: null;
     }
 
+    private function is_item_helloextend($item)
+    {
+        $helloextend_meta = $item->get_meta('_helloextend_data');
+        return $item->get_product_id() == $this->helloextend_product_protection_id && (bool) $helloextend_meta && (bool) $helloextend_meta['planId'];
+    }
+
+    private function is_item_helloextend_no_lead($item)
+    {
+        $helloextend_meta = $item->get_meta('_helloextend_data');
+        return $this->is_item_helloextend($item) && (bool) !$helloextend_meta['leadToken'];
+    }
+
+    private function is_item_helloextend_lead($item)
+    {
+        $helloextend_meta = $item->get_meta('_helloextend_data');
+        return $this->is_item_helloextend($item) && (bool) $helloextend_meta['leadToken'];
+    }
+
+    private function get_price_in_cents($item_price)
+    {
+        return (int) floatval($item_price * 100);
+    }
+
+    private function get_purchased_leads($order)
+    {
+        $lead_line_items = array();
+        foreach ($order->get_items() as $item) {
+            if ($this->is_item_helloextend_lead($item)) {
+                $helloextend_meta = $item->get_meta('_helloextend_data');
+
+                $lead_line_items[] = array(
+                    'leadToken'             => $helloextend_meta['leadToken'],
+                    'lineItemTransactionId' => 'STORE::' . $this->settings['store_id'] . '::ORDER::' . $order->get_id() . '::PRODUCT::' . $helloextend_meta['covered_product_id'] . '::OLI::' . $item->get_id(),
+                    'plan'                  => array(
+                                                'id' => $helloextend_meta['planId'],
+                                                'purchasePrice' => $helloextend_meta['price'],
+                                            ),
+                    'quantity'              => $item->get_quantity()
+                    );
+            }
+        }
+
+        return empty($lead_line_items) ? null : $lead_line_items;
+    }
+
     /**
      * helloextend_get_plans_and_products($order, $fulfill_now = false)
      * - builds line items array that will be put in order payload
@@ -142,8 +188,8 @@ class HelloExtend_Protection_Orders
         foreach ($order->get_items() as $item_id => $item) {
             $helloextend_meta_data = (array) $item->get_meta('_helloextend_data');
 
-            // if  item id is for extend-product-protection gram $helloextend_meta_data and push it to the plans array
-            if ($helloextend_meta_data['planId']) {
+            // if  item id is for extend-product-protection grab $helloextend_meta_data and push it to the plans array
+            if ($this->is_item_helloextend_no_lead($item) && $helloextend_meta_data['planId']) {
                 $helloextend_plans[] = array(
                     'id'                 => $helloextend_meta_data['planId'],
                     'purchasePrice'      => $helloextend_meta_data['price'],
@@ -151,6 +197,8 @@ class HelloExtend_Protection_Orders
                 );
             }
         }
+
+        $leads = $this->get_purchased_leads($order);
 
         // Loop through the order items and add them to the line_items array
         $helloextend_line_items = array();
@@ -204,6 +252,11 @@ class HelloExtend_Protection_Orders
                 }
             }
         }
+
+        if ($leads) {
+            $helloextend_line_items = array_merge($helloextend_line_items, $leads);
+        }
+
         return $helloextend_line_items;
     }
 
