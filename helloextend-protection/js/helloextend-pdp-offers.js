@@ -19,7 +19,7 @@
             extendOffer.hide();
         }
 
-        function handleAddToCartLogic(variation_id)  {
+        function handleAddToCartLogic()  {
 
             $atcButton.on('click', function extendHandler(e) {
                 e.preventDefault();
@@ -36,12 +36,13 @@
                 }
 
                 const component = Extend.buttons.instance('.helloextend-offer');
-
+                
                 /** get the users plan selection */
                 const plan = component.getPlanSelection();
+                const referenceId = component.getActiveProduct().id;
 
                 if (plan) {
-                    let planCopy = { ...plan, covered_product_id: variation_id };
+                    let planCopy = { ...plan, covered_product_id: referenceId };
                     let data = {
                         quantity: quantity,
                         plan: planCopy,
@@ -55,12 +56,12 @@
                 } else {
                     if(helloextend_modal_offers_enabled === '1') {
                         Extend.modal.open({
-                            referenceId: variation_id,
+                            referenceId,
                             price: price,
                             category: first_category,
                             onClose: function(plan, product) {
                                 if (plan && product) {
-                                    let planCopy = { ...plan, covered_product_id: variation_id };
+                                    let planCopy = { ...plan, covered_product_id: referenceId };
                                     let data = {
                                         quantity: quantity,
                                         plan: planCopy,
@@ -96,13 +97,12 @@
                 });
 
                 // TODO: initalize cart offers
-                handleAddToCartLogic(reference_id);
+                handleAddToCartLogic();
 
             } else if (product_type === 'variable') {
 
                 $( ".single_variation_wrap" ).on( "show_variation", function ( event, variation )  {
 
-                    // setTimeout(function(){
                         let component = Extend.buttons.instance('.helloextend-offer');
                         let variation_id = variation.variation_id;
                         let variationPrice = variation.display_price * 100
@@ -125,10 +125,9 @@
                             });
                         }
 
-                        handleAddToCartLogic(variation_id);
+                    });
 
-                    // }, 1000);
-                });
+                    handleAddToCartLogic();
             } else if (product_type === 'composite') {
 
                 Extend.buttons.render('.helloextend-offer', {
