@@ -118,11 +118,11 @@ class HelloExtend_Protection_Cart_Offer
 
             if ($this->is_warranty($line)) {
                 $product['warranty_quantity'] += $line['quantity'];
-                array_push($product['warranties'], $line);
+                $product['warranties'][] = $line;
             } else {
                 $product['quantity'] += $line['quantity'];
 
-                if (isset($line['extendData']) && $line['extendData']['leadQuantity']) {
+                if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
                     $product['leadQuantity'] = $line['extendData']['leadQuantity'];
                     $product['leadProductKey'] = $line['key'];
                 }
