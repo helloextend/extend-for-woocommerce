@@ -82,7 +82,7 @@ class HelloExtend_Protection_Cart_Offer
 
     private function is_lead($item)
     {
-        return $this->is_item_helloextend($item) && $item['extendData']['leadToken'] && $item['extendData']['leadQuantity'];
+        return $this->is_item_helloextend($item) && isset($item['extendData']['leadToken']) && isset($item['extendData']['leadQuantity']);
     }
 
     private function is_warranty($item)

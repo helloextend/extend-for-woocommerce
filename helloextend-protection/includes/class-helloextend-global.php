@@ -553,7 +553,8 @@ class HelloExtend_Protection_Global
      */
     private function helloextend_post_purchase($leadToken, $store_id, $environment, $ajaxurl)
     {
+        $cart_url = wc_get_cart_url();
         wp_enqueue_script('helloextend_global_post_purchase_script');
-        wp_localize_script('helloextend_global_post_purchase_script', 'ExtendWooCommerce', compact('store_id', 'leadToken', 'ajaxurl', 'environment'));
+        wp_localize_script('helloextend_global_post_purchase_script', 'ExtendWooCommerce', compact('store_id', 'leadToken', 'ajaxurl', 'environment', 'cart_url'));
     }
 }

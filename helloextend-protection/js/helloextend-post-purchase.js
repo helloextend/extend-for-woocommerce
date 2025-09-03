@@ -4,7 +4,8 @@
         const params = (new URL(document.location)).searchParams;
                 
         // Check if leadToken or leadtoken is in the URL
-        const leadToken = params.get('leadToken') ? params.get('leadToken') : params.get('leadtoken');
+        const leadToken = params.get('leadToken') || params.get('leadtoken');
+        if (!leadToken) return;
 
         Extend.aftermarketModal.open({
             leadToken,
@@ -19,8 +20,21 @@
                         product,
                         quantity,
                         leadToken
-                    }).then(() => {
-                        window.location = '/cart'; // Is there a standard WC cart path? Does this need to be a setting?
+                    })
+                    .then(() => {
+                        const cartUrl =
+                          (ExtendWooCommerce && ExtendWooCommerce.cart_url)
+                          || (window.wc_cart_params && wc_cart_params.cart_url)
+                          || '/cart';
+                        window.location = cartUrl;
+                    })
+                    .catch((e) => {
+                        if (ExtendWooCommerce && ExtendWooCommerce.extendAjaxLog) {
+                            ExtendWooCommerce.extendAjaxLog('error', 'post-purchase addPlanToCart failed', e && e.message ? e.message : e);
+                        } else {
+                            // eslint-disable-next-line no-console
+                            console.error('post-purchase addPlanToCart failed', e);
+                        }
                     });
                     
                 }
@@ -29,7 +43,7 @@
     }
 
     $(document).ready(() => {
-        if (!Extend || !ExtendWooCommerce) {
+        if (typeof Extend === 'undefined' || typeof ExtendWooCommerce === 'undefined') {
             return;
         }
     

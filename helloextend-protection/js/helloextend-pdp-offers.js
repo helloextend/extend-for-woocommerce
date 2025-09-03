@@ -15,8 +15,7 @@
 
         // If PDP offers are not enabled, hide Extend offer div
         if (helloextend_pdp_offers_enabled === '0') {
-            const extendOffer = $('.helloextend-offer')[0];
-            extendOffer.hide();
+            $('.helloextend-offer').hide();
         }
 
         function handleAddToCartLogic()  {

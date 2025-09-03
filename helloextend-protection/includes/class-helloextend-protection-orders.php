@@ -79,7 +79,7 @@ class HelloExtend_Protection_Orders
 	    add_action('woocommerce_order_status_refunded', [$this, 'cancel_order'], 10, 1);
 
         // Handle refunded orders
-        add_action('woocommerce_order_refunded', [$this, 'handle_order_refund'], 10, 2);
+        add_action('woocommerce_order_refunded', [$this, 'handle_contract_refund'], 10, 2);
     }
 
     private function get_product_image_url($product)
@@ -122,9 +122,9 @@ class HelloExtend_Protection_Orders
 
         // Retrieve URL safely: prefer wp_get_attachment_image_url() on WP ≥4.4
         if (function_exists('wp_get_attachment_image_url')) {
-            $url = wp_get_attachment_image_url($image_id, 'thumbnail');
+            $url = wp_get_attachment_image_url($image_id, 'full');
         } else {
-            $src = wp_get_attachment_image_src($image_id, 'thumbnail');
+            $src = wp_get_attachment_image_src($image_id, 'full');
             $url = (is_array($src) && isset($src[0])) ? $src[0] : null;
         }
 
@@ -134,19 +134,19 @@ class HelloExtend_Protection_Orders
     private function is_item_helloextend($item)
     {
         $helloextend_meta = $item->get_meta('_helloextend_data');
-        return $item->get_product_id() == $this->helloextend_product_protection_id && (bool) $helloextend_meta && (bool) $helloextend_meta['planId'];
+        return $item->get_product_id() == $this->helloextend_product_protection_id && isset($helloextend_meta) && isset($helloextend_meta['planId']);
     }
 
     private function is_item_helloextend_no_lead($item)
     {
         $helloextend_meta = $item->get_meta('_helloextend_data');
-        return $this->is_item_helloextend($item) && (bool) !$helloextend_meta['leadToken'];
+        return $this->is_item_helloextend($item) && !isset($helloextend_meta['leadToken']);
     }
 
     private function is_item_helloextend_lead($item)
     {
         $helloextend_meta = $item->get_meta('_helloextend_data');
-        return $this->is_item_helloextend($item) && (bool) $helloextend_meta['leadToken'];
+        return $this->is_item_helloextend($item) && isset($helloextend_meta['leadToken']);
     }
 
     private function get_price_in_cents($item_price)
@@ -238,8 +238,8 @@ class HelloExtend_Protection_Orders
                         'id'            => $product->get_id(),
                         'title'         => $product->get_name(),
                         'category'      => $first_category,
-                        'listPrice'     => (int) floatval($product->get_regular_price() * 100),
-                        'purchasePrice' => (int) floatval($product->get_price() * 100),
+                        'listPrice'     => $this->get_price_in_cents($product->get_regular_price() * 100),
+                        'purchasePrice' => $this->get_price_in_cents($product->get_price() * 100),
                         'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
                         'imageUrl'      => $image_url
                     ),
@@ -582,7 +582,7 @@ class HelloExtend_Protection_Orders
         }
     }
 
-    public function handle_order_refund(string $order_id, string $refund_id)
+    public function handle_contract_refund(string $order_id, string $refund_id)
     {
         $order = wc_get_order($order_id);
 
@@ -637,6 +637,7 @@ class HelloExtend_Protection_Orders
 		}
 
 
+        $cancellation_errors = [];
         // Cancel the contract
         // {{API_HOST}}/contracts/{{contractId}}/cancel
         foreach ($refunded_contracts as $contract_id) {
@@ -654,19 +655,23 @@ class HelloExtend_Protection_Orders
 
             if (is_wp_error($contract_cancel_response)) {
                 $error_message = $contract_cancel_response->get_error_message();
-                HelloExtend_Protection_Logger::helloextend_log_error('Cancel Contract Failed for ID ' . $contract_id . ' : POST request failed: ' . $error_message.', cannot cancel contract');
-                return;
+                $cancellation_errors[] = 'Cancel Contract Failed for ID ' . $contract_id . ' : POST request failed: ' . $error_message.', cannot cancel contract';
             }
 
             $contract_cancel_response_code = wp_remote_retrieve_response_code( $contract_cancel_response );
             $data = json_decode(wp_remote_retrieve_body( $contract_cancel_response ));
             if ($contract_cancel_response_code < 200 || $contract_cancel_response_code >= 300) {
-                HelloExtend_Protection_Logger::helloextend_log_error(
-                    'Contract cancel for ID ' . $contract_id . ' : POST request returned status ' . $contract_cancel_response_code . ' with error ' . isset($data->message) ? $data->message : null
-                );
-                return;
+                $cancellation_errors[] = 'Contract cancel for ID ' . $contract_id . ' : POST request returned status ' . $contract_cancel_response_code . ' with body ' . $data;
             }
+        }
 
+        if (!empty($cancellation_errors)) {
+            HelloExtend_Protection_Logger::helloextend_log_error(
+                'Some contracts failed to cancel: ' . implode('; ', $cancellation_errors)
+            );
+        }
+
+        if ($this->settings['enable_helloextend_debug'] == 1) {
             HelloExtend_Protection_Logger::helloextend_log_debug(
                 'Contract IDs ' . join(", ", $refunded_contracts) . ' canceled.'
             );
