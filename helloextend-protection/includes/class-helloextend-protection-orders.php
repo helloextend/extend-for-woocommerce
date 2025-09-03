@@ -53,6 +53,11 @@ class HelloExtend_Protection_Orders
 
     private array $settings;
 
+    private const TRANSACTION_STORE_PREFIX = 'STORE::';
+    private const TRANSACTION_ORDER_PREFIX = '::ORDER::';
+    private const TRANSACTION_PRODUCT_PREFIX = '::PRODUCT::';
+    private const TRANSACTION_OLI_PREFIX = '::OLI::';
+
     /**
      * Initialize the class and set its properties.
      *
@@ -163,7 +168,7 @@ class HelloExtend_Protection_Orders
 
                 $lead_line_items[] = array(
                     'leadToken'             => $helloextend_meta['leadToken'],
-                    'lineItemTransactionId' => 'STORE::' . $this->settings['store_id'] . '::ORDER::' . $order->get_id() . '::PRODUCT::' . $helloextend_meta['covered_product_id'] . '::OLI::' . $item->get_id(),
+                    'lineItemTransactionId' => self::TRANSACTION_STORE_PREFIX . $this->settings['store_id'] . self::TRANSACTION_ORDER_PREFIX . $order->get_id() . self::TRANSACTION_PRODUCT_PREFIX . $helloextend_meta['covered_product_id'] . self::TRANSACTION_OLI_PREFIX . $item->get_id(),
                     'plan'                  => array(
                                                 'id' => $helloextend_meta['planId'],
                                                 'purchasePrice' => $helloextend_meta['price'],
