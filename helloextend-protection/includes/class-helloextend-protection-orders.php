@@ -67,7 +67,7 @@ class HelloExtend_Protection_Orders
         /* retrieve environment variables */
         $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
         $this->helloextend_product_protection_id = $this->settings['warranty_product_id'];
-
+ 
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action('woocommerce_checkout_order_processed', [$this, 'create_update_order'], 10, 1);
 
@@ -76,6 +76,10 @@ class HelloExtend_Protection_Orders
 
 	    // Hook the callback function to the order cancelled action
 	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
+	    add_action('woocommerce_order_status_refunded', [$this, 'cancel_order'], 10, 1);
+
+        // Handle refunded orders
+        add_action('woocommerce_order_refunded', [$this, 'handle_order_refund'], 10, 2);
     }
 
     private function get_product_image_url($product)
@@ -118,9 +122,9 @@ class HelloExtend_Protection_Orders
 
         // Retrieve URL safely: prefer wp_get_attachment_image_url() on WP ≥4.4
         if (function_exists('wp_get_attachment_image_url')) {
-            $url = wp_get_attachment_image_url($image_id, 'full');
+            $url = wp_get_attachment_image_url($image_id, 'thumbnail');
         } else {
-            $src = wp_get_attachment_image_src($image_id, 'full');
+            $src = wp_get_attachment_image_src($image_id, 'thumbnail');
             $url = (is_array($src) && isset($src[0])) ? $src[0] : null;
         }
 
@@ -222,16 +226,13 @@ class HelloExtend_Protection_Orders
                 }
             }
 
-            // Get extend product id from settings
-            $helloextend_product_protection_id = $this->settings['warranty_product_id'];
-
             // Add relevant data to the line_items array
             // if product id for extend-product-protection, do not add it to helloextend_line_items array
-            if ($product_id != $helloextend_product_protection_id) {
+            if ($product_id != $this->helloextend_product_protection_id) {
                
                 $image_url = $this->get_product_image_url($product);
 
-                $helloextend_line_items[] = array(
+                $helloextend_line_item = array(
                     'lineItemTransactionId' => $product->get_id(),
                     'product'               => array(
                         'id'            => $product->get_id(),
@@ -248,8 +249,10 @@ class HelloExtend_Protection_Orders
 
                 // if $plan is not empty, add the plan to the current line item
                 if (!empty($plan)) {
-                    $helloextend_line_items[count($helloextend_line_items) - 1]['plan'] = $plan;
+                    $helloextend_line_item['plan'] = $plan;
                 }
+
+                $helloextend_line_items[] = $helloextend_line_item;
             }
         }
 
@@ -493,11 +496,11 @@ class HelloExtend_Protection_Orders
         $order = wc_get_order($order_id);
 
         if ( ! $order instanceof WC_Order ) {
-                HelloExtend_Protection_Logger::helloextend_log_error(
-                    'Cannot cancel Extend order – WooCommerce order ' . $order_id . ' not found.'
-                );
-                return;
-            }
+            HelloExtend_Protection_Logger::helloextend_log_error(
+                'Cannot cancel Extend order – WooCommerce order ' . $order_id . ' not found.'
+            );
+            return;
+        }
 
 		// Get Token from Global function
 		$token = HelloExtend_Protection_Global::helloextend_get_token();
@@ -576,6 +579,97 @@ class HelloExtend_Protection_Orders
 				);
                 return;
             }
+        }
+    }
+
+    public function handle_order_refund(string $order_id, string $refund_id)
+    {
+        $order = wc_get_order($order_id);
+
+        if ( ! $order instanceof WC_Order ) {
+            HelloExtend_Protection_Logger::helloextend_log_error(
+                'Cannot refund Extend order - WooCommerce order ' . $order_id . ' not found.'
+            );
+            return;
+        }
+
+        $refund = wc_get_order($refund_id);
+
+        if (!$refund instanceof WC_Order_Refund) {
+            HelloExtend_Protection_Logger::helloextend_log_error(
+                'Cannot refund Extend order - WooCommerce refund ' . $refund_id . ' not found.'
+            );
+            return;
+        }
+
+        $refund_items = $refund->get_items();
+        $refunded_contracts = [];
+
+        // Get contract IDs on this order and add them to contracts array
+        $contracts = get_post_meta($order->get_id(), '_product_protection_contracts', true);
+        foreach($refund_items as $refund_item) {
+            $refunded_item_id = $refund_item->get_meta('_refunded_item_id');
+            $order_item = $order->get_item($refunded_item_id);
+            $helloextend_data = $order_item->get_meta('_helloextend_data');
+            
+            if ($refund_item->get_product_id() == $this->helloextend_product_protection_id && $helloextend_data) {
+                foreach($contracts as $covered_product => $contract_id) {
+                    if ($helloextend_data['covered_product_id'] == $covered_product) {
+                        
+                        $refunded_contracts[] = $contract_id;
+                    }
+                }
+            }
+        }
+
+
+		// Get Token from Global function
+		$token = HelloExtend_Protection_Global::helloextend_get_token();
+
+		// If token exists, log successful token
+		if ($this->settings['enable_helloextend_debug'] == 1 && $token) {
+			HelloExtend_Protection_Logger::helloextend_log_debug('Access token created successfully');
+		}
+		// If token does not exist, log error
+		if ($this->settings['enable_helloextend_debug'] == 1 && !$token) {
+			HelloExtend_Protection_Logger::helloextend_log_error('Error:Access token was not created, exiting order refund');
+			return;
+		}
+
+
+        // Cancel the contract
+        // {{API_HOST}}/contracts/{{contractId}}/cancel
+        foreach ($refunded_contracts as $contract_id) {
+            $contract_cancel_endpoint = $this->settings['api_host'] . '/contracts/' . $contract_id . '/cancel';
+            $contract_cancel_args = array(
+                'method'    => 'POST',
+                'headers'   => array(
+                    'Content-Type'          => 'application/json',
+                    'Accept'                => 'application/json; version=latest',
+                    'X-Extend-Access-Token' => $token,
+                ),
+            );
+
+            $contract_cancel_response = wp_remote_request( $contract_cancel_endpoint, $contract_cancel_args );
+
+            if (is_wp_error($contract_cancel_response)) {
+                $error_message = $contract_cancel_response->get_error_message();
+                HelloExtend_Protection_Logger::helloextend_log_error('Cancel Contract Failed for ID ' . $contract_id . ' : POST request failed: ' . $error_message.', cannot cancel contract');
+                return;
+            }
+
+            $contract_cancel_response_code = wp_remote_retrieve_response_code( $contract_cancel_response );
+            $data = json_decode(wp_remote_retrieve_body( $contract_cancel_response ));
+            if ($contract_cancel_response_code < 200 || $contract_cancel_response_code >= 300) {
+                HelloExtend_Protection_Logger::helloextend_log_error(
+                    'Contract cancel for ID ' . $contract_id . ' : POST request returned status ' . $contract_cancel_response_code . ' with error ' . isset($data->message) ? $data->message : null
+                );
+                return;
+            }
+
+            HelloExtend_Protection_Logger::helloextend_log_debug(
+                'Contract IDs ' . join(", ", $refunded_contracts) . ' canceled.'
+            );
         }
     }
 }
