@@ -9,7 +9,7 @@
 
         const $atcButton = $(atc_button_selector);
 
-        const quantity = parseInt($('input[name="quantity"]').val() || 1)
+        const getQuantity = () => parseInt(($('input[name="quantity"]').val() || 1), 10);
 
         let reference_id = product_id;
 
@@ -43,7 +43,7 @@
                 if (plan) {
                     let planCopy = { ...plan, covered_product_id: referenceId };
                     let data = {
-                        quantity: quantity,
+                        quantity: getQuantity(),
                         plan: planCopy,
                         price: (plan.price / 100).toFixed(2)
                     };
@@ -62,7 +62,7 @@
                                 if (plan && product) {
                                     let planCopy = { ...plan, covered_product_id: referenceId };
                                     let data = {
-                                        quantity: quantity,
+                                        quantity: getQuantity(),
                                         plan: planCopy,
                                         price: (plan.price / 100).toFixed(2)
                                     };
