@@ -62,10 +62,10 @@
                         if (extendData && extendData['covered_product_id']) {
                             let referenceId = extendData['covered_product_id'];
                             return (
-                            extendData &&
-                            !extendData.leadToken &&
-                            referenceId &&
-                            referenceId.toString() === variantId.toString()
+                                extendData &&
+                                !extendData.leadToken &&
+                                referenceId &&
+                                referenceId.toString() === variantId.toString()
                             );
                         }
                     }
