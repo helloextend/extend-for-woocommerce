@@ -669,6 +669,12 @@ class HelloExtend_Protection_Orders
             if ($contract_cancel_response_code < 200 || $contract_cancel_response_code >= 300) {
                 $cancellation_errors[] = 'Contract cancel for ID ' . $contract_id . ' : POST request returned status ' . $contract_cancel_response_code . ' with body ' . $data;
             }
+
+            if ($this->settings['enable_helloextend_debug']) {
+                HelloExtend_Protection_Logger::helloextend_log_debug(
+                    'Contract ID ' . $contract_id . ' canceled successfully.'
+                );
+            }
         }
 
         if (!empty($cancellation_errors)) {
@@ -677,9 +683,9 @@ class HelloExtend_Protection_Orders
             );
         }
 
-        if ($this->settings['enable_helloextend_debug'] == 1) {
+        if ($this->settings['enable_helloextend_debug'] == 1 && !empty($refunded_contracts)) {
             HelloExtend_Protection_Logger::helloextend_log_debug(
-                'Contract IDs ' . join(", ", $refunded_contracts) . ' canceled.'
+                'Contract IDs ' . join(", ", $refunded_contracts) . ' canceled succesfully.'
             );
         }
     }
