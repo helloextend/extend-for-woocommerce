@@ -58,7 +58,7 @@
             const $title = $lineItemElement.find(SELECTORS.TITLE);
             const $image = $lineItemElement.find(SELECTORS.IMAGE);
             
-            if ($title.text().toLowerCase().includes('extend product protection')) {
+            if ($title.text().toLowerCase().includes('extend protection plan')) {
                 $image.css('pointer-events', 'none');
             } else {
                 const $offer = $lineItemElement.find(SELECTORS.EXTEND_OFFER);
