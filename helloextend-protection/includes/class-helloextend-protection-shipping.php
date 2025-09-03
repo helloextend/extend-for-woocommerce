@@ -118,10 +118,11 @@ class HelloExtend_Protection_Shipping
             $product = $cart_item['data'];
             if (! $product->is_virtual() ) {
                 $referenceId = $product->get_id();
+                $categories = get_the_terms($cart_item['product_id'], 'product_cat');
                 $items[]     = array(
                  'referenceId'   => $referenceId,
                  'quantity'      => $cart_item['quantity'],
-                 'category'      => get_the_terms($product->get_id(), 'product_cat')[0]->name,
+                 'category'      => $categories[0]->name,
                  'purchasePrice' => (int) floatval($product->get_price() * 100),
                  'productName'   => $product->get_name(),
                 );
