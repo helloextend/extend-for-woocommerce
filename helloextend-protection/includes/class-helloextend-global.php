@@ -53,8 +53,8 @@ class HelloExtend_Protection_Global
     public function __construct($helloextend_protection, $version)
     {
 
-        $this->helloextend_protection = $helloextend_protection;
-        $this->version           = $version;
+        $this->helloextend_protection   = $helloextend_protection;
+        $this->version                  = $version;
         $this->hooks();
     }
 
@@ -120,7 +120,7 @@ class HelloExtend_Protection_Global
 
             // add sku to cart item and label it referenceId
             $cart[$cart_item_key]['referenceId']  = $referenceId;
-            $cart[$cart_item_key]['product_name'] = $_woo_product->get_title();
+            $cart[$cart_item_key]['product_name'] = $_woo_product->get_name();
         }
 
         echo wp_json_encode($cart, JSON_PRETTY_PRINT);
@@ -349,7 +349,7 @@ class HelloExtend_Protection_Global
             // $covered        = self::helloextend_get_product($covered_id);
             $covered       = wc_get_product($covered_id);
             $sku           = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
+            $covered_title = $covered->get_name();
 
             $item->add_meta_data('Warranty', $title);
             $item->add_meta_data('Warranty Term', $term . ' Months');
@@ -378,7 +378,7 @@ class HelloExtend_Protection_Global
             // $covered        = self::helloextend_get_product($covered_id);
             $covered       = wc_get_product($covered_id);
             $sku           = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
+            $covered_title = $covered->get_name();
             $data[]        = [
                 'key'   => 'Product',
                 'value' => $covered_title,
