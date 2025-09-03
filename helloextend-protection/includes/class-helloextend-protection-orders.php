@@ -622,6 +622,7 @@ class HelloExtend_Protection_Orders
                     if ($helloextend_data['covered_product_id'] == $covered_product) {
                         
                         $refunded_contracts[] = $contract_id;
+                        break;
                     }
                 }
             }
