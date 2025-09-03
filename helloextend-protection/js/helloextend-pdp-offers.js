@@ -20,7 +20,7 @@
 
         function handleAddToCartLogic()  {
 
-            $atcButton.on('click', function extendHandler(e) {
+            $atcButton.off('click.extend').on('click.extend', function extendHandler(e) {
                 e.preventDefault();
                 e.stopImmediatePropagation();
 
@@ -29,9 +29,9 @@
                 if (isDisabled) return;
 
                 function triggerAddToCart() {
-                    $atcButton.off('click', extendHandler);
+                    $atcButton.off('click.extend', extendHandler);
                     $atcButton.trigger('click');
-                    $atcButton.on('click', extendHandler);
+                    $atcButton.on('click.extend', extendHandler);
                 }
 
                 const component = Extend.buttons.instance('.helloextend-offer');
