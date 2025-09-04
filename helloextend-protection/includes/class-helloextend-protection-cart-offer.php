@@ -223,8 +223,9 @@ class HelloExtend_Protection_Cart_Offer
             $parent_id   = $cart_item['product_id'];
             $categories  = get_the_terms($parent_id, 'product_cat');
             $category    = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
+            $price       = (int) floatval($cart_item['data']->get_price() * 100);
 
-            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($item_id)."' data-category='".esc_attr($category)."'></div>";
+            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($item_id)."' data-category='".esc_attr($category)."' data-price='" . $price . "'></div>";
         }
     }
 
