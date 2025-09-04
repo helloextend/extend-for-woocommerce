@@ -1,6 +1,6 @@
 (function( $ ) {
     'use strict';
-    $(document).ready(function() {
+    $(document).off('integration.extend.pdp').on('integration.extend.pdp', function() {
 
         if (!ExtendWooCommerce || !ExtendProductIntegration) return;
 

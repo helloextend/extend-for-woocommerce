@@ -80,7 +80,7 @@
     }
     
     // Wait until the document is fully loaded before running the script.
-    $(document).ready(() => {
+    $(document).off('integration.extend.cart').on('integration.extend.cart', () => {
         // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
         if (typeof Extend === 'undefined'
             || typeof ExtendWooCommerce === 'undefined'

@@ -42,7 +42,7 @@
         });
     }
 
-    $(document).ready(() => {
+    $(document).off('integration.extend.aftermarket').on('integration.extend.aftermarket', () => {
         if (typeof Extend === 'undefined' || typeof ExtendWooCommerce === 'undefined') {
             return;
         }
