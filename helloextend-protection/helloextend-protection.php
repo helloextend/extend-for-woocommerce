@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.0.0
+ * Version:           1.2.0
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+

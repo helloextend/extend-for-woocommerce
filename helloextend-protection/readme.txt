@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.0.0
+Stable tag: 1.2.0
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,22 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+
+= 1.2.0 2025-09-09 =
+ * Feature - Customers now have the option to purchase a protection plan after their initial purchase. Contact Extend to learn more.
+ * Fix - Any protection plans on an order will be cancelled when the line items or entire order is refunded or cancelled
+ * Fix - Small bug fixes and improvements
+
+= 1.1.3 2025-08-28 =
+ * Enhancement - Product images are now synced to Extend store
+
+= 1.1.2 2025-08-25 =
+ * Fix - Versioning patch
+
+= 1.1.1 2025-08-01 =
+ * Fix - When Shipping Protection as a line item is enabled, the cart total would not correctly update when selecting or deselecting - this has been fixed
+ * Fix - Resolved an issue where the default add to cart behavior was not always prevented in the modal offer
+ * Feature - Logs are now passed to the backend from the site. You can now view cart offer debug logs.
 
 = 1.1.0 2025-04-15 =
 * Fix — PDP offers now pass correct quantity from input element. If the input element does not exists, it defaults to 1.
