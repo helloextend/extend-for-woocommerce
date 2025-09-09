@@ -47,8 +47,6 @@ class HelloExtend_Protection_Cart_Offer
     private string $version;
 
     protected string $warranty_product_id;
-    protected array $products = [];
-    protected array $updates  = [];
     private array $settings;
 
     public function __construct()
@@ -76,87 +74,124 @@ class HelloExtend_Protection_Cart_Offer
 
     }
 
-    // get_cart_updates()
-    // goes through the cart and gets updates to products/plans for normalization
-    public function get_cart_updates()
+    private function is_item_helloextend($item)
     {
+        $warranty_product_id = $this->settings['warranty_product_id'];
+        return $item['product_id'] == $warranty_product_id && isset($item['extendData']) && !empty($item['extendData']);
+    }
 
+    private function is_lead($item)
+    {
+        return $this->is_item_helloextend($item) && isset($item['extendData']['leadToken']) && isset($item['extendData']['leadQuantity']);
+    }
+
+    private function is_warranty($item)
+    {
+        return $this->is_item_helloextend($item) && !isset($item['extendData']['leadToken']) && !isset($item['extendData']['leadQuantity']);
+    }
+
+    private function get_product_id($line)
+    {
+        if ($this->is_item_helloextend($line)) {
+            return $line['extendData']['covered_product_id'];
+        } else {
+            return $line['variation_id'] > 0 ? $line['variation_id'] : $line['product_id'];
+        }
+    }
+
+    private function map_cart_items_with_warranties()
+    {
         $cart_contents = WC()->cart->get_cart_contents();
+
+        $products = array();
 
         foreach ( $cart_contents as $line ) {
 
-            // if we're on a warranty item
-            if (intval($line['product_id']) === intval($this->settings['warranty_product_id']) && isset($line['extendData']) && !empty($line['extendData']) ) {
-                // Grab reference id
-                $product_reference_id = $line['extendData']['covered_product_id'];
+            $product_id = $this->get_product_id($line);
+            $id = $line['extendData']['leadToken'] ?? $product_id;
 
-                // If this product doesn't exist, create it with the warranty quantity and warranty added, else add to warranty quantity, and add warranty to warranty list
-                if (! isset($products[ $product_reference_id ]) ) {
-                    $products[ $product_reference_id ] = [
-                        'quantity'          => 0,
-                        'warranty_quantity' => $line['quantity'],
-                        'warranties'        => [ $line ],
-                    ];
-                } else {
-                    $products[ $product_reference_id ]['warranty_quantity'] += $line['quantity'];
-                    array_push($products[ $product_reference_id ]['warranties'], $line);
-                }
-                // if we're on a non-warranty check if the product exists in list, if so add quantity, if not add to product list
+            $product = $products[ $id ] ?? array(
+                'quantity'          => 0,
+                'warranty_quantity' => 0,
+                'warranties'        => array(),
+            );
+
+            if ($this->is_warranty($line)) {
+                $product['warranty_quantity'] += $line['quantity'];
+                $product['warranties'][] = $line;
             } else {
-                $id = $line['variation_id'] > 0 ? $line['variation_id'] : $line['product_id'];
-                if (! isset($products[ $id ]) ) {
-                    $products[ $id ] = [
-                        'quantity'          => $line['quantity'],
-                        'warranty_quantity' => 0,
-                        'warranties'        => [],
-                    ];
-                } else {
-                    $products[ $id ]['quantity'] += $line['quantity'];
+                $product['quantity'] += $line['quantity'];
+
+                if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
+                    $product['leadQuantity'] = $line['extendData']['leadQuantity'];
+                    $product['leadProductKey'] = $line['key'];
                 }
             }
+
+            $products[ $id ] = $product;
         }
 
+        return $products;
+    }
+
+    // get_cart_updates()
+    // goes through the cart and gets updates to products/plans for normalization
+    public function get_cart_updates($products)
+    {
         $cart_balancing = $this->settings['helloextend_enable_cart_balancing'] == 1 ? true : false;
 
-        // if we have products, go through each and check for updates
-        if (isset($products) ) {
-            foreach ( $products as $product ) {
+        $updates = array();
 
-                // if warranty quantity is greater than 0 and product quantity is 0 set warranty quantity to 0
-                if (intval($product['warranty_quantity']) > 0 && intval($product['quantity']) == 0 ) {
-                    foreach ( $product['warranties'] as $warranty ) {
-                        $updates[ $warranty['key'] ] = [ 'quantity' => 0 ];
-                    }
-                } else {
-                    // grab difference of warranty_quantity and product quantity
-                    $diff = $product['warranty_quantity'] - $product['quantity'];
+        foreach ( $products as $product ) {
 
-                    // if there's a difference & that difference is greater than 0, we remove warranties till we reach the product quantity
-                    if ($diff !== 0 ) {
-                        if ($diff > 0 ) {
-                            foreach ( $product['warranties'] as $warranty ) {
-                                $new_quantity_diff           = max([ 0, $diff - $warranty['quantity'] ]);
-                                $removed_quantity            = $diff - $new_quantity_diff;
-                                $updates[ $warranty['key'] ] = [ 'quantity' => $warranty['quantity'] - $removed_quantity ];
-                                $diff                        = $new_quantity_diff;
-                            }
-                        } elseif ($cart_balancing && $diff < 0 ) {
-                            foreach ( $product['warranties'] as $warranty ) {
-                                $new_quantity_diff           = max([ 0, $diff - $warranty['quantity'] ]);
-                                $new_quantity                = $warranty['quantity'] - $diff;
-                                $updates[ $warranty['key'] ] = [ 'quantity' => $new_quantity ];
-                                $diff                        = $new_quantity_diff;
-                            }
-                        }
-                    }
+            // If warranty item is coming from lead and the quantity in the cart does not match the lead quantity
+            if (isset($product['leadQuantity']) && isset($product['leadProductKey'])) {
+                if ($product['leadQuantity'] != $product['quantity']) {
+                    $updates[$product['leadProductKey']] = $product['leadQuantity'];
                 }
+
+                continue;
+            }
+
+            // Remove warranties without products
+            if ($product['warranty_quantity'] > 0 && $product['quantity'] == 0 ) {
+                foreach ( $product['warranties'] as $warranty ) {
+                    $updates[ $warranty['key'] ] = 0;
+                }
+                continue;
+            }
+            
+            // grab difference of warranty quantity and product quantity
+            $quantity_diff = $product['warranty_quantity'] - $product['quantity'];
+
+            // No difference or warranties, no updates
+            if ($quantity_diff == 0 || $product['warranty_quantity'] == 0) {
+                continue;
+            }
+
+            // Too many warranties
+            if ($quantity_diff > 0 ) {
+                foreach ( $product['warranties'] as $warranty ) {
+                    if ($quantity_diff == 0) {
+                        break;
+                    }
+
+                    $new_quantity_diff           = max([ 0, $quantity_diff - $warranty['quantity'] ]);
+                    $removed_quantity            = $quantity_diff - $new_quantity_diff;
+                    $updates[ $warranty['key'] ] = $warranty['quantity'] - $removed_quantity;
+                    $quantity_diff               = $new_quantity_diff;
+                }
+                continue;
+            }
+            
+            // Else, not enough warranties
+            if ($cart_balancing && $quantity_diff < 0 ) {
+                $warranty = $product['warranties'][0];
+                $updates[$warranty['key']] = $warranty['quantity'] - $quantity_diff;
             }
         }
 
-        // if there's updates return updates
-        if (isset($updates) ) {
-            return $updates;
-        }
+        return $updates;
     }
 
     // normalize_cart()
@@ -164,18 +199,12 @@ class HelloExtend_Protection_Cart_Offer
     public function normalize_cart()
     {
 
-        $newUpdates = $this->get_cart_updates();
+        $products = $this->map_cart_items_with_warranties();
 
-        if (isset($newUpdates) ) {
-            $cart = WC()->cart->get_cart_contents();
-            foreach ( $cart as $line ) {
+        $updates = $this->get_cart_updates($products);
 
-                foreach ( $newUpdates as $key => $value ) {
-                    if ($key == $line['key'] ) {
-                        WC()->cart->set_quantity($key, $value['quantity'], true);
-                    }
-                }
-            }
+        foreach ( $updates as $key => $quantity_update ) {
+            WC()->cart->set_quantity($key, $quantity_update, true);
         }
 
         return WC()->cart;
@@ -191,12 +220,12 @@ class HelloExtend_Protection_Cart_Offer
         // if it's not a warranty, add offer element
         if (! isset($cart_item['extendData']) ) {
             $item_id     = $cart_item['variation_id'] ? $cart_item['variation_id'] : $cart_item['product_id'];
-            $item_sku    = $cart_item['data']->get_sku() ? $cart_item['data']->get_sku() : $item_id;
-            $referenceId = $item_id;
-            $categories  = get_the_terms($item_id, 'product_cat');
+            $parent_id   = $cart_item['product_id'];
+            $categories  = get_the_terms($parent_id, 'product_cat');
             $category    = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
+            $price       = (int) floatval($cart_item['data']->get_price() * 100);
 
-            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($referenceId)."' data-category='".esc_attr($category)."'></div>";
+            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($item_id)."' data-category='".esc_attr($category)."' data-price='" . $price . "'></div>";
         }
     }
 
@@ -207,7 +236,7 @@ class HelloExtend_Protection_Cart_Offer
         // get Extend options
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
-        $cart                      = WC()->cart;
+        $cart                           = WC()->cart;
 
         if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' ) {
             wp_enqueue_script('helloextend_script');

@@ -53,8 +53,8 @@ class HelloExtend_Protection_Global
     public function __construct($helloextend_protection, $version)
     {
 
-        $this->helloextend_protection = $helloextend_protection;
-        $this->version           = $version;
+        $this->helloextend_protection   = $helloextend_protection;
+        $this->version                  = $version;
         $this->hooks();
     }
 
@@ -120,7 +120,7 @@ class HelloExtend_Protection_Global
 
             // add sku to cart item and label it referenceId
             $cart[$cart_item_key]['referenceId']  = $referenceId;
-            $cart[$cart_item_key]['product_name'] = $_woo_product->get_title();
+            $cart[$cart_item_key]['product_name'] = $_woo_product->get_name();
         }
 
         echo wp_json_encode($cart, JSON_PRETTY_PRINT);
@@ -269,6 +269,10 @@ class HelloExtend_Protection_Global
             return;
         }
 
+        if ($helloextend_data['leadToken']) {
+            $helloextend_data['leadQuantity'] = $quantity;
+        }
+
         WC()->cart->add_to_cart($warranty_product_id, $quantity, 0, 0, ['extendData' => $helloextend_data]);
     }
 
@@ -345,12 +349,15 @@ class HelloExtend_Protection_Global
             // $covered        = self::helloextend_get_product($covered_id);
             $covered       = wc_get_product($covered_id);
             $sku           = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
+            $covered_title = $covered->get_name();
 
             $item->add_meta_data('Warranty', $title);
             $item->add_meta_data('Warranty Term', $term . ' Months');
             $item->add_meta_data('Plan Id', $sku);
             $item->add_meta_data('Covered Product', $covered_title);
+            if (isset($cart_item['extendData']['leadToken'])) {
+                $item->add_meta_data('Lead Token', $cart_item['extendData']['leadToken']);
+            }
         }
     }
 
@@ -371,7 +378,7 @@ class HelloExtend_Protection_Global
             // $covered        = self::helloextend_get_product($covered_id);
             $covered       = wc_get_product($covered_id);
             $sku           = $cart_item['extendData']['planId'];
-            $covered_title = $covered->get_title();
+            $covered_title = $covered->get_name();
             $data[]        = [
                 'key'   => 'Product',
                 'value' => $covered_title,
@@ -402,6 +409,21 @@ class HelloExtend_Protection_Global
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_global_script');
             wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
+
+            // Get the leadToken from URL parameters
+            $lead_token = $this->get_lead_token_from_url();
+            if ($lead_token) {
+                // Sanitize the token for safe JavaScript output
+                $safe_lead_token = esc_js($lead_token);
+
+                // Output JavaScript to console
+                echo "<script type='text/javascript'>\n";
+                echo "console.log('found leadToken: ', '" . $safe_lead_token . "');\n";
+                echo "</script>\n";
+
+                // next step: Run Post Purchase logic to handle lead Token
+                $this->helloextend_post_purchase($lead_token, $store_id, $environment, $ajaxurl);
+            }
         } else {
             HelloExtend_Protection_Logger::helloextend_log_error('Store Id missing or Extend Product Protection is disabled');
         }
@@ -507,5 +529,32 @@ class HelloExtend_Protection_Global
         }
 
         return $categories[0]->name ?? 'Uncategorized';
+    }
+
+    /**
+     * Get leadToken from URL parameters
+     *
+     * @return string|null The leadToken value or null if not found
+     */
+    private function get_lead_token_from_url() {
+        // Check if leadToken exists in GET parameters
+        if (isset($_GET['leadToken']) && !empty($_GET['leadToken'])) {
+            // Sanitize the input
+            return sanitize_text_field($_GET['leadToken']);
+        }
+
+        return null;
+    }
+
+    /**
+     * Get the Post Purchase Logic if the lead token is passed
+     *
+     * @since 1.0.0
+     */
+    private function helloextend_post_purchase($leadToken, $store_id, $environment, $ajaxurl)
+    {
+        $cart_url = wc_get_cart_url();
+        wp_enqueue_script('helloextend_global_post_purchase_script');
+        wp_localize_script('helloextend_global_post_purchase_script', 'ExtendWooCommerce', compact('store_id', 'leadToken', 'ajaxurl', 'environment', 'cart_url'));
     }
 }

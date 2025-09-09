@@ -246,6 +246,7 @@ class HelloExtend_Protection
     {
         wp_register_script('helloextend_script', $this->sdk_url, array(), '1.0.0', true);
         wp_register_script('helloextend_global_script', $this->url . '../js/helloextend-global.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
+        wp_register_script('helloextend_global_post_purchase_script', $this->url . '../js/helloextend-post-purchase.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
         wp_register_script('helloextend_product_integration_script', $this->url . '../js/helloextend-pdp-offers.js', [ 'jquery', 'helloextend_global_script' ], '1.0.0', true);
         wp_register_script('helloextend_cart_integration_script', $this->url . '../js/helloextend-cart-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
         wp_register_script('helloextend_shipping_integration_script', $this->url . '../js/helloextend-shipping-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);

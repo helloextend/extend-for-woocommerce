@@ -1,16 +1,10 @@
 // This script is used to handle the rendering and functionality of Extend offers in a WooCommerce cart.
 (($) => {
 
-    // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
-    if (!ExtendWooCommerce || !ExtendCartIntegration) {
-        return;
-    }
-
     const SELECTORS = {
         CART_ITEM: '.cart_item',
         TITLE: '.product-name',
         IMAGE: '.product-thumbnail',
-        PRICE: '.product-price',
         QUANTITY: 'input.qty',
         EXTEND_OFFER: '.cart-extend-offer',
         UPDATE_CART: "[name='update_cart']"
@@ -78,9 +72,7 @@
                 const category = $offer.data('category');
                 const quantity = $lineItemElement.find(SELECTORS.QUANTITY).val();
                 
-                const [ dollars, cents = '00' ] = $lineItemElement.find(SELECTORS.PRICE).text().trim().replace(/[$,]/g, '').split('.');
-                const normalizedCents = cents.padEnd(2, '0');
-                const price = `${dollars}${normalizedCents}`;
+                const price = $offer.data('price');
                 
                 renderExtendOffer($offer[0], { referenceId, category, price }, quantity);
             }
@@ -88,7 +80,16 @@
     }
     
     // Wait until the document is fully loaded before running the script.
-    $(document).ready(() => {
+    $(document).off('integration.extend.cart').on('integration.extend.cart', () => {
+        // If necessary objects (ExtendWooCommerce and ExtendCartIntegration) do not exist, stop the execution of the script.
+        if (typeof Extend === 'undefined'
+            || typeof ExtendWooCommerce === 'undefined'
+            || typeof ExtendCartIntegration === 'undefined') {
+            if (ExtendWooCommerce.debugLogEnabled)
+                ExtendWooCommerce.extendAjaxLog('debug', 'One of Extend, ExtendWooCommerce, ExtendCartIntegration is not defined');
+            return;
+        }
+        
         initCartOffers();
     });
     
