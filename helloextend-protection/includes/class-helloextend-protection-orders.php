@@ -218,9 +218,11 @@ class HelloExtend_Protection_Orders
             $product_id = $product->get_id();
 
             // Get the first product category
-            $product_category_ids = $product->get_category_ids();
-            $cat_term = get_term_by('id', $product_category_ids[0], 'product_cat');
-            $first_category = $cat_term->name;
+            if ($product->get_type() == 'variation') {
+                $first_category = HelloExtend_Protection_Global::helloextend_get_first_valid_category(get_the_terms($product->get_parent_id(), 'product_cat'));
+            } else {
+                $first_category = HelloExtend_Protection_Global::helloextend_get_first_valid_category(get_the_terms($product_id, 'product_cat'));
+            }
 
             // if line_id matches any id in $helloextend_plans[], push the plan data into the covered product
             $plan = array();
