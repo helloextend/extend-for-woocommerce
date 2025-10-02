@@ -407,12 +407,14 @@ class HelloExtend_Protection_Global
         $environment    = ($environment == 'live') ? $environment : 'demo';
         $helloextend_enabled = array_key_exists('enable_helloextend', $settings) ? $settings['enable_helloextend'] : 0;
         $ajaxurl        = admin_url('admin-ajax.php');
+		$debug_log_enabled = array_key_exists('enable_helloextend_debug', $settings) ? $settings['enable_helloextend_debug'] : 0;
+	    $log_enabled 	= array_key_exists('enable_helloextend_log', $settings) ? $settings['enable_helloextend_log'] : 0;
 
 		if ($store_id){
 			if ($helloextend_enabled === '1') {
 				wp_enqueue_script('helloextend_script');
 				wp_enqueue_script('helloextend_global_script');
-				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
+				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'debug_log_enabled', 'log_enabled'));
 
 				// Get the leadToken from URL parameters
 				$lead_token = $this->get_lead_token_from_url();
