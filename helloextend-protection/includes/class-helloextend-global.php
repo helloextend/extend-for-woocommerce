@@ -419,9 +419,6 @@ class HelloExtend_Protection_Global
 				// Get the leadToken from URL parameters
 				$lead_token = $this->get_lead_token_from_url();
 				if ($lead_token) {
-					// Sanitize the token for safe JavaScript output
-					$safe_lead_token = esc_js($lead_token);
-
 					// next step: Run Post Purchase logic to handle lead Token
 					$this->helloextend_post_purchase($lead_token, $store_id, $environment, $ajaxurl);
 				}
