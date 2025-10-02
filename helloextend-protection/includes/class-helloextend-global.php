@@ -186,6 +186,9 @@ class HelloExtend_Protection_Global
         $settings['enable_helloextend_debug'] = array_key_exists('enable_helloextend_debug', $helloextend_protection_general_settings)
             ? $helloextend_protection_general_settings['enable_helloextend_debug'] : 0;
 
+		$settings['enable_helloextend_log'] = array_key_exists('enable_helloextend_log', $helloextend_protection_general_settings)
+		    ? $helloextend_protection_general_settings['enable_helloextend_log'] : 0;
+
         /* shipping protection */
         if ($helloextend_protection_shipping_protection_settings) {
             $settings['enable_helloextend_sp'] = array_key_exists('enable_helloextend_sp', $helloextend_protection_shipping_protection_settings)
@@ -405,28 +408,25 @@ class HelloExtend_Protection_Global
         $helloextend_enabled = array_key_exists('enable_helloextend', $settings) ? $settings['enable_helloextend'] : 0;
         $ajaxurl        = admin_url('admin-ajax.php');
 
-        if ($store_id && ($helloextend_enabled === '1')) {
-            wp_enqueue_script('helloextend_script');
-            wp_enqueue_script('helloextend_global_script');
-            wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
+		if ($store_id){
+			if ($helloextend_enabled === '1') {
+				wp_enqueue_script('helloextend_script');
+				wp_enqueue_script('helloextend_global_script');
+				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment'));
 
-            // Get the leadToken from URL parameters
-            $lead_token = $this->get_lead_token_from_url();
-            if ($lead_token) {
-                // Sanitize the token for safe JavaScript output
-                $safe_lead_token = esc_js($lead_token);
+				// Get the leadToken from URL parameters
+				$lead_token = $this->get_lead_token_from_url();
+				if ($lead_token) {
+					// Sanitize the token for safe JavaScript output
+					$safe_lead_token = esc_js($lead_token);
 
-                // Output JavaScript to console
-                echo "<script type='text/javascript'>\n";
-                echo "console.log('found leadToken: ', '" . $safe_lead_token . "');\n";
-                echo "</script>\n";
-
-                // next step: Run Post Purchase logic to handle lead Token
-                $this->helloextend_post_purchase($lead_token, $store_id, $environment, $ajaxurl);
-            }
-        } else {
-            HelloExtend_Protection_Logger::helloextend_log_error('Store Id missing or Extend Product Protection is disabled');
-        }
+					// next step: Run Post Purchase logic to handle lead Token
+					$this->helloextend_post_purchase($lead_token, $store_id, $environment, $ajaxurl);
+				}
+			}
+		} else {
+			HelloExtend_Protection_Logger::helloextend_log_error('Store Id is missing');
+		}
     }
 
     /*

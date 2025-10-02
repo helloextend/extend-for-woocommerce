@@ -156,7 +156,7 @@ class HelloExtend_Protection_Orders
 
     private function get_price_in_cents($item_price)
     {
-        return (int) floatval($item_price * 100);
+	    return (int) round((float) $item_price * 100);
     }
 
     private function get_purchased_leads($order)
