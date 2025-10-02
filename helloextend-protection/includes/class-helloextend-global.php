@@ -255,9 +255,11 @@ class HelloExtend_Protection_Global
         $settings['warranty_product_id'] = array_key_exists('warranty_product_id', $settings)
             ? $settings['warranty_product_id'] : helloextend_product_protection_id();
 
-        if (empty($settings['warranty_product_id'])) {
+        /* circular reference removed.
+		if (empty($settings['warranty_product_id'])) {
             HelloExtend_Protection_Logger::helloextend_log_error('Error: Warranty product is not created.');
         }
+		*/
 
         return $settings;
     }
