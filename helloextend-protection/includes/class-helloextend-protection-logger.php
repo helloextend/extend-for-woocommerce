@@ -16,17 +16,18 @@ if (! defined('ABSPATH') ) {
 
 class HelloExtend_Protection_Logger
 {
-	public static array $settings;
+	private static ?array $settings = null;
 
-
-	public function __construct()
-	{
-		/* retrieve environment variables */
-		self::$settings = HelloExtend_Protection_Global::helloextend_get_settings();
-	}
-
+    private static function helloextend_log_initialize(): void {
+        if (self::$settings === null) {
+			/* retrieve environment variables */
+            self::$settings = HelloExtend_Protection_Global::helloextend_get_settings();
+        }
+    }
+	
     public static function helloextend_log_error( $message )
     {
+		self::helloextend_log_initialize();
 	    if (self::$settings['enable_helloextend_log'] == 0) {
 			return;
 	    }
@@ -74,6 +75,7 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_log_notice( $message )
     {
+		self::helloextend_log_initialize();
 	    if (self::$settings['enable_helloextend_log'] == 0) {
 		    return;
 	    }
@@ -123,6 +125,7 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_log_debug( $message )
     {
+		self::helloextend_log_initialize();
 	    if (self::$settings['enable_helloextend_log'] == 0) {
 		    return;
 	    }
@@ -582,6 +585,7 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_logger_ajax_call()
     {
+		self::helloextend_log_initialize();
 	    if (self::$settings['enable_helloextend_log'] == 0) {
 		    return;
 	    }
