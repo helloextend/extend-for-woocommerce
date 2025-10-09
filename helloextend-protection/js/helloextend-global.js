@@ -4,7 +4,7 @@
         if(!ExtendWooCommerce) { return;
         }
 
-        const { store_id: storeId, ajaxurl, environment, debug_log_enabled: debugLogEnabled } = ExtendWooCommerce;
+        const { store_id: storeId, ajaxurl, environment, debug_log_enabled: debugLogEnabled, log_enabled: logEnabled } = ExtendWooCommerce;
 
         Extend.config({
             storeId,
@@ -91,7 +91,8 @@
             getCart,
             warrantyAlreadyInCart,
             extendAjaxLog,
-            debugLogEnabled
+            debugLogEnabled,
+            logEnabled
         }
 
         $(document).trigger('integration.extend');

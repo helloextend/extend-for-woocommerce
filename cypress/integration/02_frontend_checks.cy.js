@@ -1,6 +1,13 @@
+const URLS = {
+    EXTEND_API_OFFER: 'https://api.helloextend.com/offers*',
+    WOO_ADD_TO_CART: 'https://woocommerce.woodys.extend.com/?wc-ajax=add_to_cart',
+    WOODYS: 'https://woocommerce.woodys.extend.com/',
+    WOODYS_PRODUCT: 'https://woocommerce.woodys.extend.com/product/air-purifier/',
+}
+
 describe('Frontend Page and API Validation', () => {
     it('Checks Homepage for 500 Errors', () => {
-        cy.visit('https://woocommerce.woodys.extend.com/', { failOnStatusCode: false });
+        cy.visit(URLS.WOODYS, { failOnStatusCode: false });
 
         // Ensure the page loaded without 500 errors
         cy.document().then((doc) => {
@@ -9,7 +16,7 @@ describe('Frontend Page and API Validation', () => {
     });
 
     it('Checks Product Page for 500 Errors', () => {
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/', { failOnStatusCode: false });
+        cy.visit(URLS.WOODYS_PRODUCT, { failOnStatusCode: false });
 
         // Ensure the page loaded without 500 errors
         cy.document().then((doc) => {
@@ -18,10 +25,10 @@ describe('Frontend Page and API Validation', () => {
     });
 
     it('Intercepts Offers API Request and Validates Query Parameters', () => {
-        cy.intercept('GET', 'https://api.helloextend.com/offers*').as('offersRequest');
+        cy.intercept('GET', URLS.EXTEND_API_OFFER).as('offersRequest');
 
         // Visit the product page
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/');
+        cy.visit(URLS.WOODYS_PRODUCT);
 
         // Wait for the intercepted API request
         cy.wait('@offersRequest').then((interception) => {
@@ -34,9 +41,9 @@ describe('Frontend Page and API Validation', () => {
 
                 // Validate expected query parameters
                 expect(queryParams.storeId).to.equal('0e03bcd1-8a00-4a2a-bf2d-7c4d336c07e9');
-                expect(queryParams.productId).to.equal('104');
+                expect(queryParams.productId).to.equal('15');
                 expect(queryParams.category).to.equal('Electronics');
-                expect(queryParams.price).to.equal('69900');
+                expect(queryParams.price).to.equal('22900');
             } else {
                 throw new Error('API request was not intercepted.');
             }
@@ -44,10 +51,10 @@ describe('Frontend Page and API Validation', () => {
     });
 
     it('Intercepts Offers API Response Checks for Plans In ADH or Base', () => {
-        cy.intercept('GET', 'https://api.helloextend.com/offers*').as('offersResponse');
+        cy.intercept('GET', URLS.EXTEND_API_OFFER).as('offersResponse');
 
         // Visit the product page
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/');
+        cy.visit(URLS.WOODYS_PRODUCT);
 
         // Wait for the API response
         cy.wait('@offersResponse').then((interception) => {
@@ -76,7 +83,7 @@ describe('Frontend Page and API Validation', () => {
 
     it('Validates Extend PDP Offers & Modal Are Working', () => {
         // Visit product page
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/');
+        cy.visit(URLS.WOODYS_PRODUCT);
 
         // Check if the Extend Offer iFrame exists
         cy.get('div.helloextend-offer > div.extend-product-offer > iframe')
@@ -135,11 +142,11 @@ describe('Frontend Page and API Validation', () => {
     });
 
     it('Ensures Cart Normalization and Simple Offers Are working', () => {
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/');
+        cy.visit(URLS.WOODYS_PRODUCT);
 
         cy.get('[name="add-to-cart"]').then(($button) => {
             let productDetails = {
-                productId: '104'// Check for different attributes
+                productId: '15'// Check for different attributes
                 // ... other product details you need ...
             };
 
@@ -151,9 +158,9 @@ describe('Frontend Page and API Validation', () => {
         // the UI and directly interacts with WooCommerce's backend.
         cy.request({
             method: 'POST',
-            url: 'https://woocommerce.woodys.extend.com/?wc-ajax=add_to_cart', // Adjust if needed
+            url: URLS.WOO_ADD_TO_CART, // Adjust if needed
             body: {
-                product_id: '104', // Use the extracted product ID
+                product_id: '15', // Use the extracted product ID
                 quantity: 1,  // Or whatever quantity you want
                 // ... any other required parameters (variation IDs, etc.) ...
             },
@@ -222,7 +229,7 @@ describe('Frontend Page and API Validation', () => {
     });
 
     it('Validates Checkout Flow and Shipping Protection', () => {
-        cy.visit('https://woocommerce.woodys.extend.com/product/15in-dell-laptop/');
+        cy.visit(URLS.WOODYS_PRODUCT);
 
         // 1. Get Product Details (Important!)
         // You'll need to extract the product ID and any other relevant info
@@ -230,7 +237,7 @@ describe('Frontend Page and API Validation', () => {
         // to see how WooCommerce structures its product data.  Here's an example:
         cy.get('[name="add-to-cart"]').then(($button) => {
             let productDetails = {
-                productId: '104'// Check for different attributes
+                productId: '15'// Check for different attributes
                 // ... other product details you need ...
             };
 
@@ -242,9 +249,9 @@ describe('Frontend Page and API Validation', () => {
         // the UI and directly interacts with WooCommerce's backend.
         cy.request({
             method: 'POST',
-            url: 'https://woocommerce.woodys.extend.com/?wc-ajax=add_to_cart', // Adjust if needed
+            url: URLS.WOO_ADD_TO_CART, // Adjust if needed
             body: {
-                product_id: '104', // Use the extracted product ID
+                product_id: '15', // Use the extracted product ID
                 quantity: 1,  // Or whatever quantity you want
                 // ... any other required parameters (variation IDs, etc.) ...
             },

@@ -13,12 +13,24 @@ if (! defined('ABSPATH') ) {
     exit;
 }
 
+
 class HelloExtend_Protection_Logger
 {
+	private static ?array $settings = null;
 
+    private static function helloextend_log_initialize(): void {
+        if (self::$settings === null) {
+			/* retrieve environment variables */
+            self::$settings = HelloExtend_Protection_Global::helloextend_get_settings();
+        }
+    }
+	
     public static function helloextend_log_error( $message )
     {
-
+		self::helloextend_log_initialize();
+	    if (self::$settings['enable_helloextend_log'] == 0) {
+			return;
+	    }
         /* Get error logs from the wp_options table... */
         $error_log = get_option('helloextend_error_log');
 
@@ -63,7 +75,10 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_log_notice( $message )
     {
-
+		self::helloextend_log_initialize();
+	    if (self::$settings['enable_helloextend_log'] == 0) {
+		    return;
+	    }
         /* Get notice logs from the wp_options table... */
         $notice_log = get_option('helloextend_notice_log', true);
         if (! $notice_log ) {
@@ -110,6 +125,13 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_log_debug( $message )
     {
+		self::helloextend_log_initialize();
+	    if (self::$settings['enable_helloextend_log'] == 0) {
+		    return;
+	    }
+		if (self::$settings['enable_helloextend_debug'] == 0) {
+	        return;
+        }
 
         /* Get debug logs from the wp_options table... */
         $debug_log = get_option('helloextend_debug_log', true);
@@ -563,6 +585,11 @@ class HelloExtend_Protection_Logger
 
     public static function helloextend_logger_ajax_call()
     {
+		self::helloextend_log_initialize();
+	    if (self::$settings['enable_helloextend_log'] == 0) {
+		    return;
+	    }
+
         $method = isset($_POST['method']) ? sanitize_text_field(wp_unslash($_POST['method'])) : null;
         $message = isset($_POST['message']) ? sanitize_text_field(wp_unslash($_POST['message'])) : null;
 

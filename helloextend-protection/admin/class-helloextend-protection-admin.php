@@ -161,10 +161,12 @@ class HelloExtend_Protection_Admin
         $nonce             = wp_create_nonce('helloextend_sync_nonce');
         $helloextend_sync_batch = $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_sync_batch'];
         $debug_log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'];
+	    $log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'];
 
-        wp_enqueue_script('helloextend_script');
+
+	    wp_enqueue_script('helloextend_script');
         wp_enqueue_script('helloextend_sync_script');
-        wp_localize_script('helloextend_sync_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'nonce', 'helloextend_sync_batch', 'debug_log_enabled'));
+        wp_localize_script('helloextend_sync_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'nonce', 'helloextend_sync_batch', 'debug_log_enabled', 'log_enabled'));
 
         /* end for sync */
         global $current_screen;
@@ -480,6 +482,14 @@ class HelloExtend_Protection_Admin
             'helloextend_setting_environment_section' // section
         );
 
+	    add_settings_field(
+		    'enable_helloextend_log', // id
+		    'Enable General Log', // title
+		    array($this, 'enable_helloextend_log_callback'), // callback
+		    'helloextend-protection-for-woocommerce-settings-admin-general', // page
+		    'helloextend_setting_environment_section' // section
+	    );
+
         add_settings_field(
             'enable_helloextend_debug', // id
             'Enable Debugging Log', // title
@@ -568,6 +578,7 @@ class HelloExtend_Protection_Admin
         if (get_option('helloextend_protection_for_woocommerce_general_settings') == null) {
             $settings = [
                 'enable_helloextend_debug'           => '0',
+                'enable_helloextend_log'             => '0',
                 'helloextend_environment'            => 'sandbox',
                 'helloextend_sandbox_store_id'       => '',
                 'helloextend_live_store_id'          => '',
@@ -681,6 +692,10 @@ class HelloExtend_Protection_Admin
         if (isset($input['enable_helloextend_debug'])) {
             $sanitary_values['enable_helloextend_debug'] = $input['enable_helloextend_debug'];
         }
+
+	    if (isset($input['enable_helloextend_log'])) {
+		    $sanitary_values['enable_helloextend_log'] = $input['enable_helloextend_log'];
+	    }
 
         if (isset($input['helloextend_enable_cart_offers'])) {
             $sanitary_values['helloextend_enable_cart_offers'] = $input['helloextend_enable_cart_offers'];
@@ -1224,6 +1239,15 @@ class HelloExtend_Protection_Admin
                 && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'] === '1') ? 'checked' : ''
         );
     }
+
+    public function enable_helloextend_log_callback()
+	{
+		printf(
+			'<input type="checkbox" name="helloextend_protection_for_woocommerce_general_settings[enable_helloextend_log]" id="enable_helloextend_log" value="1" %s>',
+			(isset($this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'])
+			 && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'] === '1') ? 'checked' : ''
+		);
+	}
 
     public function helloextend_use_special_price_callback()
     {
