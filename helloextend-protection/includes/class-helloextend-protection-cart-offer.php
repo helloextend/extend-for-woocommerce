@@ -75,6 +75,11 @@ class HelloExtend_Protection_Cart_Offer
         //minicart
         add_action('wp_enqueue_scripts', [$this, 'minicart_offers']);
 
+        // minicart normalization
+        add_action('woocommerce_cart_item_removed', [ $this, 'normalize_cart' ]);
+        add_action('woocommerce_after_cart_item_quantity_update', [ $this, 'normalize_cart' ]);
+        add_action('woocommerce_add_to_cart', [ $this, 'normalize_cart' ]);
+         
     }
 
     private function is_item_helloextend($item)
@@ -107,33 +112,33 @@ class HelloExtend_Protection_Cart_Offer
         $cart_contents = WC()->cart->get_cart_contents();
 
         $products = array();
+        if ($cart_contents){
+            foreach ( $cart_contents as $line ) {
 
-        foreach ( $cart_contents as $line ) {
+                $product_id = $this->get_product_id($line);
+                $id = $line['extendData']['leadToken'] ?? $product_id;
 
-            $product_id = $this->get_product_id($line);
-            $id = $line['extendData']['leadToken'] ?? $product_id;
+                $product = $products[ $id ] ?? array(
+                    'quantity'          => 0,
+                    'warranty_quantity' => 0,
+                    'warranties'        => array(),
+                );
 
-            $product = $products[ $id ] ?? array(
-                'quantity'          => 0,
-                'warranty_quantity' => 0,
-                'warranties'        => array(),
-            );
+                if ($this->is_warranty($line)) {
+                    $product['warranty_quantity'] += $line['quantity'];
+                    $product['warranties'][] = $line;
+                } else {
+                    $product['quantity'] += $line['quantity'];
 
-            if ($this->is_warranty($line)) {
-                $product['warranty_quantity'] += $line['quantity'];
-                $product['warranties'][] = $line;
-            } else {
-                $product['quantity'] += $line['quantity'];
-
-                if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
-                    $product['leadQuantity'] = $line['extendData']['leadQuantity'];
-                    $product['leadProductKey'] = $line['key'];
+                    if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
+                        $product['leadQuantity'] = $line['extendData']['leadQuantity'];
+                        $product['leadProductKey'] = $line['key'];
+                    }
                 }
+
+                $products[ $id ] = $product;
             }
-
-            $products[ $id ] = $product;
         }
-
         return $products;
     }
 
@@ -259,6 +264,7 @@ class HelloExtend_Protection_Cart_Offer
 
     // renders minicart offers
     public function minicart_offers(){
+        $cart_contents = null;
         // get Extend options
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
@@ -318,7 +324,7 @@ class HelloExtend_Protection_Cart_Offer
 
         }
 
-        if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' ) {
+        if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' && $cart_contents) {
             wp_enqueue_script('helloextend_minicart_integration_script');
              wp_localize_script(
                 'helloextend_minicart_integration_script',
