@@ -307,7 +307,7 @@ class HelloExtend_Protection_Cart_Offer
                 'categories'      => $categories, 
                 'top_category'    => $category,               // array e.g. ['T-shirts', 'Summer']
                 'quantity'        => $cart_item['quantity'],
-                'price_raw'       => $product->get_price(),          // string: "29.99"
+                'price_raw'       => (int) round( (float) $product->get_price() * 100 ),         // string: "29.99"
                 'price_formatted' => wc_price( $product->get_price() ), // "$29.99" or with currency
                 'price_html'      => $product->get_price_html(),     // includes <del>/<ins> if on sale
                 'line_subtotal'   => WC()->cart->get_product_subtotal( $product, $cart_item['quantity'] ),
