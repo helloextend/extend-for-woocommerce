@@ -160,8 +160,8 @@ class HelloExtend_Protection_Admin
         $ajaxurl           = admin_url('admin-ajax.php');
         $nonce             = wp_create_nonce('helloextend_sync_nonce');
         $helloextend_sync_batch = $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_sync_batch'];
-        $debug_log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'];
-	    $log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'];
+        $debug_log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'] ?? '';
+	    $log_enabled = $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'] ?? '';
 
 
 	    wp_enqueue_script('helloextend_script');

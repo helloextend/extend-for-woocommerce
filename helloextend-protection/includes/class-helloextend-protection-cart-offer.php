@@ -72,6 +72,14 @@ class HelloExtend_Protection_Cart_Offer
         // run normalization on check
         add_action('woocommerce_check_cart_items', [ $this, 'normalize_cart' ]);
 
+        //minicart
+        add_action('wp_enqueue_scripts', [$this, 'minicart_offers']);
+
+        // minicart normalization
+        add_action('woocommerce_cart_item_removed', [ $this, 'normalize_cart' ]);
+        add_action('woocommerce_after_cart_item_quantity_update', [ $this, 'normalize_cart' ]);
+        add_action('woocommerce_add_to_cart', [ $this, 'normalize_cart' ]);
+         
     }
 
     private function is_item_helloextend($item)
@@ -104,33 +112,33 @@ class HelloExtend_Protection_Cart_Offer
         $cart_contents = WC()->cart->get_cart_contents();
 
         $products = array();
+        if ($cart_contents){
+            foreach ( $cart_contents as $line ) {
 
-        foreach ( $cart_contents as $line ) {
+                $product_id = $this->get_product_id($line);
+                $id = $line['extendData']['leadToken'] ?? $product_id;
 
-            $product_id = $this->get_product_id($line);
-            $id = $line['extendData']['leadToken'] ?? $product_id;
+                $product = $products[ $id ] ?? array(
+                    'quantity'          => 0,
+                    'warranty_quantity' => 0,
+                    'warranties'        => array(),
+                );
 
-            $product = $products[ $id ] ?? array(
-                'quantity'          => 0,
-                'warranty_quantity' => 0,
-                'warranties'        => array(),
-            );
+                if ($this->is_warranty($line)) {
+                    $product['warranty_quantity'] += $line['quantity'];
+                    $product['warranties'][] = $line;
+                } else {
+                    $product['quantity'] += $line['quantity'];
 
-            if ($this->is_warranty($line)) {
-                $product['warranty_quantity'] += $line['quantity'];
-                $product['warranties'][] = $line;
-            } else {
-                $product['quantity'] += $line['quantity'];
-
-                if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
-                    $product['leadQuantity'] = $line['extendData']['leadQuantity'];
-                    $product['leadProductKey'] = $line['key'];
+                    if (isset($line['extendData']) && isset($line['extendData']['leadQuantity'])) {
+                        $product['leadQuantity'] = $line['extendData']['leadQuantity'];
+                        $product['leadProductKey'] = $line['key'];
+                    }
                 }
+
+                $products[ $id ] = $product;
             }
-
-            $products[ $id ] = $product;
         }
-
         return $products;
     }
 
@@ -241,9 +249,11 @@ class HelloExtend_Protection_Cart_Offer
         if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_cart_integration_script');
+            wp_enqueue_script('helloextend_minicart_integration_script');
             $ajaxurl = admin_url('admin-ajax.php');
             wp_localize_script(
                 'helloextend_cart_integration_script',
+                //'helloextend_minicart_integration_script',
                 'ExtendCartIntegration',
                 compact('cart', 'helloextend_enable_cart_offers')
             );
@@ -251,4 +261,79 @@ class HelloExtend_Protection_Cart_Offer
             HelloExtend_Protection_Logger::helloextend_log_error('Cart Offers Class: Extend is not enabled');
         }
     }
+
+    // renders minicart offers
+    public function minicart_offers(){
+        $cart_contents = null;
+        // get Extend options
+        $enable_helloextend             = trim($this->settings['enable_helloextend']);
+        $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
+        $minicart                           = WC()->cart;
+
+        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+           /** @var WC_Product $product */
+            $product = $cart_item['data'];
+
+            // Skip if product object is invalid (rare, but safe)
+            if ( ! is_a( $product, 'WC_Product' ) ) {
+                continue;
+            }
+
+            $product_id = $product->get_id(); 
+            // Categories: array of category names
+            $categories = array();
+            $terms = get_the_terms( $product_id, 'product_cat' );
+            if ( $terms && ! is_wp_error( $terms ) ) {
+                  $categories = wp_list_pluck( $terms, 'name', 'term_id' ); // ← use 'slug' or 'term_id' if preferred
+                
+            }
+
+            $category = null;
+       
+            $ignored_set = array_flip(array_map('intval', (array) get_option('helloextend_protection_for_woocommerce_ignored_categories')));
+
+
+            foreach( $categories as $cat => $term ){
+                    if (!isset($ignored_set[(int)($cat)])) {
+                        $category = $term  ?? 'Uncategorized';
+                        break;
+                    }
+            }
+            // Build item data
+            $item = array(
+               
+                'product_id'      => $product_id,
+                'name'            => $product->get_name(),
+                'categories'      => $categories, 
+                'top_category'    => $category,               // array e.g. ['T-shirts', 'Summer']
+                'quantity'        => $cart_item['quantity'],
+                'price_raw'       => (int) round( (float) $product->get_price() * 100 ),         // string: "29.99"
+                'price_formatted' => wc_price( $product->get_price() ), // "$29.99" or with currency
+                'price_html'      => $product->get_price_html(),     // includes <del>/<ins> if on sale
+                'line_subtotal'   => WC()->cart->get_product_subtotal( $product, $cart_item['quantity'] ),
+                'permalink'       => $product->get_permalink(),
+                'sku'          => $product->get_sku()                
+            );
+            // If it's a variation, add variation-specific info
+            if ( $product->is_type( 'variation' ) ) {
+                $item['variation_id'] = $product->get_id();
+                $item['parent_id']    = $product->get_parent_id();
+                // $item['attributes'] = $product->get_variation_attributes(); // or from $cart_item['variation']
+            }
+            $cart_contents[ $cart_item_key ] = $item;
+
+        }
+
+        if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' && $cart_contents) {
+            wp_enqueue_script('helloextend_minicart_integration_script');
+             wp_localize_script(
+                'helloextend_minicart_integration_script',
+                'ExtendCartIntegration',
+                compact('cart_contents', 'helloextend_enable_cart_offers')
+            );
+        } else {
+            HelloExtend_Protection_Logger::helloextend_log_error('Cart Offers Class / Minicart: Extend is not enabled');
+        }
+    }
+
 }
