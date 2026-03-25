@@ -294,7 +294,7 @@ class HelloExtend_Protection_Cart_Offer
 
 
             foreach( $categories as $cat => $term ){
-                    if (!isset($ignored[(int)($cat ?? 0)])) {
+                    if (!isset($ignored_set[(int)($cat)])) {
                         $category = $term  ?? 'Uncategorized';
                         break;
                     }
