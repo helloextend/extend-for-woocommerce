@@ -288,7 +288,7 @@ class HelloExtend_Protection_Global
         if (is_admin() && !defined('DOING_AJAX')) return;
 
         foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
-            if (!empty($cart_item['extendData']['price']) || $cart_item['extendData']['price'] == (int) 0) {
+            if (!empty($cart_item['extendData']) && (!empty($cart_item['extendData']['price']) || $cart_item['extendData']['price'] == (int) 0)) {
 
                 $price = round(floatval($cart_item['extendData']['price']) / 100, 2);
 
