@@ -93,7 +93,7 @@ class HelloExtend_Protection_Global
         add_action('woocommerce_checkout_create_order_line_item', [$this, 'order_item_meta'], 10, 3);
 
         // update price for warranty items
-        add_action('woocommerce_before_calculate_totals', [$this, 'update_price']);
+        add_action('woocommerce_before_calculate_totals', [$this, 'update_price'], 99999);
 
         // Initialize global ExtendWooCommerce
         add_action('wp_head', [$this, 'helloextend_init_global']);
@@ -283,16 +283,18 @@ class HelloExtend_Protection_Global
 
     // update_price($cart_object)
     // @param $cart_object : WC_Cart, represents current cart object
-    public function update_price($cart_object)
+    public function update_price($cart)
     {
-        $cart_items = $cart_object->cart_contents;
+        if (is_admin() && !defined('DOING_AJAX')) return;
 
-        if (!empty($cart_items)) {
+        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
+            if (!empty($cart_item['extendData']['price'])) {
 
-            foreach ($cart_items as $key => $value) {
-                if (isset($value['extendData']) && !empty($value['extendData'])) {
-                    $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
-                }
+                $price = round(floatval($cart_item['extendData']['price']) / 100, 2);
+
+                $cart_item['data']->set_price($price);
+                $cart_item['data']->set_regular_price($price);
+                $cart_item['data']->set_sale_price('');
             }
         }
     }
