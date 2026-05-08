@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.0
+Stable tag: 1.2.4
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,13 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+
+= 1.2.4 2026-05-08 =
+* Fix - Decreased priority for warranty price hook so that plan prices are properly set in more scenarios.
+* Fix - Fixed a bug where product prices were incorrectly set when orders were sent to Extend.
+
+= 1.2.3 2026-03-25 =
+* Feature - Added support for cart offers in WooCommerce side cart
 
 = 1.2.0 2025-09-09 =
  * Feature - Customers now have the option to purchase a protection plan after their initial purchase. Contact Extend to learn more.
