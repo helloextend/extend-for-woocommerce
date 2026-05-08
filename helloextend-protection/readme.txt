@@ -80,7 +80,7 @@ For more information on our terms of service and privacy policy, visit the links
 == Changelog ==
 
 = 1.2.4 2026-05-08 =
-* Fix - Decreased priority for warranty price hook so that plan prices are properly set in more scenarios.
+* Fix - Increased priority for warranty price hook so that plan prices are properly set in more scenarios.
 * Fix - Fixed a bug where product prices were incorrectly set when orders were sent to Extend.
 
 = 1.2.3 2026-03-25 =
