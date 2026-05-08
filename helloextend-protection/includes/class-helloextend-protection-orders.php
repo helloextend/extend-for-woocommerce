@@ -245,8 +245,8 @@ class HelloExtend_Protection_Orders
                         'id'            => $product->get_id(),
                         'title'         => $product->get_name(),
                         'category'      => $first_category,
-                        'listPrice'     => $this->get_price_in_cents($product->get_regular_price() * 100),
-                        'purchasePrice' => $this->get_price_in_cents($product->get_price() * 100),
+                        'listPrice'     => $this->get_price_in_cents($product->get_regular_price()),
+                        'purchasePrice' => $this->get_price_in_cents($product->get_price()),
                         'purchaseDate'  => $order->get_data()['date_created']->getTimestamp() * 1000,
                         'imageUrl'      => $image_url
                     ),
