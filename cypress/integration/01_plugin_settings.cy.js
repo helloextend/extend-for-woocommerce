@@ -59,8 +59,8 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
             cy.get('#wp-submit').click();
         }
 
-        // check #enable_helloextend_pp is unchecked
-
+        // check/enable #enable_helloextend_pp 
+        cy.get('#enable_helloextend_pp').check();
 
         // Check #helloextendenable_cart_offers if unchecked
         cy.get('#helloextendenable_cart_offers').then(($el) => {
