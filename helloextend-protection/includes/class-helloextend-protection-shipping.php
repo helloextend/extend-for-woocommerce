@@ -138,7 +138,7 @@ class HelloExtend_Protection_Shipping
 	        // phpcs:enable
         }
     
-        if ($enable_helloextend_sp == 1 ) {
+        if ($enable_helloextend_sp == 1 && $helloextend_enabled == 1 ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_shipping_integration_script');
             wp_localize_script(

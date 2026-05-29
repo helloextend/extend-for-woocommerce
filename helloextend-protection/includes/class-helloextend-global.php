@@ -259,11 +259,6 @@ class HelloExtend_Protection_Global
         $settings['warranty_product_id'] = array_key_exists('warranty_product_id', $settings)
             ? $settings['warranty_product_id'] : helloextend_product_protection_id();
 
-        /* circular reference removed.
-		if (empty($settings['warranty_product_id'])) {
-            HelloExtend_Protection_Logger::helloextend_log_error('Error: Warranty product is not created.');
-        }
-		*/
 
         return $settings;
     }
@@ -292,12 +287,15 @@ class HelloExtend_Protection_Global
         $cart_items = $cart_object->cart_contents;
 
         if (!empty($cart_items)) {
-
-            foreach ($cart_items as $key => $value) {
-                if (isset($value['extendData']) && !empty($value['extendData'])) {
-                    $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
+            foreach ($cart_items as $value) {
+                if (
+                    isset($value['extendData'], $value['extendData']['price'], $value['data']) &&
+                    is_numeric($value['extendData']['price']) &&
+                    is_object($value['data'])
+                ) {
+                    $value['data']->set_price(round(((float) $value['extendData']['price']) / 100, 2));
                 }
-            }
+             }
         }
     }
 

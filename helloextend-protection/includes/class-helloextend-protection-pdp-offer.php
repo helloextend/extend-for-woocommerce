@@ -102,7 +102,7 @@ class HelloExtend_Protection_PDP_Offer
         $helloextend_enabled              = $this->settings['enable_helloextend'];
         $atc_button_selector         = $this->settings['helloextend_atc_button_selector'];
 
-        if ($helloextend_enabled == '1' ) {
+        if ($helloextend_enabled == '1' && $helloextend_pp_enabled == '1' ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_product_integration_script');
             wp_localize_script(
