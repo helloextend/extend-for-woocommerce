@@ -17,6 +17,9 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
         // Visit Plugin Settings Page
         cy.visit('https://woocommerce.woodys.extend.com/wp-admin/admin.php?page=helloextend-protection-settings');
 
+        // Check #enable_helloextend, if unchecked, check if it is unchecked
+        cy.get('#enable_helloextend').check();
+
         // Select "Live" environment
         cy.get('#helloextendenvironment').select('live');
 
@@ -56,12 +59,8 @@ describe('Update Plugin Settings in WP-Admin > Extend', () => {
             cy.get('#wp-submit').click();
         }
 
-        // Check #enable_helloextend if unchecked
-        cy.get('#enable_helloextend').then(($el) => {
-            if (!$el.is(':checked')) {
-                cy.wrap($el).check();
-            }
-        });
+        // check #enable_helloextend_pp is unchecked
+
 
         // Check #helloextendenable_cart_offers if unchecked
         cy.get('#helloextendenable_cart_offers').then(($el) => {
