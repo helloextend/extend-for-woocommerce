@@ -93,7 +93,7 @@ class HelloExtend_Protection_Global
         add_action('woocommerce_checkout_create_order_line_item', [$this, 'order_item_meta'], 10, 3);
 
         // update price for warranty items
-        add_action('woocommerce_before_calculate_totals', [$this, 'update_price'], 99999);
+        add_action('woocommerce_before_calculate_totals', [$this, 'update_price']);
 
         // Initialize global ExtendWooCommerce
         add_action('wp_head', [$this, 'helloextend_init_global']);
@@ -141,8 +141,12 @@ class HelloExtend_Protection_Global
         $helloextend_protection_product_protection_settings  = (array) get_option('helloextend_protection_for_woocommerce_product_protection_settings');
         $helloextend_protection_shipping_protection_settings = (array) get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
 
-        $settings['enable_helloextend'] = array_key_exists('enable_helloextend', $helloextend_protection_product_protection_settings)
-            ? $helloextend_protection_product_protection_settings['enable_helloextend'] : 0;
+        $settings['enable_helloextend'] = array_key_exists('enable_helloextend', $helloextend_protection_general_settings)
+            ? $helloextend_protection_general_settings['enable_helloextend'] : 0;
+
+            
+        $settings['enable_helloextend_pp'] = array_key_exists('enable_helloextend_pp', $helloextend_protection_product_protection_settings)
+                ? $helloextend_protection_product_protection_settings['enable_helloextend_pp'] : 0;
 
         $settings['helloextend_enable_cart_offers'] = array_key_exists('helloextend_enable_cart_offers', $helloextend_protection_product_protection_settings)
             ? $helloextend_protection_product_protection_settings['helloextend_enable_cart_offers'] : 0;
@@ -283,18 +287,16 @@ class HelloExtend_Protection_Global
 
     // update_price($cart_object)
     // @param $cart_object : WC_Cart, represents current cart object
-    public function update_price($cart)
+    public function update_price($cart_object)
     {
-        if (is_admin() && !defined('DOING_AJAX')) return;
+        $cart_items = $cart_object->cart_contents;
 
-        foreach ($cart->get_cart() as $cart_item_key => $cart_item) {
-            if (!empty($cart_item['extendData']) && (!empty($cart_item['extendData']['price']) || $cart_item['extendData']['price'] == (int) 0)) {
+        if (!empty($cart_items)) {
 
-                $price = round(floatval($cart_item['extendData']['price']) / 100, 2);
-
-                $cart_item['data']->set_price($price);
-                $cart_item['data']->set_regular_price($price);
-                $cart_item['data']->set_sale_price('');
+            foreach ($cart_items as $key => $value) {
+                if (isset($value['extendData']) && !empty($value['extendData'])) {
+                    $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
+                }
             }
         }
     }
@@ -415,7 +417,7 @@ class HelloExtend_Protection_Global
 	    $log_enabled 	= array_key_exists('enable_helloextend_log', $settings) ? $settings['enable_helloextend_log'] : 0;
 
 		if ($store_id){
-			if ($helloextend_enabled === '1') {
+			if ($helloextend_enabled == '1') {
 				wp_enqueue_script('helloextend_script');
 				wp_enqueue_script('helloextend_global_script');
 				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'debug_log_enabled', 'log_enabled'));

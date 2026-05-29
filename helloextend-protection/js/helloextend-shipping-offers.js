@@ -7,22 +7,15 @@
         function initShippingOffers()
         {
             // Deconstructs ExtendProductIntegration variables
-            const { env, items, enable_helloextend_sp, ajax_url, update_order_review_nonce, helloextend_sp_add_sku } = ExtendShippingIntegration;
+            const { env, items, helloextend_enabled, enable_helloextend_sp, ajax_url, update_order_review_nonce, helloextend_sp_add_sku } = ExtendShippingIntegration;
             let items_array = eval(items);
 
-            // If Extend shipping protection offers are not enabled, hide Extend offer div
-            if(enable_helloextend_sp === '0') {
-                const extendShippingOffer = document.querySelector('.helloextend-sp-offer')
-                if (extendShippingOffer) {
-                    extendShippingOffer.style.display = 'none';
-                }
+            if (helloextend_enabled == 0 || enable_helloextend_sp == 0)  return;
 
-            }
-            //const isShippingProtectionInCart = ExtendShippingIntegration.shippingProtectionInCart(items);
             const isShippingProtectionInCart = false;
 
             //If Extend shipping  protection is enabled, render offers
-            if (enable_helloextend_sp === '1') {
+            if (enable_helloextend_sp == '1') {
                 Extend.shippingProtection.render(
                     {
                         selector: '#helloextend-shipping-offer',

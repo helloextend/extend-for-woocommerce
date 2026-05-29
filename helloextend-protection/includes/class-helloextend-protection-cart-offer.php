@@ -244,9 +244,10 @@ class HelloExtend_Protection_Cart_Offer
         // get Extend options
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
+        $enable_helloextend_pp          = trim($this->settings['enable_helloextend_pp']);
         $cart                           = WC()->cart;
 
-        if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' ) {
+        if ($helloextend_enable_cart_offers == '1' && $enable_helloextend == '1' && $enable_helloextend_pp == '1') {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_cart_integration_script');
             wp_enqueue_script('helloextend_minicart_integration_script');
@@ -257,8 +258,6 @@ class HelloExtend_Protection_Cart_Offer
                 'ExtendCartIntegration',
                 compact('cart', 'helloextend_enable_cart_offers')
             );
-        } else {
-            HelloExtend_Protection_Logger::helloextend_log_error('Cart Offers Class: Extend is not enabled');
         }
     }
 
@@ -267,6 +266,7 @@ class HelloExtend_Protection_Cart_Offer
         $cart_contents = null;
         // get Extend options
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
+        $enable_helloextend_pp          = trim($this->settings['enable_helloextend_pp']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
         $minicart                           = WC()->cart;
 
@@ -324,16 +324,14 @@ class HelloExtend_Protection_Cart_Offer
 
         }
 
-        if ($helloextend_enable_cart_offers === '1' && $enable_helloextend === '1' && $cart_contents) {
+        if ($helloextend_enable_cart_offers == '1' && $enable_helloextend == '1' && $cart_contents && $enable_helloextend_pp == '1') {
             wp_enqueue_script('helloextend_minicart_integration_script');
              wp_localize_script(
                 'helloextend_minicart_integration_script',
                 'ExtendCartIntegration',
                 compact('cart_contents', 'helloextend_enable_cart_offers')
             );
-        } else {
-            HelloExtend_Protection_Logger::helloextend_log_error('Cart Offers Class / Minicart: Extend is not enabled');
-        }
+        } 
     }
 
 }

@@ -5,7 +5,10 @@
         if (!ExtendWooCommerce || !ExtendProductIntegration) return;
 
         // Deconstructs ExtendProductIntegration variables
-        const { type: product_type, id: product_id, sku, first_category, price, helloextend_pdp_offers_enabled, helloextend_modal_offers_enabled, atc_button_selector } = ExtendProductIntegration;
+        const { type: product_type, id: product_id, sku, first_category, price, helloextend_enabled, helloextend_pp_enabled,  helloextend_pdp_offers_enabled, helloextend_modal_offers_enabled, atc_button_selector } = ExtendProductIntegration;
+
+
+        if (helloextend_enabled == 0 || helloextend_pp_enabled == 0)  return;
 
         const $atcButton = $(atc_button_selector);
 
@@ -14,7 +17,7 @@
         let reference_id = product_id;
 
         // If PDP offers are not enabled, hide Extend offer div
-        if (helloextend_pdp_offers_enabled === '0') {
+        if (helloextend_pdp_offers_enabled == '0' || helloextend_pp_enabled == '0' || helloextend_enabled =='0') {
             $('.helloextend-offer').hide();
         }
 
@@ -53,7 +56,7 @@
                             triggerAddToCart();
                         });
                 } else {
-                    if(helloextend_modal_offers_enabled === '1') {
+                    if(helloextend_modal_offers_enabled == '1' ) {
                         Extend.modal.open({
                             referenceId,
                             price: price,
@@ -86,7 +89,7 @@
         }
 
         // If Extend PDP is enabled, render offers
-        if (helloextend_pdp_offers_enabled === '1') {
+        if (helloextend_pdp_offers_enabled == '1') {
             if(product_type ==='simple'){
 
                 Extend.buttons.render('.helloextend-offer', {

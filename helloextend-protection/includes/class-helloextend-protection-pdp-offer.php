@@ -96,18 +96,19 @@ class HelloExtend_Protection_PDP_Offer
         $price                       = (int) floatval($product->get_price() * 100);
         $type                        = $product->get_type();
         $env                         = $this->settings['helloextend_environment'];
+        $helloextend_pp_enabled      = $this->settings['enable_helloextend_pp'];
         $helloextend_pdp_offers_enabled   = $this->settings['helloextend_enable_pdp_offers'];
         $helloextend_modal_offers_enabled = $this->settings['helloextend_enable_modal_offers'];
         $helloextend_enabled              = $this->settings['enable_helloextend'];
         $atc_button_selector         = $this->settings['helloextend_atc_button_selector'];
 
-        if ($helloextend_enabled === '1' ) {
+        if ($helloextend_enabled == '1' ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_product_integration_script');
             wp_localize_script(
                 'helloextend_product_integration_script',
                 'ExtendProductIntegration',
-                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector')
+                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pp_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector')
             );
             echo "<div class='helloextend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }
