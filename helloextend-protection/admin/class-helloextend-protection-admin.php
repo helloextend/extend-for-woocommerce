@@ -343,9 +343,9 @@ class HelloExtend_Protection_Admin
         /* product protection */
 
         add_settings_field(
-            'enable_helloextend', // id
+            'enable_helloextend_pp', // id
             'Enable Product Protection', // title
-            array($this, 'enable_helloextend_callback'), // callback
+            array($this, 'enable_helloextend_pp_callback'), // callback
             'helloextend-protection-for-woocommerce-settings-admin-product-protection', // page
             'helloextend_protection_for_woocommerce_settings_setting_section' // section
         );
@@ -425,6 +425,14 @@ class HelloExtend_Protection_Admin
         );
 
         /* general settings */
+
+        add_settings_field(
+            'enable_helloextend', // id
+            'Enable Extend Module', // title
+            array($this, 'enable_helloextend_callback'), // callback
+            'helloextend-protection-for-woocommerce-settings-admin-general', // page
+            'helloextend_setting_environment_section' // section
+        );
 
         add_settings_field(
             'helloextend_environment', // id
@@ -577,6 +585,7 @@ class HelloExtend_Protection_Admin
 
         if (get_option('helloextend_protection_for_woocommerce_general_settings') == null) {
             $settings = [
+                'enable_helloextend'                => '1',
                 'enable_helloextend_debug'           => '0',
                 'enable_helloextend_log'             => '0',
                 'helloextend_environment'            => 'sandbox',
@@ -592,7 +601,7 @@ class HelloExtend_Protection_Admin
 
         if (get_option('helloextend_protection_for_woocommerce_product_protection_settings') == null) {
             $settingsPP = [
-                'enable_helloextend'                => '1',
+                'enable_helloextend_pp'             => '1',
                 'helloextend_enable_cart_offers'    => '1',
                 'helloextend_enable_modal_offers'   => '1',
                 'helloextend_enable_cart_balancing' => '1',
@@ -679,6 +688,10 @@ class HelloExtend_Protection_Admin
         $sanitary_values = array();
         if (isset($input['enable_helloextend'])) {
             $sanitary_values['enable_helloextend'] = $input['enable_helloextend'];
+        }
+        
+        if (isset($input['enable_helloextend_pp'])) {
+            $sanitary_values['enable_helloextend_pp'] = $input['enable_helloextend_pp'];
         }
 
         if (isset($input['enable_helloextend_sp'])) {
@@ -806,9 +819,18 @@ class HelloExtend_Protection_Admin
     public function enable_helloextend_callback()
     {
         printf(
-            '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[enable_helloextend]" id="enable_helloextend" value="1" %s>',
-            (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['enable_helloextend'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['enable_helloextend'] === '1') ? 'checked' : ''
+            '<input type="checkbox" name="helloextend_protection_for_woocommerce_general_settings[enable_helloextend]" id="enable_helloextend" value="1" %s>',
+            (isset($this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend'])
+                && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend'] == '1') ? 'checked' : ''
+        );
+    }
+
+    public function enable_helloextend_pp_callback()
+    {
+        printf(
+            '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[enable_helloextend_pp]" id="enable_helloextend_pp" value="1" %s>',
+            (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['enable_helloextend_pp'])
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['enable_helloextend_pp'] == '1') ? 'checked' : ''
         );
     }
 
@@ -817,7 +839,7 @@ class HelloExtend_Protection_Admin
         printf(
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[enable_helloextend_sp]" id="enable_helloextend_sp" value="1" %s>',
             (isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['enable_helloextend_sp'])
-                && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['enable_helloextend_sp'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['enable_helloextend_sp'] == '1') ? 'checked' : ''
         );
     }
 
@@ -826,7 +848,7 @@ class HelloExtend_Protection_Admin
         printf(
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_shipping_protection_settings[helloextend_sp_add_sku]" id="helloextend_sp_add_sku" value="1" %s> <label for="helloextend_sp_add_sku">Leave unchecked for Shipping Protection as a fee</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'])
-                && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_shipping_protection_options['helloextend_sp_add_sku'] == '1') ? 'checked' : ''
         );
     }
 
@@ -870,7 +892,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_catalog_sync_settings[helloextend_use_skus]" 
                            id="helloextenduse_skus" value="1" %s> <label for="helloextenduse_skus">If SKUs are not present, we\'ll use IDs instead. (%s)</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_skus'])
-                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_skus'] === '1') ? 'checked' : '',
+                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_skus'] == '1') ? 'checked' : '',
             wp_kses($note, $allowed_note_tags)
         );
     }
@@ -881,7 +903,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_enable_cart_offers]" 
                            id="helloextendenable_cart_offers" value="1" %s> <label for="helloextendenable_cart_offers">Display protection offers in the cart</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_offers'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_offers'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_offers'] == '1') ? 'checked' : ''
         );
     }
 
@@ -891,7 +913,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_enable_cart_balancing]" 
                            id="helloextendenable_cart_balancing" value="1" %s> <label for="helloextendenable_cart_balancing">Automatically adjust quantities</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_balancing'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_balancing'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_cart_balancing'] == '1') ? 'checked' : ''
         );
     }
 
@@ -901,7 +923,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_enable_pdp_offers]" 
                            id="helloextendenable_pdp_offers" value="1" %s> <label for="helloextendenable_pdp_offers">Display offers on product page</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_pdp_offers'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_pdp_offers'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_pdp_offers'] == '1') ? 'checked' : ''
         );
     }
 
@@ -911,7 +933,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_enable_modal_offers]" 
                            id="helloextendenable_modal_offers" value="1" %s> <label for="helloextendenable_modal_offers">Display offers in a modal (PDP and cart)</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_modal_offers'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_modal_offers'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_enable_modal_offers'] == '1') ? 'checked' : ''
         );
     }
 
@@ -1129,7 +1151,7 @@ class HelloExtend_Protection_Admin
                            id="helloextendproduct_protection_contract_create" value="1" %s> 
                     <label for="helloextendproduct_protection_contract_create">Create Product Protection Contracts</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_product_protection_contract_create'])
-                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_product_protection_contract_create'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_product_protection_options['helloextend_product_protection_contract_create'] == '1') ? 'checked' : ''
         );
     }
 
@@ -1236,7 +1258,7 @@ class HelloExtend_Protection_Admin
         printf(
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_general_settings[enable_helloextend_debug]" id="enable_helloextend_debug" value="1" %s>',
             (isset($this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'])
-                && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_debug'] == '1') ? 'checked' : ''
         );
     }
 
@@ -1245,7 +1267,7 @@ class HelloExtend_Protection_Admin
 		printf(
 			'<input type="checkbox" name="helloextend_protection_for_woocommerce_general_settings[enable_helloextend_log]" id="enable_helloextend_log" value="1" %s>',
 			(isset($this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'])
-			 && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'] === '1') ? 'checked' : ''
+			 && $this->helloextend_protection_for_woocommerce_settings_general_options['enable_helloextend_log'] == '1') ? 'checked' : ''
 		);
 	}
 
@@ -1255,7 +1277,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_catalog_sync_settings[helloextend_use_special_price]" id="helloextenduse_special_price" value="1" %s>
                     <label for="helloextenduse_special_price">If present, use special price, otherwise use base price</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_special_price'])
-                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_special_price'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_use_special_price'] == '1') ? 'checked' : ''
         );
     }
 
@@ -1311,7 +1333,7 @@ class HelloExtend_Protection_Admin
             '<input type="checkbox" name="helloextend_protection_for_woocommerce_catalog_sync_settings[helloextend_sync_on_update]" id="helloextendsync_on_update" value="1" %s>
                     <label for="helloextendsync_on_update">Automatically sync products when they are updated</label>',
             (isset($this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_sync_on_update'])
-                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_sync_on_update'] === '1') ? 'checked' : ''
+                && $this->helloextend_protection_for_woocommerce_settings_catalog_sync_options['helloextend_sync_on_update'] == '1') ? 'checked' : ''
         );
     }
 

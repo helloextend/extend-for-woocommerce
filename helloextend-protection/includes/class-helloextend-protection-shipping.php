@@ -106,8 +106,9 @@ class HelloExtend_Protection_Shipping
     {
 
         // add offer element
-        $enable_helloextend_sp          = $this->settings['enable_helloextend_sp'];
-        $helloextend_sp_add_sku        = $this->settings['helloextend_sp_add_sku'];
+        $helloextend_enabled       = $this->settings['enable_helloextend'];
+        $enable_helloextend_sp     = $this->settings['enable_helloextend_sp'];
+        $helloextend_sp_add_sku    = $this->settings['helloextend_sp_add_sku'];
         $env                       = $this->settings['helloextend_environment'];
         $cart_items                = WC()->cart->get_cart();
         $ajax_url                  = admin_url('admin-ajax.php');
@@ -136,14 +137,14 @@ class HelloExtend_Protection_Shipping
 	        HelloExtend_Protection_Logger::helloextend_log_debug('DEBUG : Shipping Protection Cart Item Payload :' . print_r($items, true));
 	        // phpcs:enable
         }
-
-        if ($enable_helloextend_sp == 1 ) {
+    
+        if ($enable_helloextend_sp == 1 && $helloextend_enabled == 1 ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_shipping_integration_script');
             wp_localize_script(
                 'helloextend_shipping_integration_script',
                 'ExtendShippingIntegration',
-                compact('env', 'items', 'enable_helloextend_sp', 'helloextend_sp_add_sku', 'ajax_url', 'update_order_review_nonce')
+                compact('env', 'items', 'helloextend_enabled',  'enable_helloextend_sp', 'helloextend_sp_add_sku', 'ajax_url', 'update_order_review_nonce')
             );
             echo '<tr><td colspan="2"><div id="helloextend-shipping-offer" style="height: 120px;"></div></td></tr>';
         } else {
