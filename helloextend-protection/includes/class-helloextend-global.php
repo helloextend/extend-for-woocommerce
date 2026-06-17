@@ -45,6 +45,19 @@ class HelloExtend_Protection_Global
     protected $plugin = null;
 
     /**
+     * True while we are adding the Extend warranty to the cart on its own.
+     *
+     * The warranty is added in its own AJAX request, before the covered product
+     * is added (the native add-to-cart fires in a separate, follow-up request).
+     * During that window the cart contains a warranty with no covered product,
+     * which the cart normalizer treats as an orphan and removes. This flag lets
+     * the normalizer skip that removal while the warranty add is in progress.
+     *
+     * @var bool
+     */
+    public static $is_adding_warranty = false;
+
+    /**
      * Constructor
      *
      * @since 1.0.0
@@ -273,11 +286,21 @@ class HelloExtend_Protection_Global
             return;
         }
 
-        if ($helloextend_data['leadToken']) {
+        if (!empty($helloextend_data['leadToken'])) {
             $helloextend_data['leadQuantity'] = $quantity;
         }
 
+        // Flag the orphan-warranty normalizer off while we add the warranty by
+        // itself; the covered product is added in a separate follow-up request,
+        // where normalization runs normally with both items present.
+        self::$is_adding_warranty = true;
         WC()->cart->add_to_cart($warranty_product_id, $quantity, 0, 0, ['extendData' => $helloextend_data]);
+        self::$is_adding_warranty = false;
+
+        //fix session issue on first add to cart
+        WC()->session->set_customer_session_cookie(true);
+        WC()->session->save_data();
+        wp_die();
     }
 
     // update_price($cart_object)
@@ -287,15 +310,12 @@ class HelloExtend_Protection_Global
         $cart_items = $cart_object->cart_contents;
 
         if (!empty($cart_items)) {
-            foreach ($cart_items as $value) {
-                if (
-                    isset($value['extendData'], $value['extendData']['price'], $value['data']) &&
-                    is_numeric($value['extendData']['price']) &&
-                    is_object($value['data'])
-                ) {
-                    $value['data']->set_price(round(((float) $value['extendData']['price']) / 100, 2));
+
+            foreach ($cart_items as $key => $value) {
+                if (isset($value['extendData']) && !empty($value['extendData'])) {
+                    $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
                 }
-             }
+            }
         }
     }
 

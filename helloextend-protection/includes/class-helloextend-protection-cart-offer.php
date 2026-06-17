@@ -206,6 +206,13 @@ class HelloExtend_Protection_Cart_Offer
     // grabs & applies cart updates
     public function normalize_cart()
     {
+        // Skip while the Extend warranty is being added on its own. At that point
+        // the covered product is not in the cart yet (it is added in a separate
+        // follow-up request), so the warranty would be wrongly removed as an
+        // orphan. The follow-up product add re-runs normalization with both items.
+        if (HelloExtend_Protection_Global::$is_adding_warranty) {
+            return WC()->cart;
+        }
 
         $products = $this->map_cart_items_with_warranties();
 
