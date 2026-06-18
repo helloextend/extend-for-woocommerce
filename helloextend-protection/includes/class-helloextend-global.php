@@ -45,6 +45,19 @@ class HelloExtend_Protection_Global
     protected $plugin = null;
 
     /**
+     * True while we are adding the Extend warranty to the cart on its own.
+     *
+     * The warranty is added in its own AJAX request, before the covered product
+     * is added (the native add-to-cart fires in a separate, follow-up request).
+     * During that window the cart contains a warranty with no covered product,
+     * which the cart normalizer treats as an orphan and removes. This flag lets
+     * the normalizer skip that removal while the warranty add is in progress.
+     *
+     * @var bool
+     */
+    public static $is_adding_warranty = false;
+
+    /**
      * Constructor
      *
      * @since 1.0.0
@@ -265,6 +278,10 @@ class HelloExtend_Protection_Global
 
     public static function helloextend_add_to_cart()
     {
+        if (!isset($_REQUEST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'helloextend_add_to_cart')) {
+            wp_send_json_error('Invalid nonce', 403);
+            wp_die();
+        }
         $warranty_product_id = wc_get_product_id_by_sku('helloextend-product-protection');
         $quantity            = isset($_REQUEST['quantity']) ? (int) sanitize_key($_REQUEST['quantity']) : null;
         $helloextend_data    = isset($_REQUEST['extendData']) ? array_map('sanitize_text_field', wp_unslash($_REQUEST['extendData'])): null;
@@ -273,11 +290,21 @@ class HelloExtend_Protection_Global
             return;
         }
 
-        if ($helloextend_data['leadToken']) {
+        if (!empty($helloextend_data['leadToken'])) {
             $helloextend_data['leadQuantity'] = $quantity;
         }
 
+        // Flag the orphan-warranty normalizer off while we add the warranty by
+        // itself; the covered product is added in a separate follow-up request,
+        // where normalization runs normally with both items present.
+        self::$is_adding_warranty = true;
         WC()->cart->add_to_cart($warranty_product_id, $quantity, 0, 0, ['extendData' => $helloextend_data]);
+        self::$is_adding_warranty = false;
+
+        //fix session issue on first add to cart
+        WC()->session->set_customer_session_cookie(true);
+        WC()->session->save_data();
+        wp_die();
     }
 
     // update_price($cart_object)
@@ -288,14 +315,10 @@ class HelloExtend_Protection_Global
 
         if (!empty($cart_items)) {
             foreach ($cart_items as $value) {
-                if (
-                    isset($value['extendData'], $value['extendData']['price'], $value['data']) &&
-                    is_numeric($value['extendData']['price']) &&
-                    is_object($value['data'])
-                ) {
-                    $value['data']->set_price(round(((float) $value['extendData']['price']) / 100, 2));
-                }
-             }
+                if (!empty($value['extendData']) && isset($value['extendData']['price']) && is_numeric($value['extendData']['price'])) {
+                   $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
+                 }
+            }
         }
     }
 
@@ -413,12 +436,13 @@ class HelloExtend_Protection_Global
         $ajaxurl        = admin_url('admin-ajax.php');
 		$debug_log_enabled = array_key_exists('enable_helloextend_debug', $settings) ? $settings['enable_helloextend_debug'] : 0;
 	    $log_enabled 	= array_key_exists('enable_helloextend_log', $settings) ? $settings['enable_helloextend_log'] : 0;
+        $nonce          =  wp_create_nonce('helloextend_add_to_cart');
 
 		if ($store_id){
 			if ($helloextend_enabled == '1') {
 				wp_enqueue_script('helloextend_script');
 				wp_enqueue_script('helloextend_global_script');
-				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'debug_log_enabled', 'log_enabled'));
+				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'nonce', 'debug_log_enabled', 'log_enabled'));
 
 				// Get the leadToken from URL parameters
 				$lead_token = $this->get_lead_token_from_url();
