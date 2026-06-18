@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.4
+Stable tag: 1.2.5
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,10 +78,14 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.5 2026-06-18 =
+* Fix - Add to cart on an empty cart did not add the warranty item because of the cart normalization running before the item was in cart
+* Fix - upgrading the module would default to disable the module and lose the enable product protection setting. 
 
 = 1.2.4 2026-05-08 =
 * Fix - Increased priority for warranty price hook so that plan prices are properly set in more scenarios.
 * Fix - Fixed a bug where product prices were incorrectly set when orders were sent to Extend.
+
 
 = 1.2.3 2026-03-25 =
 * Feature - Added support for cart offers in WooCommerce side cart

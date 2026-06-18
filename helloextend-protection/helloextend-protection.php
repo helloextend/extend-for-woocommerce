@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.2.4
+ * Version:           1.2.5
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
@@ -44,7 +44,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.2.4');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.2.5');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
@@ -76,7 +76,55 @@ function helloextend_deactivate()
 register_activation_hook(__FILE__, 'helloextend_activate');
 register_deactivation_hook(__FILE__, 'helloextend_deactivate');
 
+/**
+ * Run one-time data migrations after the plugin is updated.
+ *
+ * Plugin updates from the WordPress marketplace replace the plugin files but do
+ * NOT run the activation hook and never delete existing rows in wp_options. So
+ * when a setting is moved or renamed between versions, the old value still lives
+ * in the database under its previous key — the new code just stops reading it,
+ * which looks like the setting was wiped. This routine copies those values into
+ * their new location once per version bump.
+ *
+ * Gated by the stored `helloextend_db_version` option so it only does work after
+ * an update. Every migration below must be idempotent (safe to run twice).
+ *
+ * @since 1.2.4
+ */
+function helloextend_maybe_upgrade()
+{
+    $stored_version = get_option('helloextend_db_version', '0');
+
+    // Already migrated for this code version — nothing to do.
+    if (version_compare($stored_version, HELLOEXTEND_PROTECTION_VERSION, '>=')) {
+        return;
+    }
+
+    /*
+     * Migration: `enable_helloextend` moved from the Product Protection settings
+     * group into the General settings group. Copy it forward only if the new
+     * location has not been set yet, so we never clobber a newer admin choice.
+     */
+    $general_settings = (array) get_option('helloextend_protection_for_woocommerce_general_settings', array());
+    $pp_settings      = (array) get_option('helloextend_protection_for_woocommerce_product_protection_settings', array());
+
+    if (!array_key_exists('enable_helloextend', $general_settings)
+        && array_key_exists('enable_helloextend', $pp_settings)
+    ) {
+        $general_settings['enable_helloextend'] = $pp_settings['enable_helloextend'];
+        update_option('helloextend_protection_for_woocommerce_general_settings', $general_settings);
+        // Old key is left in place intentionally (non-destructive) — the new code
+        // ignores it, and keeping it allows a safe rollback to a prior version.
+    }
+
+    // Record that migrations through the current code version have run.
+    update_option('helloextend_db_version', HELLOEXTEND_PROTECTION_VERSION);
+}
+
 /* Actions */
+
+/* run data migrations after a plugin update */
+add_action('plugins_loaded', 'helloextend_maybe_upgrade');
 
 /* extend logger */
 add_action('plugins_loaded', 'helloextend_logger_constants');

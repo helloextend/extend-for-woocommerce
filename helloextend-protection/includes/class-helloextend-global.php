@@ -155,7 +155,7 @@ class HelloExtend_Protection_Global
         $helloextend_protection_shipping_protection_settings = (array) get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
 
         $settings['enable_helloextend'] = array_key_exists('enable_helloextend', $helloextend_protection_general_settings)
-            ? $helloextend_protection_general_settings['enable_helloextend'] : 0;
+            ? $helloextend_protection_general_settings['enable_helloextend'] : 1;
 
             
         $settings['enable_helloextend_pp'] = array_key_exists('enable_helloextend_pp', $helloextend_protection_product_protection_settings)
