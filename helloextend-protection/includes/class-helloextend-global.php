@@ -278,6 +278,10 @@ class HelloExtend_Protection_Global
 
     public static function helloextend_add_to_cart()
     {
+        if (!isset($_REQUEST['nonce']) || !wp_verify_nonce(sanitize_text_field(wp_unslash($_REQUEST['nonce'])), 'helloextend_add_to_cart')) {
+            wp_send_json_error('Invalid nonce', 403);
+            wp_die();
+        }
         $warranty_product_id = wc_get_product_id_by_sku('helloextend-product-protection');
         $quantity            = isset($_REQUEST['quantity']) ? (int) sanitize_key($_REQUEST['quantity']) : null;
         $helloextend_data    = isset($_REQUEST['extendData']) ? array_map('sanitize_text_field', wp_unslash($_REQUEST['extendData'])): null;
@@ -310,11 +314,10 @@ class HelloExtend_Protection_Global
         $cart_items = $cart_object->cart_contents;
 
         if (!empty($cart_items)) {
-
-            foreach ($cart_items as $key => $value) {
-                if (isset($value['extendData']) && !empty($value['extendData'])) {
-                    $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
-                }
+            foreach ($cart_items as $value) {
+                if (!empty($value['extendData']) && isset($value['extendData']['price']) && is_numeric($value['extendData']['price'])) {
+                   $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
+                 }
             }
         }
     }
@@ -433,12 +436,13 @@ class HelloExtend_Protection_Global
         $ajaxurl        = admin_url('admin-ajax.php');
 		$debug_log_enabled = array_key_exists('enable_helloextend_debug', $settings) ? $settings['enable_helloextend_debug'] : 0;
 	    $log_enabled 	= array_key_exists('enable_helloextend_log', $settings) ? $settings['enable_helloextend_log'] : 0;
+        $nonce          =  wp_create_nonce('helloextend_add_to_cart');
 
 		if ($store_id){
 			if ($helloextend_enabled == '1') {
 				wp_enqueue_script('helloextend_script');
 				wp_enqueue_script('helloextend_global_script');
-				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'debug_log_enabled', 'log_enabled'));
+				wp_localize_script('helloextend_global_script', 'ExtendWooCommerce', compact('store_id', 'ajaxurl', 'environment', 'nonce', 'debug_log_enabled', 'log_enabled'));
 
 				// Get the leadToken from URL parameters
 				$lead_token = $this->get_lead_token_from_url();

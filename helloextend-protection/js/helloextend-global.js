@@ -16,6 +16,7 @@
             return await jQuery.post(
                 ajaxurl, {
                     action: "add_to_cart_helloextend",
+                    nonce: ExtendWooCommerce.nonce,
                     quantity: opts.quantity,
                     extendData: {
                         ...opts.plan,
