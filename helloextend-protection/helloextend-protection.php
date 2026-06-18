@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.2.3
+ * Version:           1.2.5
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
@@ -44,7 +44,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.2.3');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.2.5');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
@@ -89,7 +89,7 @@ register_deactivation_hook(__FILE__, 'helloextend_deactivate');
  * Gated by the stored `helloextend_db_version` option so it only does work after
  * an update. Every migration below must be idempotent (safe to run twice).
  *
- * @since 1.2.3
+ * @since 1.2.4
  */
 function helloextend_maybe_upgrade()
 {
