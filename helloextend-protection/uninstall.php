@@ -34,3 +34,11 @@ if (! defined('ABSPATH') ) {
 if (! defined('WP_UNINSTALL_PLUGIN') ) {
     exit;
 }
+
+/*
+ * Remove the cached Extend Product Protection product ID. The plugin constant is
+ * not loaded during uninstall, so the option name is referenced literally here;
+ * it must stay in sync with HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION in
+ * helloextend-protection.php.
+ */
+delete_option('helloextend_product_protection_id');

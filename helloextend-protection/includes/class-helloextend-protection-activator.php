@@ -42,10 +42,13 @@ class HelloExtend_Protection_Activator
         add_option('helloextend_sandbox_token');
 
         //create the extend protection product if it doesn't exist (or if it's in the trash)
+        // Resolve once; the getter already excludes trashed products, so a null result
+        // means "no live product" and we (re)create below. Guard wc_get_product() since
+        // it returns false for a missing/invalid ID.
         $helloextend_product_protection_id = helloextend_product_protection_id();
-        $deletedProduct = wc_get_product(helloextend_product_protection_id());
+        $deletedProduct = $helloextend_product_protection_id ? wc_get_product($helloextend_product_protection_id) : false;
 
-        if (!$helloextend_product_protection_id || $deletedProduct->status == 'trash' ){
+        if (!$helloextend_product_protection_id || !$deletedProduct || $deletedProduct->get_status() === 'trash') {
             try {
                 // create new
                 $product = new WC_Product_Simple();
@@ -57,6 +60,9 @@ class HelloExtend_Protection_Activator
                 $product->set_regular_price(1.00);
                 $product->set_virtual(true);
                 $product->save();
+
+                // Prime the cached ID so subsequent lookups skip the SKU resolution.
+                helloextend_set_product_protection_id_cache($product->get_id());
             } catch (\Exception $e) {
                 HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
             }
