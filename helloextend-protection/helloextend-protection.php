@@ -48,6 +48,14 @@ define('HELLOEXTEND_PROTECTION_VERSION', '1.2.5');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
+/*
+ * Option used to cache the resolved Extend Product Protection product ID.
+ * Resolving the ID from the SKU is an unindexed scan of wp_postmeta.meta_value;
+ * caching it in an autoloaded option turns the repeated lookups made throughout
+ * the plugin into an in-memory read. See helloextend_product_protection_id().
+ */
+define('HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION', 'helloextend_product_protection_id');
+
 
 define( 'HELLOEXTEND_PLUGIN_FILE', __FILE__ );
 define( 'HELLOEXTEND_PLUGIN_DIR', plugin_dir_path( __FILE__ ) );
@@ -343,6 +351,9 @@ function helloextend_product_protection_create()
             $product->set_regular_price(1.00);
             $product->set_virtual(true);
             $product->save();
+
+            // Prime the cached ID so subsequent lookups skip the SKU resolution.
+            helloextend_set_product_protection_id_cache($product->get_id());
         } catch (\Exception $e) {
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
         }
@@ -456,22 +467,51 @@ function helloextend_logger_includes()
 
 function helloextend_product_protection_id(): ?int
 {
-    global $wpdb;
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery
-	/* translators: Meta Value. */
-    $product_id = $wpdb->get_var(
-        $wpdb->prepare(
-            "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value=%s ORDER BY meta_id DESC LIMIT 1",
-            HELLOEXTEND_PRODUCT_PROTECTION_SKU
-        )
-    );
-    // phpcs:enable
+    // Fast path: return the cached ID if it still points to a live product with
+    // the expected SKU. The option is autoloaded, so this is an in-memory read,
+    // and wc_get_product() resolves by primary key (cached per request) rather
+    // than scanning the unindexed wp_postmeta.meta_value column.
+    $cached_id = (int) get_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION);
+    if ($cached_id) {
+        $product = wc_get_product($cached_id);
+        if ($product
+            && $product->get_status() !== 'trash'
+            && $product->get_sku() === HELLOEXTEND_PRODUCT_PROTECTION_SKU
+        ) {
+            return $cached_id;
+        }
+    }
+
+    // Slow path: resolve the ID from the SKU via WooCommerce's native lookup,
+    // which reads the indexed wc_product_meta_lookup table, then cache it so the
+    // fast path serves every subsequent call this request and beyond.
+    $product_id = (int) wc_get_product_id_by_sku(HELLOEXTEND_PRODUCT_PROTECTION_SKU);
 
     if ($product_id) {
+        helloextend_set_product_protection_id_cache($product_id);
         return $product_id;
     }
 
+    // No product with this SKU exists (yet); drop any stale cache.
+    delete_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION);
+
     return null;
+}
+
+/**
+ * Cache the resolved Extend Product Protection product ID in an autoloaded option.
+ *
+ * Called after the product is (re)created so the fast path in
+ * helloextend_product_protection_id() is primed immediately.
+ *
+ * @param int $product_id
+ */
+function helloextend_set_product_protection_id_cache($product_id)
+{
+    $product_id = (int) $product_id;
+    if ($product_id > 0) {
+        update_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION, $product_id, true);
+    }
 }
 
 function helloextend_add_shipping_protection_fee()

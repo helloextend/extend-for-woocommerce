@@ -57,6 +57,9 @@ class HelloExtend_Protection_Activator
                 $product->set_regular_price(1.00);
                 $product->set_virtual(true);
                 $product->save();
+
+                // Prime the cached ID so subsequent lookups skip the SKU resolution.
+                helloextend_set_product_protection_id_cache($product->get_id());
             } catch (\Exception $e) {
                 HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
             }
