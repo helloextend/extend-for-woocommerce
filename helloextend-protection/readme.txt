@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.6
+Stable tag: 1.2.7
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,9 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.7 2026-07-10 =
+* Fix - keep Extend plan price on cart line when Advanced Coupons is active
+
 = 1.2.6 2026-07-09 =
 ### Performance
 - **Cache the Extend Product Protection product ID.** `helloextend_product_protection_id()` previously ran an unindexed `wp_postmeta.meta_value` scan on every call, across many code paths per request. The resolved ID is now stored in an autoloaded option (`helloextend_product_protection_id`) and served from memory, with a single fully-indexed query to validate it still points to a live product.
