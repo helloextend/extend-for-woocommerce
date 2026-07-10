@@ -555,7 +555,7 @@ function helloextend_resolve_product_protection_id_by_sku(): int
     ) === $lookup_table;
 
     if ($has_lookup) {
-        return (int) $wpdb->get_var(
+        $product_id = (int) $wpdb->get_var(
             $wpdb->prepare(
                 "SELECT l.product_id FROM {$lookup_table} l
                  INNER JOIN $wpdb->posts p ON p.ID = l.product_id
@@ -564,6 +564,9 @@ function helloextend_resolve_product_protection_id_by_sku(): int
                 HELLOEXTEND_PRODUCT_PROTECTION_SKU
             )
         );
+        if ($product_id > 0) {
+            return $product_id;
+        }
     }
 
     return (int) $wpdb->get_var(
