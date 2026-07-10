@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.5
+Stable tag: 1.2.6
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,23 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.6 2026-07-09 =
+### Performance
+- **Cache the Extend Product Protection product ID.** `helloextend_product_protection_id()` previously ran an unindexed `wp_postmeta.meta_value` scan on every call, across many code paths per request. The resolved ID is now stored in an autoloaded option (`helloextend_product_protection_id`) and served from memory, with a single fully-indexed query to validate it still points to a live product.
+- **Self-validating cache.** On each read the cached ID is checked for existence, non-trashed status, and matching SKU; if the product is trashed, deleted, or its SKU changed, the cache re-resolves and refreshes automatically (returns null when no valid product exists).
+- **Cheaper cold-path resolution.** When the cache is empty/stale, the ID is resolved via WooCommerce's `wc_product_meta_lookup` table (one row per product) instead of scanning `wp_postmeta`, with a fallback to `wp_postmeta` when the lookup table is unavailable.
+- **Cache priming.** The cached ID is populated proactively on plugin activation, after plugin updates (upgrade routine), and whenever the protection product is created, so the slow resolution effectively never runs on a live request.
+- Add-to-cart (AJAX) now uses the cached lookup instead of `wc_get_product_id_by_sku()` on every request.
+
+### Fixed
+- **Fatal error on load/activation** (`Call to undefined function wc_get_product_id_by_sku()`). The plugin now bootstraps on `plugins_loaded` (after WooCommerce is guaranteed loaded) instead of at file-include time, and the ID lookup no longer depends on WooCommerce functions being available.
+- Activation no longer fatals when its logging/settings classes aren't yet loaded; the activation path now loads its own dependencies.
+- Hardened the activator's product check against a null/false product result and replaced the deprecated `->status` access with `->get_status()`.
+
+### Added
+- Graceful admin notice when WooCommerce is not active, instead of a fatal error.
+- Removal of the cached product-ID option on plugin uninstall.
+
 = 1.2.5 2026-06-18 =
 * Fix - Add to cart on an empty cart did not add the warranty item because of the cart normalization running before the item was in cart
 * Fix - upgrading the module would default to disable the module and lose the enable product protection setting. 

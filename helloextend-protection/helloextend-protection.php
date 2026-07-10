@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.2.5
+ * Version:           1.2.6
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
@@ -44,9 +44,17 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.2.5');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.2.6');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
+
+/*
+ * Option used to cache the resolved Extend Product Protection product ID.
+ * Resolving the ID from the SKU is an unindexed scan of wp_postmeta.meta_value;
+ * caching it in an autoloaded option turns the repeated lookups made throughout
+ * the plugin into an in-memory read. See helloextend_product_protection_id().
+ */
+define('HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION', 'helloextend_product_protection_id');
 
 
 define( 'HELLOEXTEND_PLUGIN_FILE', __FILE__ );
@@ -59,6 +67,13 @@ define( 'HELLOEXTEND_PLUGIN_URL', plugin_dir_url( __FILE__ ) );
  */
 function helloextend_activate()
 {
+	// The activator logs via HelloExtend_Protection_Logger, which in turn resolves
+	// settings through HelloExtend_Protection_Global. These classes are normally
+	// loaded as dependencies of helloextend_run(), which now runs on plugins_loaded
+	// and has already fired by the time activate_plugin() calls this hook — so load
+	// the activation dependencies explicitly here rather than relying on bootstrap.
+	include_once HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-global.php';
+	include_once HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-protection-logger.php';
 	include_once HELLOEXTEND_PLUGIN_DIR . 'includes/class-helloextend-protection-activator.php';
     HelloExtend_Protection_Activator::activate();
 }
@@ -116,6 +131,17 @@ function helloextend_maybe_upgrade()
         // Old key is left in place intentionally (non-destructive) — the new code
         // ignores it, and keeping it allows a safe rollback to a prior version.
     }
+
+    /*
+     * Prime the product-protection ID cache after an update. Plugin updates replace
+     * files without running the activation hook, so existing installs would not have
+     * the cache option populated until the getter's cold path fired on a live request.
+     * Resolving it here means that first post-update request already hits the fast
+     * path. Safe to call this early on plugins_loaded: the getter uses $wpdb only. If
+     * the product doesn't exist yet this is a harmless no-op — the activation/init
+     * creation routines populate the cache when they create it.
+     */
+    helloextend_product_protection_id();
 
     // Record that migrations through the current code version have run.
     update_option('helloextend_db_version', HELLOEXTEND_PROTECTION_VERSION);
@@ -343,6 +369,9 @@ function helloextend_product_protection_create()
             $product->set_regular_price(1.00);
             $product->set_virtual(true);
             $product->save();
+
+            // Prime the cached ID so subsequent lookups skip the SKU resolution.
+            helloextend_set_product_protection_id_cache($product->get_id());
         } catch (\Exception $e) {
             HelloExtend_Protection_Logger::helloextend_log_error($e->getMessage());
         }
@@ -457,21 +486,115 @@ function helloextend_logger_includes()
 function helloextend_product_protection_id(): ?int
 {
     global $wpdb;
-	// phpcs:disable WordPress.DB.DirectDatabaseQuery
-	/* translators: Meta Value. */
-    $product_id = $wpdb->get_var(
+
+    // Fast path: return the cached ID if it still points to a live product with
+    // the expected SKU. The option is autoloaded (in-memory) and the validation
+    // query is fully indexed (posts primary key + postmeta post_id index), so it
+    // avoids the unindexed meta_value scan the resolution below performs. This
+    // uses $wpdb rather than WooCommerce helpers because the function runs during
+    // plugin bootstrap, before WooCommerce's functions are defined.
+    $cached_id = (int) get_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION);
+    if ($cached_id) {
+        // phpcs:disable WordPress.DB.DirectDatabaseQuery
+        $is_valid = $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT p.ID FROM $wpdb->posts p
+                 INNER JOIN $wpdb->postmeta pm ON pm.post_id = p.ID
+                 WHERE p.ID = %d AND p.post_status != 'trash'
+                 AND pm.meta_key = '_sku' AND pm.meta_value = %s
+                 LIMIT 1",
+                $cached_id,
+                HELLOEXTEND_PRODUCT_PROTECTION_SKU
+            )
+        );
+        // phpcs:enable
+        if ($is_valid) {
+            return $cached_id;
+        }
+    }
+
+    // Cold/stale cache: resolve the ID from the SKU. This runs only when the cache
+    // is empty or invalid (e.g. right after the product is created or trashed)
+    // rather than on every call, and the result is cached so the fast path serves
+    // every subsequent call this request and beyond.
+    $product_id = helloextend_resolve_product_protection_id_by_sku();
+
+    if ($product_id) {
+        helloextend_set_product_protection_id_cache($product_id);
+        return $product_id;
+    }
+
+    // No product with this SKU exists (yet); drop any stale cache.
+    delete_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION);
+
+    return null;
+}
+
+/**
+ * Resolve the Extend Product Protection product ID from its SKU (the cold path).
+ *
+ * Prefers WooCommerce's wc_product_meta_lookup table: it holds one row per product
+ * (versus ~dozens per product in wp_postmeta), so even though `sku` is not indexed
+ * there, the scan is far cheaper than the equivalent postmeta scan. The join to
+ * wp_posts excludes trashed products. Falls back to wp_postmeta when the lookup
+ * table is absent (older WooCommerce, or lookup tables not yet regenerated).
+ *
+ * Uses $wpdb only — no WooCommerce functions — so it is safe during bootstrap.
+ *
+ * @return int Product ID, or 0 if no matching live product exists.
+ */
+function helloextend_resolve_product_protection_id_by_sku(): int
+{
+    global $wpdb;
+
+    $lookup_table = $wpdb->prefix . 'wc_product_meta_lookup';
+
+    // phpcs:disable WordPress.DB.DirectDatabaseQuery, WordPress.DB.PreparedSQL
+    $has_lookup = $wpdb->get_var(
+        $wpdb->prepare('SHOW TABLES LIKE %s', $wpdb->esc_like($lookup_table))
+    ) === $lookup_table;
+
+    if ($has_lookup) {
+        $product_id = (int) $wpdb->get_var(
+            $wpdb->prepare(
+                "SELECT l.product_id FROM {$lookup_table} l
+                 INNER JOIN $wpdb->posts p ON p.ID = l.product_id
+                 WHERE l.sku = %s AND p.post_status != 'trash'
+                 ORDER BY l.product_id DESC LIMIT 1",
+                HELLOEXTEND_PRODUCT_PROTECTION_SKU
+            )
+        );
+        if ($product_id > 0) {
+            return $product_id;
+        }
+    }
+
+    return (int) $wpdb->get_var(
         $wpdb->prepare(
-            "SELECT post_id FROM $wpdb->postmeta WHERE meta_key='_sku' AND meta_value=%s ORDER BY meta_id DESC LIMIT 1",
+            "SELECT pm.post_id FROM $wpdb->postmeta pm
+             INNER JOIN $wpdb->posts p ON p.ID = pm.post_id
+             WHERE pm.meta_key = '_sku' AND pm.meta_value = %s AND p.post_status != 'trash'
+             ORDER BY pm.meta_id DESC LIMIT 1",
             HELLOEXTEND_PRODUCT_PROTECTION_SKU
         )
     );
     // phpcs:enable
+}
 
-    if ($product_id) {
-        return $product_id;
+/**
+ * Cache the resolved Extend Product Protection product ID in an autoloaded option.
+ *
+ * Called after the product is (re)created so the fast path in
+ * helloextend_product_protection_id() is primed immediately.
+ *
+ * @param int $product_id
+ */
+function helloextend_set_product_protection_id_cache($product_id)
+{
+    $product_id = (int) $product_id;
+    if ($product_id > 0) {
+        update_option(HELLOEXTEND_PRODUCT_PROTECTION_ID_OPTION, $product_id, true);
     }
-
-    return null;
 }
 
 function helloextend_add_shipping_protection_fee()
@@ -756,4 +879,32 @@ function helloextend_add_protection_message_to_thankyou_page($order_id) {
 }
 
 
-helloextend_run();
+/**
+ * Bootstrap the plugin on plugins_loaded rather than at file-include time.
+ *
+ * Active plugin files are included alphabetically, so this plugin loads before
+ * WooCommerce; kicking off at include time meant our runtime code could run before
+ * WooCommerce's functions/classes existed. By plugins_loaded every plugin file has
+ * been included, so WooCommerce is guaranteed available. Priority 11 keeps this
+ * after helloextend_maybe_upgrade() (priority 10).
+ *
+ * If WooCommerce is not active we skip bootstrapping entirely and surface an admin
+ * notice instead of fataling on the first WooCommerce call.
+ */
+function helloextend_bootstrap()
+{
+    if (!helloextend_is_woocommerce_activated()) {
+        add_action('admin_notices', 'helloextend_woocommerce_missing_notice');
+        return;
+    }
+
+    helloextend_run();
+}
+add_action('plugins_loaded', 'helloextend_bootstrap', 11);
+
+function helloextend_woocommerce_missing_notice()
+{
+    echo '<div class="error"><p><strong>'
+        . esc_html__('Extend Protection requires the WooCommerce plugin to be installed and active.', 'helloextend-protection')
+        . '</strong></p></div>';
+}

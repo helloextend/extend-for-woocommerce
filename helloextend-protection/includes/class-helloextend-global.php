@@ -282,7 +282,9 @@ class HelloExtend_Protection_Global
             wp_send_json_error('Invalid nonce', 403);
             wp_die();
         }
-        $warranty_product_id = wc_get_product_id_by_sku('helloextend-product-protection');
+        // Use the cached lookup rather than wc_get_product_id_by_sku() (a postmeta
+        // join on every add-to-cart); returns null when no live product exists.
+        $warranty_product_id = helloextend_product_protection_id();
         $quantity            = isset($_REQUEST['quantity']) ? (int) sanitize_key($_REQUEST['quantity']) : null;
         $helloextend_data    = isset($_REQUEST['extendData']) ? array_map('sanitize_text_field', wp_unslash($_REQUEST['extendData'])): null;
 
