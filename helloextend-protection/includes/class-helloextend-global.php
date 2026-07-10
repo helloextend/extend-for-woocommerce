@@ -106,10 +106,20 @@ class HelloExtend_Protection_Global
         add_action('woocommerce_checkout_create_order_line_item', [$this, 'order_item_meta'], 10, 3);
 
         // update price for warranty items
-        add_action('woocommerce_before_calculate_totals', [$this, 'update_price']);
+        add_action('woocommerce_before_calculate_totals', [$this, 'update_price'], 9999);
+
+        // Stamp the plan price the moment the cart line is rehydrated from session,
+        // before any coupon/totals logic reads it. Makes the price authoritative for
+        // the whole request rather than only during woocommerce_before_calculate_totals.
+        add_filter('woocommerce_get_cart_item_from_session', [$this, 'restore_price_from_session'], 20, 2);
+
+        // Force the displayed line subtotal to reflect the plan price, so extra
+        // calculate_totals() cycles from coupon plugins can't render the $1 base.
+        add_filter('woocommerce_cart_item_subtotal', [$this, 'cart_item_subtotal'], 9999, 3);
 
         // Initialize global ExtendWooCommerce
         add_action('wp_head', [$this, 'helloextend_init_global']);
+
     }
 
     /**
@@ -322,6 +332,51 @@ class HelloExtend_Protection_Global
                  }
             }
         }
+    }
+    /**
+     * Re-apply the Extend plan price when a warranty line is restored from the
+     * session. Runs before coupon/dynamic-pricing logic reads the price, so the
+     * WC_Product carries the plan price from the very start of every request.
+     *
+     * @param array $cart_item The cart item being rebuilt from session.
+     * @param array $values    The persisted session values for this line.
+     * @return array
+     */
+    public function restore_price_from_session($cart_item, $values)
+    {
+        if (!empty($values['extendData']['price'])
+            && is_numeric($values['extendData']['price'])
+            && isset($cart_item['data'])
+            && $cart_item['data'] instanceof WC_Product
+        ) {
+            $cart_item['data']->set_price(round((float) $values['extendData']['price'] / 100, 2));
+        }
+
+        return $cart_item;
+    }
+
+    /**
+     * Force the cart/mini-cart line SUBTOTAL to reflect the Extend plan price.
+     * Mirrors cart_item_price() (which only covers the unit-price column).
+     *
+     * @param string $subtotal      Default subtotal HTML.
+     * @param array  $cart_item     Current cart item.
+     * @param string $cart_item_key Cart item key.
+     * @return string
+     */
+    public function cart_item_subtotal($subtotal, $cart_item, $cart_item_key)
+    {
+        if (!empty($cart_item['extendData'])
+            && isset($cart_item['extendData']['price'])
+            && is_numeric($cart_item['extendData']['price'])
+        ) {
+            $price    = round((float) $cart_item['extendData']['price'] / 100, 2);
+            $quantity = isset($cart_item['quantity']) ? (int) $cart_item['quantity'] : 1;
+
+            return wc_price($price * $quantity);
+        }
+
+        return $subtotal;
     }
 
     public function cart_item_price($price, $cart_item, $cart_item_key)
