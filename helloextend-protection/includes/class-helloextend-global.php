@@ -113,6 +113,21 @@ class HelloExtend_Protection_Global
         // the whole request rather than only during woocommerce_before_calculate_totals.
         add_filter('woocommerce_get_cart_item_from_session', [$this, 'restore_price_from_session'], 20, 2);
 
+        // Re-assert the plan price once the whole session cart is loaded. The block
+        // Cart/Checkout render from the Store API, which reads each line's product
+        // price directly; this guarantees the plan price is on the WC_Product for
+        // the entire request, even if a coupon plugin rehydrated the $1 base after
+        // the per-item restore above.
+        add_action('woocommerce_cart_loaded_from_session', [$this, 'apply_plan_prices_to_cart'], 20);
+
+        // Re-assert again AFTER totals are calculated. The block Cart/Checkout Store
+        // API reads each line's product price (prices.price -> get_price()) when it
+        // serializes the cart response, which happens after calculate_totals(). Extra
+        // recalc cycles (e.g. Advanced Coupons) can leave the product re-hydrated at
+        // its $1 base by then, so stamping the plan price here is what the block
+        // order summary's per-item price ends up displaying.
+        add_action('woocommerce_after_calculate_totals', [$this, 'apply_plan_prices_to_cart'], 9999);
+
         // Force the displayed line subtotal to reflect the plan price, so extra
         // calculate_totals() cycles from coupon plugins can't render the $1 base.
         add_filter('woocommerce_cart_item_subtotal', [$this, 'cart_item_subtotal'], 9999, 3);
@@ -327,9 +342,63 @@ class HelloExtend_Protection_Global
 
         if (!empty($cart_items)) {
             foreach ($cart_items as $value) {
-                if (!empty($value['extendData']) && isset($value['extendData']['price']) && is_numeric($value['extendData']['price'])) {
-                   $value['data']->set_price(round($value['extendData']['price'] / 100, 2));
+                if (!empty($value['extendData']) && isset($value['extendData']['price']) && is_numeric($value['extendData']['price'])
+                    && isset($value['data']) && $value['data'] instanceof WC_Product) {
+                    $this->stamp_plan_price($value['data'], $value['extendData']['price']);
                  }
+            }
+        }
+    }
+
+    /**
+     * Stamp the Extend plan price onto a warranty product object.
+     *
+     * Sets BOTH the active price and the regular price (and clears any sale price).
+     * The warranty product's stored base is $1/$1; setting only the active price
+     * leaves regular_price at $1, which the block Cart/Checkout Store API surfaces
+     * as prices.regular_price and can render as the visible "individual price"
+     * (a price-above-regular state). Aligning all three removes that ambiguity.
+     *
+     * @param WC_Product $product     The warranty product object on the cart line.
+     * @param int|string $price_cents The Extend plan price in cents (from extendData).
+     * @return void
+     */
+    private function stamp_plan_price($product, $price_cents)
+    {
+        $price = round((float) $price_cents / 100, 2);
+        $product->set_regular_price($price);
+        $product->set_sale_price('');
+        $product->set_price($price);
+    }
+
+    /**
+     * Re-assert the Extend plan price on every warranty line once the whole
+     * session cart has loaded. Runs before the block Cart/Checkout serialize the
+     * cart via the Store API (which reads each line's product price directly), so
+     * the plan price — not the $1 base — is what those blocks display.
+     *
+     * @param WC_Cart|mixed $cart The cart passed by the hook. Falls back to the
+     *                            global cart when the hook does not pass one.
+     * @return void
+     */
+    public function apply_plan_prices_to_cart($cart = null)
+    {
+        if (!$cart instanceof WC_Cart) {
+            $cart = (function_exists('WC') && WC()->cart instanceof WC_Cart) ? WC()->cart : null;
+        }
+
+        if (!$cart instanceof WC_Cart) {
+            return;
+        }
+
+        foreach ($cart->get_cart() as $cart_item) {
+            if (!empty($cart_item['extendData'])
+                && isset($cart_item['extendData']['price'])
+                && is_numeric($cart_item['extendData']['price'])
+                && isset($cart_item['data'])
+                && $cart_item['data'] instanceof WC_Product
+            ) {
+                $this->stamp_plan_price($cart_item['data'], $cart_item['extendData']['price']);
             }
         }
     }
@@ -349,7 +418,7 @@ class HelloExtend_Protection_Global
             && isset($cart_item['data'])
             && $cart_item['data'] instanceof WC_Product
         ) {
-            $cart_item['data']->set_price(round((float) $values['extendData']['price'] / 100, 2));
+            $this->stamp_plan_price($cart_item['data'], $values['extendData']['price']);
         }
 
         return $cart_item;
@@ -429,6 +498,23 @@ class HelloExtend_Protection_Global
     {
         if (isset($cart_item['extendData']) &&  !empty($cart_item['extendData'])) {
             $item->add_meta_data('_helloextend_data', $cart_item['extendData']);
+
+            // Force the WooCommerce order line item to carry the Extend plan price.
+            // The warranty product's base price is $1; the real plan price lives in
+            // extendData. Cart-level set_price() is transient (see update_price /
+            // restore_price_from_session) and does not reliably survive into the
+            // order under coupon plugins or the block/Store API checkout, which
+            // rebuild the line total from the $1 base. Stamping the line subtotal
+            // and total here makes the order total authoritative for BOTH classic
+            // and block checkout — this hook fires on both paths.
+            if (isset($cart_item['extendData']['price']) && is_numeric($cart_item['extendData']['price'])) {
+                $plan_price  = round((float) $cart_item['extendData']['price'] / 100, 2);
+                $quantity    = isset($cart_item['quantity']) ? (int) $cart_item['quantity'] : $item->get_quantity();
+                $line_amount = $plan_price * $quantity;
+
+                $item->set_subtotal($line_amount);
+                $item->set_total($line_amount);
+            }
 
             $covered_id = $cart_item['extendData']['covered_product_id'];
             $term       = $cart_item['extendData']['term'];
