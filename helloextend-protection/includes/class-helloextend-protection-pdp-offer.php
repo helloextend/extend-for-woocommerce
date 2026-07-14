@@ -93,7 +93,7 @@ class HelloExtend_Protection_PDP_Offer
         $categories                  = get_the_terms($id, 'product_cat');
         $first_category              = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
 
-        $price                       = (int) ( floatval($product->get_price()) * 100 );
+        $price                       = (int) round(floatval($product->get_price()) * 100);
         $type                        = $product->get_type();
         $env                         = $this->settings['helloextend_environment'];
         $helloextend_pp_enabled      = $this->settings['enable_helloextend_pp'];
