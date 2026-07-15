@@ -4,7 +4,7 @@ Plugin URI: https://www.extend.com/
 Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
-Tested up to: 6.8
+Tested up to: 7.0
 Stable tag: 1.2.9
 Requires PHP: 7.4
 License: GPLv2 or later
