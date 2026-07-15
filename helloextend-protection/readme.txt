@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.8
+Stable tag: 1.2.9
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,9 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.9 2026-07-15 =
+* Fix - keep the warranty "Product"/Term metadata visible in the block Cart/Checkout order summary (it was dropped on the Store API cart refresh)
+
 = 1.2.8 2026-07-14 =
 * Fix - show the Extend plan price (not the $1 base) in the block-based Cart/Checkout (Store API) order summary
 * Fix - stamp the plan price on the WooCommerce order line item so placing an order no longer reverts the warranty to $1 and skews the order total

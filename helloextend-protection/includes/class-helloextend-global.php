@@ -541,7 +541,18 @@ class HelloExtend_Protection_Global
     public function checkout_details($data, $cart_item)
     {
 
-        if (!is_cart() && !is_checkout()) {
+        // is_cart()/is_checkout() are page conditionals: they are true during the
+        // initial (server-side) render of the classic and block Cart/Checkout, but
+        // FALSE on the Store API (REST) requests the block Cart/Checkout fires to
+        // refresh the cart afterwards. Without allowing the Store API context, this
+        // filter returns no item_data on that refresh and the block drops the
+        // "Product"/"Term" metadata (wc-block-components-product-metadata) a moment
+        // after load. WC()->is_rest_api_request() covers the Store API request.
+        $is_rest_request = function_exists('WC')
+            && method_exists(WC(), 'is_rest_api_request')
+            && WC()->is_rest_api_request();
+
+        if (!is_cart() && !is_checkout() && !$is_rest_request) {
             return $data;
         }
 
