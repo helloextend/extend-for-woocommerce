@@ -107,7 +107,7 @@
 
                         let component = Extend.buttons.instance('.helloextend-offer');
                         let variation_id = variation.variation_id;
-                        let variationPrice = variation.display_price * 100
+                        let variationPrice = (variation.display_price * 100)
 
                         if (component) {
                             if(variation_id) {
