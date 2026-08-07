@@ -8,10 +8,14 @@ jobs:
   deploy:
     name: Deploy plugin to WordPress.org SVN
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
 
     steps:
       - name: Checkout release tag
-        uses: actions/checkout@v4
+        uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4.4.0
+        with:
+          persist-credentials: false
 
       - name: Verify release tag matches plugin version
         run: |
@@ -29,7 +33,7 @@ jobs:
           fi
 
       - name: Deploy to WordPress.org plugin repository
-        uses: 10up/action-wordpress-plugin-deploy@stable
+        uses: 10up/action-wordpress-plugin-deploy@54bd289b8525fd23a5c365ec369185f2966529c2 # v2.3.0
         env:
           SVN_USERNAME: ${{ secrets.SVN_USERNAME }}
           SVN_PASSWORD: ${{ secrets.SVN_PASSWORD }}
