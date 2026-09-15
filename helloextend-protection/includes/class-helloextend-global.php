@@ -208,11 +208,12 @@ class HelloExtend_Protection_Global
         $settings['helloextend_atc_button_selector'] = array_key_exists('helloextend_atc_button_selector', $helloextend_protection_product_protection_settings)
             ? $helloextend_protection_product_protection_settings['helloextend_atc_button_selector'] : 'button.single_add_to_cart_button';
 
-        // update pdp offer location if "other" is selected otherwise default
-        if ($settings['helloextend_pdp_offer_location'] == 'other' && $settings['helloextend_pdp_offer_location_other'] !== '') {
-            $settings['helloextend_pdp_offer_location'] = $settings['helloextend_pdp_offer_location_other'];
-        } else {
-            $settings['helloextend_pdp_offer_location'] = 'woocommerce_before_add_to_cart_button';
+        // resolve the "other" selection to the custom hook, falling back to the default
+        // when no custom hook was entered. Any other selection is used as-is.
+        if ($settings['helloextend_pdp_offer_location'] === 'other') {
+            $settings['helloextend_pdp_offer_location'] = $settings['helloextend_pdp_offer_location_other'] !== ''
+                ? $settings['helloextend_pdp_offer_location_other']
+                : 'woocommerce_before_add_to_cart_button';
         }
 
         /* Contract Creation Settings */
@@ -241,16 +242,17 @@ class HelloExtend_Protection_Global
 
             $settings['helloextend_sp_offer_location'] = array_key_exists('helloextend_sp_offer_location', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['helloextend_sp_offer_location']
-                : 'woocommerce_review_order_after_shipping';
+                : 'woocommerce_review_order_before_payment';
 
             $settings['helloextend_sp_offer_location_other'] = array_key_exists('helloextend_sp_offer_location_other', $helloextend_protection_shipping_protection_settings)
                 ? $helloextend_protection_shipping_protection_settings['helloextend_sp_offer_location_other'] : '';
 
-            // update sp offer location if "other" is selected otherwise default
-            if ($settings['helloextend_sp_offer_location'] == 'other' && $settings['helloextend_sp_offer_location_other'] !== '') {
-                $settings['helloextend_sp_offer_location'] = $settings['helloextend_sp_offer_location_other'];
-            } else {
-                $settings['helloextend_sp_offer_location'] = 'woocommerce_review_order_before_payment';
+            // resolve the "other" selection to the custom hook, falling back to the default
+            // when no custom hook was entered. Any other selection is used as-is.
+            if ($settings['helloextend_sp_offer_location'] === 'other') {
+                $settings['helloextend_sp_offer_location'] = $settings['helloextend_sp_offer_location_other'] !== ''
+                    ? $settings['helloextend_sp_offer_location_other']
+                    : 'woocommerce_review_order_before_payment';
             }
         }
 

@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.10
+Stable tag: 1.2.11
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,11 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.11 2026-09-15 =
+* Fix - the PDP "Offer Location" setting was ignored: every built-in dropdown hook fell through to `woocommerce_before_add_to_cart_button`, so the offer never moved. Only the "other" custom hook was ever honored
+* Fix - the same defect pinned the shipping protection "Offer Location" to `woocommerce_review_order_before_payment`
+* Fix - align the shipping protection offer location fallback with the default shown in the admin UI (`woocommerce_review_order_before_payment`)
+
 = 1.2.10 2026-08-07 =
 * Fix - variable products with a price ending in .99 get a javascript rounding error. This is standard floating-point imprecision. 74.99 can't be represented exactly in binary floating point (IEEE 754 double)
 
