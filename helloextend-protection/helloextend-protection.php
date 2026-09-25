@@ -721,7 +721,7 @@ function helloextend_fix_affirm_fee_unit_price($affirm_data)
     // Fee name => amount in cents, as Affirm should have received it.
     $fee_totals = array();
     foreach ($order->get_items('fee') as $fee) {
-        $fee_totals[$fee->get_name()] = (int) floor(100 * (float) $fee->get_total());
+        $fee_totals[$fee->get_name()] = (int) round(100 * (float) $fee->get_total());
     }
 
     if (!$fee_totals) {
