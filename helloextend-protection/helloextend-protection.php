@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.2.11
+ * Version:           1.2.12
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
@@ -44,7 +44,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.2.11');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.2.12');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
@@ -166,6 +166,7 @@ add_action('wp_ajax_remove_shipping_protection_fee', 'helloextend_remove_shippin
 add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'helloextend_remove_shipping_protection_fee');
 add_action('woocommerce_cart_calculate_fees', 'helloextend_set_shipping_fee');
 add_action('woocommerce_checkout_order_processed', 'helloextend_save_shipping_protection_quote_id', 5, 2);
+add_filter('wc_gateway_affirm_initiate_checkout_data', 'helloextend_fix_affirm_fee_unit_price');
 
 // Hook into WooCommerce order details display on admin screen
 add_action('woocommerce_after_order_itemmeta', 'helloextend_add_protection_contract', 10, 2);
@@ -604,7 +605,7 @@ function helloextend_add_shipping_protection_fee()
     }
 
     if (isset($_POST['fee_amount']) && isset($_POST['fee_label'])) {
-        $fee_amount = floatval(number_format( sanitize_text_field(wp_unslash($_POST['fee_amount'])) / 100, 2));
+        $fee_amount = round(floatval(sanitize_text_field(wp_unslash($_POST['fee_amount']))) / 100, 2);
         $fee_label  = sanitize_text_field(wp_unslash($_POST['fee_label']));
         $shipping_quote_id = ( !empty($_POST['shipping_quote_id'] ))  ? (sanitize_key( wp_unslash( $_POST['shipping_quote_id']))) : null;
 
@@ -693,6 +694,59 @@ function helloextend_set_shipping_fee()
     }
 }
 
+/**
+ * Send fee line items to Affirm in cents.
+ *
+ * WC_Gateway_Affirm::getItemsFormattedForAffirm() scales product line items to
+ * cents but passes fee line items through in dollars, so a $6.00 shipping
+ * protection fee reaches Affirm as 6 cents. Re-scale any fee item so the Affirm
+ * itemisation matches the order total it is sent alongside, and give fee items
+ * their own SKU instead of another product's ID.
+ *
+ * @param array $affirm_data Checkout payload localised for the Affirm script.
+ *
+ * @return array
+ */
+function helloextend_fix_affirm_fee_unit_price($affirm_data)
+{
+    if (empty($affirm_data['order_id']) || empty($affirm_data['items']) || !is_array($affirm_data['items'])) {
+        return $affirm_data;
+    }
+
+    $order = wc_get_order($affirm_data['order_id']);
+    if (!$order) {
+        return $affirm_data;
+    }
+
+    // Fee name => amount in cents, as Affirm should have received it.
+    $fee_totals = array();
+    foreach ($order->get_items('fee') as $fee) {
+        $fee_totals[$fee->get_name()] = (int) round(100 * (float) $fee->get_total());
+    }
+
+    if (!$fee_totals) {
+        return $affirm_data;
+    }
+
+    foreach ($affirm_data['items'] as $key => $item) {
+        $name = isset($item['display_name']) ? $item['display_name'] : '';
+
+        if (!isset($fee_totals[$name]) || !isset($item['unit_price'])) {
+            continue;
+        }
+
+        // Skip the rescale if it is already in cents (gateway bug fixed upstream).
+        if ((int) $item['unit_price'] !== $fee_totals[$name]) {
+            $affirm_data['items'][$key]['unit_price'] = $fee_totals[$name];
+        }
+
+        // The gateway falls back to a product ID left over from a previous loop
+        // iteration for fee SKUs, so give each fee a stable SKU of its own.
+        $affirm_data['items'][$key]['sku'] = sanitize_title($name);
+    }
+
+    return $affirm_data;
+}
 
 function helloextend_save_shipping_protection_quote_id($order_id)
 {

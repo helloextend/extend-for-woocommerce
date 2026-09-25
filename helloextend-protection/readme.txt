@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.11
+Stable tag: 1.2.12
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,11 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.12 2026-09-25 =
+* Fix - Affirm itemization for the shipping protection fee: woocommerce-gateway-affirm (3.0.8) sent fee line items in dollars while product lines were in cents, so a $6.00 fee reached Affirm as $0.06. Fee `unit_price` is now converted to cents from the order's fee totals (left untouched if already in cents), only during an Affirm checkout
+* Fix - give each fee line sent to Affirm its own SKU instead of reusing the previous product's ID
+* Fix - shipping protection fees of $1,000 or more were truncated to $1 because `number_format` added a thousands separator
+
 = 1.2.11 2026-09-15 =
 * Fix - the PDP "Offer Location" setting was ignored: every built-in dropdown hook fell through to `woocommerce_before_add_to_cart_button`, so the offer never moved. Only the "other" custom hook was ever honored
 * Fix - the same defect pinned the shipping protection "Offer Location" to `woocommerce_review_order_before_payment`
