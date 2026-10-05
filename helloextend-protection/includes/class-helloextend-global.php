@@ -223,6 +223,10 @@ class HelloExtend_Protection_Global
         $settings['helloextend_product_protection_contract_create_event'] = array_key_exists('helloextend_product_protection_contract_create_event', $helloextend_protection_product_protection_settings)
             ? $helloextend_protection_product_protection_settings['helloextend_product_protection_contract_create_event'] : 'Fulfillment';
 
+        // Order statuses (without the "wc-" prefix) that fulfill contracts and activate shipping protection
+        $settings['helloextend_contract_fulfillment_statuses'] = !empty($helloextend_protection_product_protection_settings['helloextend_contract_fulfillment_statuses'])
+            ? (array) $helloextend_protection_product_protection_settings['helloextend_contract_fulfillment_statuses'] : array('completed');
+
         $settings['helloextend_environment'] = array_key_exists('helloextend_environment', $helloextend_protection_general_settings)
             ? $helloextend_protection_general_settings['helloextend_environment'] : 'sandbox';
 

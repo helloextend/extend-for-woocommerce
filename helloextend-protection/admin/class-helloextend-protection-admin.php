@@ -424,6 +424,14 @@ class HelloExtend_Protection_Admin
             'helloextend_setting_contract_section' // section
         );
 
+        add_settings_field(
+            'helloextend_contract_fulfillment_statuses', // id
+            'Fulfillment Order Statuses', // title
+            array($this, 'helloextend_contract_fulfillment_statuses_callback'), // callback
+            'helloextend-protection-for-woocommerce-settings-admin-product-protection', // page
+            'helloextend_setting_contract_section' // section
+        );
+
         /* general settings */
 
         add_settings_field(
@@ -756,6 +764,12 @@ class HelloExtend_Protection_Admin
 
         if (isset($input['helloextend_product_protection_contract_create_event'])) {
             $sanitary_values['helloextend_product_protection_contract_create_event'] = $input['helloextend_product_protection_contract_create_event'];
+        }
+
+        if (isset($input['helloextend_contract_fulfillment_statuses']) && is_array($input['helloextend_contract_fulfillment_statuses'])) {
+            $sanitary_values['helloextend_contract_fulfillment_statuses'] = array_values(
+                array_map('sanitize_key', $input['helloextend_contract_fulfillment_statuses'])
+            );
         }
 
         if (isset($input['helloextend_environment'])) {
@@ -1170,6 +1184,26 @@ class HelloExtend_Protection_Admin
             ?>
 			<option value="Fulfillment" <?php echo esc_attr($selected); ?>>Fulfillment</option>
 		</select>
+        <?php
+    }
+
+    public function helloextend_contract_fulfillment_statuses_callback()
+    {
+        $options  = $this->helloextend_protection_for_woocommerce_settings_product_protection_options;
+        $selected = !empty($options['helloextend_contract_fulfillment_statuses'])
+            ? (array) $options['helloextend_contract_fulfillment_statuses'] : array('completed');
+
+        foreach (wc_get_order_statuses() as $status_key => $status_label) {
+            $status = 'wc-' === substr($status_key, 0, 3) ? substr($status_key, 3) : $status_key;
+            printf(
+                '<label style="display:block"><input type="checkbox" name="helloextend_protection_for_woocommerce_product_protection_settings[helloextend_contract_fulfillment_statuses][]" value="%s" %s> %s</label>',
+                esc_attr($status),
+                checked(in_array($status, $selected, true), true, false),
+                esc_html($status_label)
+            );
+        }
+        ?>
+        <p class="description">Orders moving to any of these statuses fulfill product protection contracts (when the Contracts Event is Fulfillment) and activate shipping protection. Defaults to Completed.</p>
         <?php
     }
 
