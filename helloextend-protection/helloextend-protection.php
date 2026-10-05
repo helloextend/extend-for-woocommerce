@@ -648,7 +648,14 @@ function helloextend_add_shipping_protection_fee()
                 }
 
                 if (!$already_in_cart) {
-                    WC()->cart->add_to_cart($product_id, 1);
+                    $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
+                    if (!$cart_item_key) {
+                        WC()->session->set('shipping_fee', false);
+                        WC()->session->set('shipping_fee_value', null);
+                        WC()->session->set('shipping_quote_id', null);
+                        echo ' No shipping protection fee added because of an error ';
+                        wp_die();
+                    }
                 }
                 WC()->cart->calculate_totals();
             }
