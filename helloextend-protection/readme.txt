@@ -64,7 +64,7 @@ Extend Protection For WooCommerce relies on the Extend API to send and receive c
 - [Extend SDK](https://helloextend.github.io/extend-sdk-client): The plugin also uses Extend's SDK via `sdk.helloextend.com` to render protection offers in the frontend.
 - [Extend Merchant Portal](https://merchants.extend.com/): is available for users to manage products, plans, contracts, claims, and upsell leads. It also provides enhanced reporting & dashboards: customer segmentation, catalog analysis, trends, and performance.
 
-The plugin sends order information to the Extend API when the actions `woocommerce_checkout_order_processed` and `woocommerce_order_status_completed` are triggered to create a contract and send the customer an email with the contract details.
+The plugin sends order information to the Extend API when the action `woocommerce_checkout_order_processed` is triggered, and when an order reaches one of the fulfillment order statuses configured in the plugin settings (Completed by default, via `woocommerce_order_status_{status}`), to create a contract and send the customer an email with the contract details.
 
 For more information on our terms of service and privacy policy, visit the links below:
 - https://www.extend.com/terms
