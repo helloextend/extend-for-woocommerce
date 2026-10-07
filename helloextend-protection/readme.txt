@@ -78,10 +78,12 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+
 = 1.2.14 2026-10-07 =
 * Add - "Fulfillment Order Statuses" setting (Product Protection tab) to choose which order statuses fulfill product protection contracts and activate shipping protection, including custom statuses such as "Delivered". Defaults to Completed, so existing stores are unchanged
 * Add - `helloextend_fulfillment_order_statuses` filter to set the fulfillment statuses in code
 * Fix - an order moving through more than one selected fulfillment status is only fulfilled once
+
 = 1.2.12 2026-09-25 =
 * Fix - Affirm itemization for the shipping protection fee: woocommerce-gateway-affirm (3.0.8) sent fee line items in dollars while product lines were in cents, so a $6.00 fee reached Affirm as $0.06. Fee `unit_price` is now converted to cents from the order's fee totals (left untouched if already in cents), only during an Affirm checkout
 * Fix - give each fee line sent to Affirm its own SKU instead of reusing the previous product's ID

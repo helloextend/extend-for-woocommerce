@@ -7,12 +7,18 @@
         function initShippingOffers()
         {
             // Deconstructs ExtendProductIntegration variables
-            const { env, items, helloextend_enabled, enable_helloextend_sp, ajax_url, update_order_review_nonce, helloextend_sp_add_sku } = ExtendShippingIntegration;
+            const { env, items, helloextend_enabled, enable_helloextend_sp, ajax_url, update_order_review_nonce } = ExtendShippingIntegration;
             let items_array = eval(items);
 
             if (helloextend_enabled == 0 || enable_helloextend_sp == 0)  return;
 
             const isShippingProtectionInCart = false;
+
+            // The cart is already updated server-side (fee or SP product), so one refresh gets the right total
+            function refreshCheckout()
+            {
+                $('body').trigger('update_checkout');
+            }
 
             //If Extend shipping  protection is enabled, render offers
             if (enable_helloextend_sp == '1') {
@@ -33,16 +39,7 @@
                                         fee_label: 'Shipping Protection',
                                         shipping_quote_id: quote.id
                                     },
-                                    success: function () {
-                                        $('body').trigger('update_checkout');
-
-                                        // Need to trigger again for SP line item settings to get correct total
-                                        if (helloextend_sp_add_sku) {
-                                            setTimeout(() => {
-                                                $('body').trigger('update_checkout');
-                                            }, 50);
-                                        }
-                                    }
+                                    success: refreshCheckout
                                 }
                             );
                         },
@@ -55,16 +52,7 @@
                                     data: {
                                         action: 'remove_shipping_protection_fee',
                                     },
-                                    success: function () {
-                                        $('body').trigger('update_checkout');
-
-                                        // Need to trigger again for SP line item settings to get correct total
-                                        if (helloextend_sp_add_sku) {
-                                            setTimeout(() => {
-                                                $('body').trigger('update_checkout');
-                                            }, 50);
-                                        }
-                                    }
+                                    success: refreshCheckout
                                 }
                             );
                         },
@@ -81,16 +69,7 @@
                                         fee_label: 'Shipping Protection',
                                         shipping_quote_id: quote.id
                                     },
-                                    success: function () {
-                                        $('body').trigger('update_checkout');
-
-                                        // Need to trigger again for SP line item settings to get correct total
-                                        if (helloextend_sp_add_sku) {
-                                            setTimeout(() => {
-                                                $('body').trigger('update_checkout');
-                                            }, 50);
-                                        }
-                                    }
+                                    success: refreshCheckout
                                 }
                             );
                         }

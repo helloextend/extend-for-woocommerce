@@ -598,6 +598,22 @@ function helloextend_set_product_protection_id_cache($product_id)
     }
 }
 
+function helloextend_sp_add_as_sku()
+{
+    $options = get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
+    return isset($options['helloextend_sp_add_sku']) && $options['helloextend_sp_add_sku'];
+}
+
+function helloextend_remove_shipping_protection_product_from_cart()
+{
+    foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
+        $product = $values['data'];
+        if ($product && get_post_meta($product->get_id(), '_helloextend_shipping_protection_product', true)) {
+            WC()->cart->remove_cart_item($cart_item_key);
+        }
+    }
+}
+
 function helloextend_add_shipping_protection_fee()
 {
     if (!defined('DOING_AJAX') || !$_POST) {
@@ -613,6 +629,36 @@ function helloextend_add_shipping_protection_fee()
             WC()->session->set('shipping_fee', true);
             WC()->session->set('shipping_fee_value', $fee_amount);
             WC()->session->set('shipping_quote_id', $shipping_quote_id);
+
+            // Add the SP product here rather than in woocommerce_cart_calculate_fees: adding a cart item
+            // mid-calculation left the totals stale until a second update_checkout.
+            if (helloextend_sp_add_as_sku()) {
+                $product_id = helloextend_get_or_create_shipping_protection_product($fee_amount);
+                if (!$product_id) {
+                    HelloExtend_Protection_Logger::helloextend_log_error('Could not create or retrieve shipping protection product');
+                    wp_die();
+                }
+
+                $already_in_cart = false;
+                foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
+                    if ($values['product_id'] == $product_id) {
+                        $already_in_cart = true;
+                        break;
+                    }
+                }
+
+                if (!$already_in_cart) {
+                    $cart_item_key = WC()->cart->add_to_cart($product_id, 1);
+                    if (!$cart_item_key) {
+                        WC()->session->set('shipping_fee', false);
+                        WC()->session->set('shipping_fee_value', null);
+                        WC()->session->set('shipping_quote_id', null);
+                        echo ' No shipping protection fee added because of an error ';
+                        wp_die();
+                    }
+                }
+                WC()->cart->calculate_totals();
+            }
         } else {
             echo ' No shipping protection fee added because of an error ';
         }
@@ -631,6 +677,11 @@ function helloextend_remove_shipping_protection_fee()
     WC()->session->set('shipping_fee_value', null);
     WC()->session->set('shipping_quote_id', null);
 
+    if (helloextend_sp_add_as_sku()) {
+        helloextend_remove_shipping_protection_product_from_cart();
+        WC()->cart->calculate_totals();
+    }
+
     wp_die();
 }
 
@@ -645,41 +696,17 @@ function helloextend_set_shipping_fee()
     $remove_fee = WC()->session->get('shipping_fee_remove');
     $fee_amount = WC()->session->get('shipping_fee_value');
 
-    $options = get_option('helloextend_protection_for_woocommerce_shipping_protection_settings');
-    $add_as_sku = isset($options['helloextend_sp_add_sku']) && $options['helloextend_sp_add_sku'];
+    $add_as_sku = helloextend_sp_add_as_sku();
 
+    // In SKU mode the SP product is added by helloextend_add_shipping_protection_fee()
     if ($shipping_fee == 1) {
-        if ($add_as_sku) {
-
-            $product_id = helloextend_get_or_create_shipping_protection_product($fee_amount);
-            if (!$product_id) {
-                HelloExtend_Protection_Logger::helloextend_log_error('Could not create or retrieve shipping protection product');
-                return;
-            }
-            // Avoid duplicate product in cart
-            $already_in_cart = false;
-            foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
-                if ($values['product_id'] == $product_id) {
-                    $already_in_cart = true;
-                    break;
-                }
-            }
-
-            if (!$already_in_cart) {
-                WC()->cart->add_to_cart($product_id, 1);
-            }
-        } else {
+        if (!$add_as_sku) {
             WC()->cart->add_fee($fee_label, $fee_amount);
         }
     } elseif ($remove_fee == 1) {
         if ($add_as_sku) {
-            // Remove the product from cart
-            foreach (WC()->cart->get_cart() as $cart_item_key => $values) {
-                $product = $values['data'];
-                if ($product && get_post_meta($product->get_id(), '_helloextend_shipping_protection_product', true)) {
-                    WC()->cart->remove_cart_item($cart_item_key);
-                }
-            }
+            // Fallback for removals flagged outside the AJAX handler (SP disabled, order placed)
+            helloextend_remove_shipping_protection_product_from_cart();
         } else {
             $fees = WC()->cart->get_fees();
             foreach ($fees as $key => $fee) {
