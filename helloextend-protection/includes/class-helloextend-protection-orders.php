@@ -316,6 +316,16 @@ class HelloExtend_Protection_Orders
             return;
         }
 
+        // Never fulfill a cancelled or refunded order, even if those statuses were selected or added by filter.
+        // cancel_order() handles these statuses and must not be followed by a fulfillment PUT.
+        $blocked_statuses = array('cancelled', 'refunded');
+        if (in_array($to, $blocked_statuses, true) || $order->has_status($blocked_statuses)) {
+            if ($this->settings['enable_helloextend_debug'] == 1) {
+                HelloExtend_Protection_Logger::helloextend_log_debug('Order ID ' . $order_id . ' : order is ' . $order->get_status() . ', skipping fulfillment');
+            }
+            return;
+        }
+
         // Only fulfill once, e.g. when both "delivered" and "completed" are selected
         if ($order->get_meta('_helloextend_fulfillment_sent')) {
             if ($this->settings['enable_helloextend_debug'] == 1) {
