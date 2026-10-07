@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.0
 Tested up to: 6.8
-Stable tag: 1.2.13
+Stable tag: 1.2.14
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -64,7 +64,7 @@ Extend Protection For WooCommerce relies on the Extend API to send and receive c
 - [Extend SDK](https://helloextend.github.io/extend-sdk-client): The plugin also uses Extend's SDK via `sdk.helloextend.com` to render protection offers in the frontend.
 - [Extend Merchant Portal](https://merchants.extend.com/): is available for users to manage products, plans, contracts, claims, and upsell leads. It also provides enhanced reporting & dashboards: customer segmentation, catalog analysis, trends, and performance.
 
-The plugin sends order information to the Extend API when the actions `woocommerce_checkout_order_processed` and `woocommerce_order_status_completed` are triggered to create a contract and send the customer an email with the contract details.
+The plugin sends order information to the Extend API when the action `woocommerce_checkout_order_processed` is triggered, and when an order reaches one of the fulfillment order statuses configured in the plugin settings (Completed by default, via `woocommerce_order_status_{status}`), to create a contract and send the customer an email with the contract details.
 
 For more information on our terms of service and privacy policy, visit the links below:
 - https://www.extend.com/terms
@@ -78,6 +78,11 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.2.14 2026-10-07 =
+* Add - "Fulfillment Order Statuses" setting (Product Protection tab) to choose which order statuses fulfill product protection contracts and activate shipping protection, including custom statuses such as "Delivered". Defaults to Completed, so existing stores are unchanged
+* Add - `helloextend_fulfillment_order_statuses` filter to set the fulfillment statuses in code
+* Fix - an order moving through more than one selected fulfillment status is only fulfilled once
+
 = 1.2.13 2026-09-28 =
 * Fix - checkout refreshed twice every time shipping protection was added, updated or removed. The second refresh was meant for "SP as line item" mode only, but the setting reached the browser as the string "0", which JavaScript treats as true, so fee mode also refreshed twice
 * Fix - in "SP as line item" mode the shipping protection product is now added and removed when the shopper toggles the offer, instead of during the cart totals calculation, so a single checkout refresh shows the correct total

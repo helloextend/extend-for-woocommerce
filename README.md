@@ -56,7 +56,7 @@ The plugin communicates with Extend services:
 
 ### Actions Triggered:
 - `woocommerce_checkout_order_processed`
-- `woocommerce_order_status_completed`
+- `woocommerce_order_status_{status}` for each configured fulfillment order status (Completed by default)
 
 These send order details to Extend for contract creation and customer notification.
 

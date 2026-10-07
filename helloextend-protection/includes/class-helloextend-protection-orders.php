@@ -76,8 +76,9 @@ class HelloExtend_Protection_Orders
         // Hook the callback function to the 'woocommerce_new_order' action
         add_action('woocommerce_checkout_order_processed', [$this, 'create_update_order'], 10, 1);
 
-        // Hook the callback function to the order completed action
-        add_action('woocommerce_order_status_completed', [$this, 'create_update_order'], 10, 1);
+        // Fulfill contracts when the order reaches one of the configured fulfillment statuses.
+        // Registered on init so the helloextend_fulfillment_order_statuses filter can be added from a theme.
+        add_action('init', [$this, 'register_fulfillment_hooks']);
 
 	    // Hook the callback function to the order cancelled action
 	    add_action('woocommerce_order_status_cancelled', [$this, 'cancel_order'], 10, 1);
@@ -271,12 +272,80 @@ class HelloExtend_Protection_Orders
     }
 
     /**
+     * Get the order statuses (without the "wc-" prefix) that fulfill contracts
+     *
+     * @return array
+     */
+    public function get_fulfillment_statuses()
+    {
+        $statuses = (array) apply_filters(
+            'helloextend_fulfillment_order_statuses',
+            $this->settings['helloextend_contract_fulfillment_statuses']
+        );
+
+        return array_map(
+            function ($status) {
+                return 'wc-' === substr($status, 0, 3) ? substr($status, 3) : $status;
+            },
+            $statuses
+        );
+    }
+
+    /**
+     * Hook each fulfillment status. woocommerce_order_status_{status} also fires for orders
+     * created directly in that status, unlike woocommerce_order_status_changed.
+     */
+    public function register_fulfillment_hooks()
+    {
+        foreach (array_unique($this->get_fulfillment_statuses()) as $status) {
+            add_action('woocommerce_order_status_' . $status, [$this, 'handle_fulfillment_status'], 10, 1);
+        }
+    }
+
+    /**
+     * Send the fulfillment to Extend when the order moves to a fulfillment status
+     *
+     * @param int $order_id The ID of the order.
+     */
+    public function handle_fulfillment_status($order_id)
+    {
+        $to = str_replace('woocommerce_order_status_', '', current_filter());
+
+        $order = wc_get_order($order_id);
+        if (!$order instanceof WC_Order) {
+            return;
+        }
+
+        // Never fulfill a cancelled or refunded order, even if those statuses were selected or added by filter.
+        // cancel_order() handles these statuses and must not be followed by a fulfillment PUT.
+        $blocked_statuses = array('cancelled', 'refunded');
+        if (in_array($to, $blocked_statuses, true) || $order->has_status($blocked_statuses)) {
+            if ($this->settings['enable_helloextend_debug'] == 1) {
+                HelloExtend_Protection_Logger::helloextend_log_debug('Order ID ' . $order_id . ' : order is ' . $order->get_status() . ', skipping fulfillment');
+            }
+            return;
+        }
+
+        // Only fulfill once, e.g. when both "delivered" and "completed" are selected
+        if ($order->get_meta('_helloextend_fulfillment_sent')) {
+            if ($this->settings['enable_helloextend_debug'] == 1) {
+                HelloExtend_Protection_Logger::helloextend_log_debug('Order ID ' . $order_id . ' : fulfillment already sent to Extend, skipping status ' . $to);
+            }
+            return;
+        }
+
+        $this->create_update_order((string) $order_id, null, true);
+    }
+
+    /**
      * Create/Update Orders in Extend
      *
      * @param string $order_id The ID of the order.
+     * @param mixed  $order    Unused, kept for hook compatibility.
+     * @param bool   $fulfill  True when the order reached a fulfillment status.
      * @since 1.0.0
      */
-    public function create_update_order(string $order_id, array $order = null)
+    public function create_update_order(string $order_id, $order = null, bool $fulfill = false)
     {
         // If contract creation is disabled, return
         $contract_creation = $this->settings['helloextend_product_protection_contract_create'];
@@ -307,9 +376,7 @@ class HelloExtend_Protection_Orders
             // Will pass fulfill as true to the line items array to fulfill the contract immediately
             $helloextend_line_items = $this->helloextend_get_plans_and_products($order, true);
         } else {
-            // Check if the current action hook is woocommerce_order_status_completed
-            $called_action_hook = current_filter();
-            if ($called_action_hook == 'woocommerce_order_status_completed') {
+            if ($fulfill) {
                 $helloextend_line_items = $this->helloextend_get_plans_and_products($order, true);
             } else {
                 // Does not fulfill product protection line items
@@ -335,8 +402,7 @@ class HelloExtend_Protection_Orders
             $split_country = explode(":", $store_raw_country);
             $store_country = $split_country[0];
             $store_state = $split_country[1];
-            $called_action_hook = current_filter();
-            if ($called_action_hook == 'woocommerce_order_status_completed') {
+            if ($fulfill) {
                 $arg = array(
                     'limit'  => -1,
                     'status' => 'publish',
@@ -470,6 +536,11 @@ class HelloExtend_Protection_Orders
 
                     // add the contracts array at the order level
                     update_post_meta($order->get_id(), '_product_protection_contracts', $contracts);
+                }
+
+                if ($fulfill) {
+                    $order->update_meta_data('_helloextend_fulfillment_sent', time());
+                    $order->save_meta_data();
                 }
             } else {
                 if ($this->settings['enable_helloextend_debug'] == 1) {
