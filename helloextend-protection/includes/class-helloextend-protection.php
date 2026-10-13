@@ -89,6 +89,7 @@ class HelloExtend_Protection
     private HelloExtend_Protection_Cart_Offer $cart_offer;
     private HelloExtend_Protection_Orders $orders;
     private HelloExtend_Protection_Shipping $shipping_protection;
+    private HelloExtend_Protection_Blocks $blocks;
 
     /**
      * Define the core functionality of the plugin.
@@ -120,6 +121,7 @@ class HelloExtend_Protection
         $this->define_cart_offer_hooks();
         $this->define_orders_hooks();
         $this->define_shipping_protection_offer_hooks();
+        $this->define_block_hooks();
     }
 
     /**
@@ -196,6 +198,11 @@ class HelloExtend_Protection
          * The class responsible for handling the Shipping Protection
          */
         include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-shipping.php';
+
+        /**
+         * The class responsible for registering the plugin's editor blocks
+         */
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-blocks.php';
 
         $this->loader = new HelloExtend_Protection_Loader();
 
@@ -301,6 +308,17 @@ class HelloExtend_Protection
     private function define_orders_hooks()
     {
         $this->orders = new HelloExtend_Protection_Orders($this->helloextend_get_protection(), $this->get_version());
+    }
+
+    /**
+     * Register the plugin's editor blocks.
+     *
+     * @since  1.2.11
+     * @access private
+     */
+    private function define_block_hooks()
+    {
+        $this->blocks = new HelloExtend_Protection_Blocks();
     }
 
     /**
