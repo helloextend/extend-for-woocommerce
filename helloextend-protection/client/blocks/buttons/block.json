@@ -4,8 +4,8 @@
 	"name": "helloextend/buttons",
 	"version": "1.0.0",
 	"title": "Extend Buttons",
-	"category": "design",
-	"description": "Renders Extend protection buttons. Output is produced server-side by render.php.",
+	"category": "helloextend-protection",
+	"description": "Renders Extend buttons.",
 	"textdomain": "helloextend-protection",
 	"supports": {
 		"html": false

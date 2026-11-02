@@ -49,6 +49,22 @@ class HelloExtend_Protection_Cart_Offer
     protected string $warranty_product_id;
     private array $settings;
 
+    /**
+     * Guards normalize_cart() against re-entering itself.
+     *
+     * normalize_cart() adjusts quantities, and WC_Cart::set_quantity() fires
+     * woocommerce_after_cart_item_quantity_update — which this class also
+     * listens on. Without this flag that is unbounded recursion: each level
+     * re-reads the cart and calls set_quantity() again, and the request dies on
+     * exhausted memory rather than any error that points back here. The same
+     * applies to woocommerce_cart_item_removed via remove_cart_item().
+     *
+     * @since  1.3
+     * @access private
+     * @var    bool $is_normalizing
+     */
+    private bool $is_normalizing = false;
+
     public function __construct()
     {
         $this->hooks();
@@ -78,8 +94,7 @@ class HelloExtend_Protection_Cart_Offer
         // minicart normalization
         add_action('woocommerce_cart_item_removed', [ $this, 'normalize_cart' ]);
         add_action('woocommerce_after_cart_item_quantity_update', [ $this, 'normalize_cart' ]);
-        add_action('woocommerce_add_to_cart', [ $this, 'normalize_cart' ]);
-         
+        add_action('woocommerce_add_to_cart', [ $this, 'normalize_cart' ]);         
     }
 
     private function is_item_helloextend($item)
@@ -214,12 +229,35 @@ class HelloExtend_Protection_Cart_Offer
             return WC()->cart;
         }
 
-        $products = $this->map_cart_items_with_warranties();
+        // Re-entry from our own cart writes below. The outermost call is already
+        // working from the current cart and will settle it, so a nested call
+        // adds nothing but stack depth.
+        if ($this->is_normalizing) {
+            return WC()->cart;
+        }
 
-        $updates = $this->get_cart_updates($products);
+        $this->is_normalizing = true;
 
-        foreach ( $updates as $key => $quantity_update ) {
-            WC()->cart->set_quantity($key, $quantity_update, true);
+        try {
+            $products = $this->map_cart_items_with_warranties();
+
+            $updates = $this->get_cart_updates($products);
+
+            foreach ( $updates as $key => $quantity_update ) {
+                // Pass false to skip the per-item totals refresh: each one is a
+                // full recalculation describing a cart that is still half
+                // updated. Totals are refreshed once after the loop instead.
+                WC()->cart->set_quantity($key, $quantity_update, false);
+            }
+
+            if (!empty($updates)) {
+                WC()->cart->calculate_totals();
+            }
+        } finally {
+            // Cleared in finally so a throw inside the loop cannot leave the
+            // guard stuck on, silently disabling normalization for the rest of
+            // the request.
+            $this->is_normalizing = false;
         }
 
         return WC()->cart;
@@ -240,7 +278,7 @@ class HelloExtend_Protection_Cart_Offer
             $category    = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
             $price       = (int) floatval($cart_item['data']->get_price() * 100);
 
-            echo "<div id='offer_".esc_attr($item_id)."' class='cart-extend-offer' data-covered='".esc_attr($item_id)."' data-category='".esc_attr($category)."' data-price='" . $price . "'></div>";
+            echo "<div id='offer_" . esc_attr($item_id)."' class='cart-extend-offer' data-covered='" . esc_attr($item_id) . "' data-category='" . esc_attr($category) . "' data-price='" . esc_attr($price) . "'></div>";
         }
     }
 
@@ -252,16 +290,55 @@ class HelloExtend_Protection_Cart_Offer
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
         $enable_helloextend_pp          = trim($this->settings['enable_helloextend_pp']);
-        $cart                           = WC()->cart;
+        $cart = [];
+
+        foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
+           /** @var WC_Product $product */
+            $product = $cart_item['data'];
+
+            // Skip if product object is invalid (rare, but safe)
+            if ( ! is_a( $product, 'WC_Product' ) ) {
+                continue;
+            }
+
+            $product_id = $product->get_id();
+
+            $categories = get_the_terms( $product->is_type( 'variation' ) ? $product->get_parent_id() : $product_id, 'product_cat' );
+            $category = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
+
+            // Build item data
+            $item = array(
+                'product_id'      => $product_id,
+                'name'            => $product->get_name(),
+                'categories'      => $categories, 
+                'top_category'    => $category,
+                'quantity'        => $cart_item['quantity'],
+                'price_raw'       => (int) round( (float) $product->get_price() * 100 ),
+                'price_formatted' => wc_price( $product->get_price() ),
+                'price_html'      => $product->get_price_html(),
+                'line_subtotal'   => WC()->cart->get_product_subtotal( $product, $cart_item['quantity'] ),
+                'permalink'       => $product->get_permalink(),
+                'sku'             => $product->get_sku()
+            );
+
+            if ( isset( $cart_item['extendData'] ) ) {
+                $item['extendData'] = $cart_item['extendData'];
+            }
+
+            // If it's a variation, add variation-specific info
+            if ( $product->is_type( 'variation' ) ) {
+                $item['variation_id'] = $product->get_id();
+                $item['parent_id']    = $product->get_parent_id();
+            }
+
+            $cart[ $cart_item_key ] = $item;
+        }
 
         if ($helloextend_enable_cart_offers == '1' && $enable_helloextend == '1' && $enable_helloextend_pp == '1') {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_cart_integration_script');
-            wp_enqueue_script('helloextend_minicart_integration_script');
-            $ajaxurl = admin_url('admin-ajax.php');
             wp_localize_script(
                 'helloextend_cart_integration_script',
-                //'helloextend_minicart_integration_script',
                 'ExtendCartIntegration',
                 compact('cart', 'helloextend_enable_cart_offers')
             );
@@ -270,12 +347,16 @@ class HelloExtend_Protection_Cart_Offer
 
     // renders minicart offers
     public function minicart_offers(){
+        if ( function_exists( 'is_cart' ) && is_cart() ) {
+            return;
+        }
+
         $cart_contents = null;
         // get Extend options
         $enable_helloextend             = trim($this->settings['enable_helloextend']);
         $enable_helloextend_pp          = trim($this->settings['enable_helloextend_pp']);
         $helloextend_enable_cart_offers = $this->settings['helloextend_enable_cart_offers'];
-        $minicart                           = WC()->cart;
+        $minicart                       = WC()->cart;
 
         foreach ( WC()->cart->get_cart() as $cart_item_key => $cart_item ) {
            /** @var WC_Product $product */
@@ -288,44 +369,29 @@ class HelloExtend_Protection_Cart_Offer
 
             $product_id = $product->get_id(); 
             // Categories: array of category names
-            $categories = array();
-            $terms = get_the_terms( $product_id, 'product_cat' );
-            if ( $terms && ! is_wp_error( $terms ) ) {
-                  $categories = wp_list_pluck( $terms, 'name', 'term_id' ); // ← use 'slug' or 'term_id' if preferred
-                
-            }
+            $categories = get_the_terms( $product->is_type( 'variation' ) ? $product->get_parent_id() : $product_id, 'product_cat' );
+            $category = HelloExtend_Protection_Global::helloextend_get_first_valid_category($categories);
 
-            $category = null;
-       
-            $ignored_set = array_flip(array_map('intval', (array) get_option('helloextend_protection_for_woocommerce_ignored_categories')));
-
-
-            foreach( $categories as $cat => $term ){
-                    if (!isset($ignored_set[(int)($cat)])) {
-                        $category = $term  ?? 'Uncategorized';
-                        break;
-                    }
-            }
             // Build item data
             $item = array(
                
                 'product_id'      => $product_id,
                 'name'            => $product->get_name(),
                 'categories'      => $categories, 
-                'top_category'    => $category,               // array e.g. ['T-shirts', 'Summer']
+                'top_category'    => $category,
                 'quantity'        => $cart_item['quantity'],
-                'price_raw'       => (int) round( (float) $product->get_price() * 100 ),         // string: "29.99"
-                'price_formatted' => wc_price( $product->get_price() ), // "$29.99" or with currency
-                'price_html'      => $product->get_price_html(),     // includes <del>/<ins> if on sale
+                'price_raw'       => (int) round( (float) $product->get_price() * 100 ),
+                'price_formatted' => wc_price( $product->get_price() ),
+                'price_html'      => $product->get_price_html(),
                 'line_subtotal'   => WC()->cart->get_product_subtotal( $product, $cart_item['quantity'] ),
                 'permalink'       => $product->get_permalink(),
-                'sku'          => $product->get_sku()                
+                'sku'             => $product->get_sku()
             );
+            
             // If it's a variation, add variation-specific info
             if ( $product->is_type( 'variation' ) ) {
                 $item['variation_id'] = $product->get_id();
                 $item['parent_id']    = $product->get_parent_id();
-                // $item['attributes'] = $product->get_variation_attributes(); // or from $cart_item['variation']
             }
             $cart_contents[ $cart_item_key ] = $item;
 
@@ -338,7 +404,7 @@ class HelloExtend_Protection_Cart_Offer
                 'ExtendCartIntegration',
                 compact('cart_contents', 'helloextend_enable_cart_offers')
             );
-        } 
+        }
     }
 
 }

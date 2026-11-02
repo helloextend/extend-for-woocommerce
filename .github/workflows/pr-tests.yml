@@ -15,6 +15,54 @@ jobs:
         with:
           ref: ${{ github.event.pull_request.head.ref }}
 
+      # The blocks under helloextend-protection/client compile into
+      # helloextend-protection/build, which is what gets zipped below. Without
+      # this the test store runs against whatever build output happened to be
+      # committed, not the PR's source.
+      - name: Set up pnpm
+        uses: pnpm/action-setup@b906affcce14559ad1aafd4ab0e942779e9f58b1 # v4.3.0
+
+      - name: Set up Node
+        uses: actions/setup-node@a0853c24544627f65ddf259abe73b1d18a591444 # v5.0.0
+        with:
+          node-version: 22
+          cache: pnpm
+
+      # Also installs Cypress 10.11.0, which is pinned in devDependencies.
+      - name: Install dependencies
+        run: pnpm install --frozen-lockfile
+
+      - name: Build blocks
+        run: pnpm run build
+
+      - name: Verify block build output
+        run: |
+          MANIFEST="helloextend-protection/build/blocks-manifest.php"
+
+          if [ ! -f "$MANIFEST" ]; then
+            echo "::error::$MANIFEST was not produced by the build — the plugin would deploy with no blocks."
+            exit 1
+          fi
+
+          # Each manifest key must resolve to build/<key>/block.json. WordPress
+          # builds that exact path to locate a block's metadata, and when it
+          # misses it registers a block with no scripts and no render callback
+          # — silently, with nothing in the inserter.
+          php -r '
+            $manifest = require "helloextend-protection/build/blocks-manifest.php";
+            $missing = [];
+            foreach (array_keys($manifest) as $block) {
+                if (!file_exists("helloextend-protection/build/$block/block.json")) {
+                    $missing[] = $block;
+                }
+            }
+            if ($missing) {
+                fwrite(STDERR, "::error::Manifest keys with no block.json: " . implode(", ", $missing) . "\n");
+                exit(1);
+            }
+            echo "Verified " . count($manifest) . " block(s) in the build collection.\n";
+          '
+
       - name: Zip the updated plugin folder
         run: zip -r helloextend-protection.zip helloextend-protection
 
@@ -36,9 +84,6 @@ jobs:
           RESPONSE=$(curl -X DELETE "https://woocommerce.woodys.extend.com/wp-json/wp/v2/plugins/cleanup?file=helloextend-protection.zip" \
             -u "${{ secrets.WP_ADMIN_AUTH }}")
           echo "Cleanup Response: $RESPONSE"
-
-      - name: Install Cypress@10.11.0
-        run: npm install cypress@10.11.0
 
       - name: Run Cypress tests for plugin settings
         run: npx cypress run --spec "cypress/integration/01_plugin_settings.cy.js"

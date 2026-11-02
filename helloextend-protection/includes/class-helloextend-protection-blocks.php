@@ -3,7 +3,7 @@
 /**
  * Extend For WooCommerce Block Registration.
  *
- * @since   1.2.11
+ * @since   1.3
  * @package HelloExtend_Protection
  *
  * @package    HelloExtend_Protection
@@ -13,10 +13,10 @@
 /**
  * Registers the plugin's editor blocks.
  *
- * Blocks live under client/blocks/<name>/ and are registered from their
- * block.json metadata. Each block is dynamic — its markup is produced by the
- * render.php the metadata points at, so no build step or editor bundle is
- * required.
+ * Blocks are authored under client/blocks/<name>/ and compiled into build/,
+ * where the build also emits blocks-manifest.php — a single file holding every
+ * block.json in the collection, so WordPress parses one PHP file instead of
+ * reading and decoding each block.json separately.
  *
  * @package HelloExtend_Protection
  * @author  Extend, Inc.
@@ -31,15 +31,6 @@ if (!defined('ABSPATH')) {
 
 class HelloExtend_Protection_Blocks
 {
-    /**
-     * Directories under client/blocks/ to register, relative to the plugin root.
-     *
-     * @since  1.2.11
-     * @access private
-     * @var    string[] $blocks
-     */
-    private array $blocks = [ 'buttons' ];
-
     public function __construct()
     {
         $this->hooks();
@@ -48,29 +39,71 @@ class HelloExtend_Protection_Blocks
     /**
      * Initiate our hooks.
      *
-     * @since 1.2.11
+     * @since 1.3
      */
     public function hooks()
     {
+        /*
+         * Blocks must be registered on init. This class is constructed from
+         * HelloExtend_Protection during plugins_loaded, which is too early —
+         * registering there also registers the blocks' scripts before
+         * wp_register_script() is allowed to run, which WordPress flags as
+         * _doing_it_wrong.
+         */
         add_action('init', [ $this, 'register_blocks' ]);
+        add_filter( 'block_categories_all', [$this, 'register_block_category'], 10, 2 );
     }
 
     /**
-     * Register each block from its block.json metadata.
+     * @param array[] $block_categories
+     * @param WP_Block_Editor_Context $editor_context
+     * 
+     * @since 1.3
+     */
+    public function register_block_category($block_categories, $editor_context)
+    {
+        array_push(
+            $block_categories,
+            array(
+                'slug'  => 'helloextend-protection',
+                'title' => __( 'Extend Protection', 'helloextend-protection' ),
+                'icon'  => null,
+            )
+        );
+
+        return $block_categories;
+    }
+
+    /**
+     * Register every block in the build collection from its manifest.
      *
-     * @since 1.2.11
+     * @since 1.3
      */
     public function register_blocks()
     {
-        foreach ($this->blocks as $block) {
-            $block_path = HELLOEXTEND_PLUGIN_DIR . 'client/blocks/' . $block;
+        /*
+         * The collection root must be the directory that DIRECTLY contains the
+         * block folders. WordPress locates each block's metadata by joining the
+         * root with the manifest key and '/block.json', and the keys the build
+         * emits are bare folder names ('buttons'), never paths. If the blocks
+         * sit one level deeper the lookup misses, block.json is reported as
+         * non-existent, and the metadata's 'file' entry becomes null — which
+         * silently strips the render callback and the editor script, leaving a
+         * block that registers without error and never appears in the inserter.
+         */
+        $collection_path = HELLOEXTEND_PLUGIN_DIR . 'build';
+        $manifest_path   = $collection_path . '/blocks-manifest.php';
 
-            if (!file_exists($block_path . '/block.json')) {
-                HelloExtend_Protection_Logger::helloextend_log_error('Could not register block, block.json missing at: ' . $block_path);
-                continue;
-            }
-
-            register_block_type($block_path);
+        /*
+         * A missing manifest is silent unless WP_DEBUG is on: the collection
+         * fails to register and every block disappears from the inserter with
+         * no other symptom. Log it so the cause is visible in the plugin log.
+         */
+        if (!file_exists($manifest_path)) {
+            HelloExtend_Protection_Logger::helloextend_log_error('Could not register blocks, manifest missing at: ' . $manifest_path . ' — run the block build.');
+            return;
         }
+
+        wp_register_block_types_from_metadata_collection($collection_path, $manifest_path);
     }
 }

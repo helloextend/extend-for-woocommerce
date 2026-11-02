@@ -295,7 +295,7 @@ class HelloExtend_Protection
      */
     private function define_shipping_protection_offer_hooks()
     {
-        $this->shipping_protection_offer = new HelloExtend_Protection_Shipping($this->helloextend_get_protection(), $this->get_version());
+        $this->shipping_protection = new HelloExtend_Protection_Shipping($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -313,7 +313,7 @@ class HelloExtend_Protection
     /**
      * Register the plugin's editor blocks.
      *
-     * @since  1.2.11
+     * @since  1.3
      * @access private
      */
     private function define_block_hooks()

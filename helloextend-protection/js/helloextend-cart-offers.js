@@ -64,7 +64,7 @@
                 
                 const referenceId = $offer.data('covered');
                 
-                if (ExtendWooCommerce.warrantyAlreadyInCart(referenceId, cart ? cart : window.ExtendCartIntegration.cart)
+                if (ExtendWooCommerce.warrantyAlreadyInCart(referenceId, cart)
                     || ExtendCartIntegration.helloextend_enable_cart_offers !== '1') {
                     return;
                 }

@@ -1,57 +1,48 @@
-/**
- * Editor registration for the helloextend/buttons block.
- *
- * The block is registered server-side from block.json, so the editor already
- * knows its title, category and description — WordPress bootstraps that
- * metadata into the editor for every block type registered in PHP. This file
- * supplies only the parts that have to live in JavaScript: an edit component
- * for the canvas, and a save that returns null because the front-end markup is
- * produced by render.php on every request.
- *
- * Without this file the block still renders correctly wherever it is placed,
- * but it is absent from the inserter — the editor builds that list from blocks
- * registered on the client, not from the PHP registry.
- *
- * No build step: this is plain ES5-compatible JS against the wp.* globals,
- * matching the rest of the plugin's JavaScript.
- *
- * Generated with assistance from Claude Code.
- */
+import { registerBlockType } from '@wordpress/blocks';
+import { useBlockProps } from '@wordpress/block-editor';
+import { createElement } from '@wordpress/element';
+import { __ } from '@wordpress/i18n';
 
-(function ( blocks, element, blockEditor, i18n ) {
-    'use strict';
+/* wp-scripts chains @svgr/webpack with url-loader for .svg imports, so the
+   DEFAULT export is a data URL and the React component is the named
+   `ReactComponent` export — importing the default here would hand
+   createElement() a string and produce a bogus element.
 
-    const el = element.createElement;
-    const useBlockProps = blockEditor.useBlockProps;
-    const __ = i18n.__;
+   The icon has to be supplied here rather than in block.json: that file's
+   `icon` field only accepts a Dashicon slug and cannot reference a file. */
+import { ReactComponent as ExtendX } from '../../../assets/extend-x-24x24.svg';
 
-    blocks.registerBlockType('helloextend/buttons', {
-        /**
-         * Placeholder rendered on the editor canvas.
-         *
-         * This is a static label rather than a live preview of render.php. If
-         * the PHP output grows beyond a placeholder and the preview needs to
-         * match it, swap this for wp.serverSideRender and add
-         * 'wp-server-side-render' to the dependencies in index.asset.php.
-         *
-         * @return {Object} Element to render in the editor.
-         */
-        edit: function () {
-            return el(
-                'div',
-                useBlockProps(),
-                __('Extend Buttons', 'helloextend-protection')
-            );
-        },
+/* Must match the name in block.json — the editor merges the server-side
+   metadata (title, category) in by name, and a mismatch leaves the block
+   untitled and out of the inserter. */
+registerBlockType( 'helloextend/buttons', {
+	icon: createElement( ExtendX ),
 
-        /**
-         * Dynamic block: nothing is written into post content, so the saved
-         * markup is just the block comment delimiter.
-         *
-         * @return {null} Nothing to serialize.
-         */
-        save: function () {
-            return null;
-        }
-    });
-})(window.wp.blocks, window.wp.element, window.wp.blockEditor, window.wp.i18n);
+	/**
+	 * Placeholder rendered on the editor canvas.
+	 *
+	 * This is a static label rather than a live preview of render.php. If the
+	 * PHP output grows beyond a placeholder and the preview needs to match it,
+	 * import ServerSideRender from '@wordpress/server-side-render' and return
+	 * that instead — the dependency list updates itself on the next build.
+	 *
+	 * @return {Object} Element to render in the editor.
+	 */
+	edit: function Edit() {
+		return createElement(
+			'div',
+			useBlockProps(),
+			__( 'Extend Buttons', 'helloextend-protection' )
+		);
+	},
+
+	/**
+	 * Dynamic block: nothing is written into post content, so the saved markup
+	 * is just the block comment delimiter.
+	 *
+	 * @return {null} Nothing to serialize.
+	 */
+	save: function Save() {
+		return null;
+	}
+} );

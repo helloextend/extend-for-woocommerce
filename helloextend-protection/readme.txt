@@ -3,9 +3,9 @@ Plugin Name: Extend Protection For WooCommerce
 Plugin URI: https://www.extend.com/
 Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
-Requires at least: 4.0
-Tested up to: 6.8
-Stable tag: 1.2.14
+Requires at least: 4.1
+Tested up to: 7.1
+Stable tag: 1.3
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,14 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.3 2026-10-23 =
+* Add - "Extend Simple Offer" block, so the product protection offer can be placed anywhere in a block (FSE) theme's product template instead of depending on a classic template hook
+* Add - "Extend Shipping Protection" block for the WooCommerce Cart and Checkout blocks, with the fee applied through the Store API
+* Add - "Extend Protection" category in the block inserter, grouping the plugin's blocks together
+* Fix - add to cart on the product page is intercepted in the capture phase, so the protection offer still applies on themes that drive add to cart from their own capture-phase listener and stop the event before anything else sees it
+* Fix - the add to cart button could be left unresponsive when adding the protection plan failed; the add to cart now continues either way
+* Fix - cart normalization could re-enter itself through WooCommerce's quantity update hook until the request exhausted the memory limit
+
 = 1.2.14 2026-10-07 =
 * Add - "Fulfillment Order Statuses" setting (Product Protection tab) to choose which order statuses fulfill product protection contracts and activate shipping protection, including custom statuses such as "Delivered". Defaults to Completed, so existing stores are unchanged
 * Add - `helloextend_fulfillment_order_statuses` filter to set the fulfillment statuses in code

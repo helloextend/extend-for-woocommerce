@@ -1,0 +1,21 @@
+{
+	"$schema": "https://schemas.wp.org/trunk/block.json",
+	"apiVersion": 3,
+	"name": "helloextend/shipping-protection",
+	"version": "1.0.0",
+	"title": "Extend Shipping Protection",
+	"category": "helloextend-protection",
+	"description": "Renders Extend shipping protection offer.",
+	"textdomain": "helloextend-protection",
+	"supports": {
+		"html": false,
+		"multiple": false
+	},
+	"editorScript": "file:./index.js",
+	"render": "file:./render.php",
+	"viewScript": "file:./view.js",
+	"parent": [
+	    "woocommerce/checkout-totals-block",
+    	"woocommerce/checkout-fields-block"
+	]
+}

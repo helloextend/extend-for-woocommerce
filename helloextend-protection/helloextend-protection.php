@@ -16,7 +16,7 @@
  * Plugin Name:       Extend Protection For WooCommerce
  * Plugin URI:        https://docs.extend.com/docs/extend-protection-plugin-for-woocommerce
  * Description:       Extend Protection for Woocommerce. Allows WooCommerce merchants to offer product and shipping protection to their customers.
- * Version:           1.2.14
+ * Version:           1.3
  * Author:            Extend, Inc.
  * Author URI:        https://extend.com/
  * License:           GPL-2.0+
@@ -44,7 +44,7 @@ if (!defined('WPINC')) {
  * Start at version 1.0.0 and use SemVer - https://semver.org
  * Rename this for your plugin and update it as you release new versions.
  */
-define('HELLOEXTEND_PROTECTION_VERSION', '1.2.14');
+define('HELLOEXTEND_PROTECTION_VERSION', '1.3');
 define('HELLOEXTEND_PRODUCT_PROTECTION_SKU', 'helloextend-product-protection');
 define('HELLOEXTEND_SHIPPING_PROTECTION_SKU', 'helloextend-shipping-protection');
 
@@ -165,6 +165,8 @@ add_action('wp_ajax_nopriv_add_shipping_protection_fee', 'helloextend_add_shippi
 add_action('wp_ajax_remove_shipping_protection_fee', 'helloextend_remove_shipping_protection_fee');
 add_action('wp_ajax_nopriv_remove_shipping_protection_fee', 'helloextend_remove_shipping_protection_fee');
 add_action('woocommerce_cart_calculate_fees', 'helloextend_set_shipping_fee');
+/* drop shipping protection when the shopper navigates away from checkout */
+add_action('template_redirect', 'helloextend_clear_shipping_protection_off_checkout');
 add_action('woocommerce_checkout_order_processed', 'helloextend_save_shipping_protection_quote_id', 5, 2);
 add_filter('wc_gateway_affirm_initiate_checkout_data', 'helloextend_fix_affirm_fee_unit_price');
 
@@ -683,6 +685,57 @@ function helloextend_remove_shipping_protection_fee()
     }
 
     wp_die();
+}
+
+/**
+ * Clear shipping protection once the shopper leaves checkout.
+ *
+ * set_sp_fee() runs on woocommerce_cart_calculate_fees and decides purely from
+ * the session flags, with no notion of which page it is on — by design, because
+ * the block checkout renders through the Store API where page conditionals are
+ * meaningless. The consequence is that protection stays applied on the cart and
+ * everywhere else until something clears the flags. This is that something.
+ *
+ * Hooked to template_redirect specifically because it does NOT fire for Store
+ * API, admin-ajax, or wc-ajax requests. is_checkout() is false in all of those,
+ * so a check that ran there would wipe protection during the very background
+ * request the block checkout uses to render it. Restricting the check to real
+ * front-end page views is what makes the conditional trustworthy.
+ *
+ * Clearing is left to set_sp_fee() via the shipping_fee_remove flag rather than
+ * stripping the fee here, so fee mode and SKU mode keep following one path.
+ *
+ * @since 1.3
+ *
+ * Generated with assistance from Claude Code.
+ */
+function helloextend_clear_shipping_protection_off_checkout()
+{
+    if (is_admin() || wp_doing_ajax() || is_null(WC()->cart) || is_null(WC()->session)) {
+        return;
+    }
+
+    // has_block() covers a block checkout living on a page that is_checkout()
+    // does not recognise — stripping protection on the real checkout would be
+    // far worse than leaving it applied a page too long.
+    if (is_checkout() || has_block('woocommerce/checkout')) {
+        return;
+    }
+
+    // Nothing applied, nothing to undo. Also keeps this off the hot path for
+    // the overwhelming majority of page views.
+    if (!WC()->session->get('shipping_fee')) {
+        return;
+    }
+
+    WC()->session->set('shipping_fee_remove', true);
+    WC()->session->set('shipping_fee', false);
+    WC()->session->set('shipping_fee_value', null);
+    WC()->session->set('shipping_quote_id', null);
+
+    // Runs set_sp_fee(), which consumes shipping_fee_remove and drops either the
+    // fee or the SP line item depending on the mode.
+    WC()->cart->calculate_totals();
 }
 
 function helloextend_set_shipping_fee()

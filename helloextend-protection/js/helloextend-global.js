@@ -13,7 +13,7 @@
 
         async function addPlanToCart(opts)
         {
-            return await jQuery.post(
+            return await $.post(
                 ajaxurl, {
                     action: "add_to_cart_helloextend",
                     nonce: ExtendWooCommerce.nonce,
@@ -29,7 +29,7 @@
         async function getCart()
         {
             return JSON.parse(
-                await jQuery.post(
+                await $.post(
                     ajaxurl, {
                         action: "get_cart_helloextend"
                     }
@@ -39,8 +39,8 @@
 
         function warrantyAlreadyInCart(variantId, cart)
         {
-            let cartContents = cart['cart_contents'];
-            if (!cartContents) {
+            let cartContents = window.ExtendCartIntegration.cart;
+            if (cart !== undefined) {
                 cartContents = cart;
             }
             const cartItems = Object.values(cartContents);
@@ -99,6 +99,3 @@
         $(document).trigger('integration.extend');
     });
 })(jQuery);
-
-
-

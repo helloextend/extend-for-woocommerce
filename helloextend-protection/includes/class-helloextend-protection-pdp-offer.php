@@ -102,14 +102,39 @@ class HelloExtend_Protection_PDP_Offer
         $helloextend_enabled              = $this->settings['enable_helloextend'];
         $atc_button_selector         = $this->settings['helloextend_atc_button_selector'];
 
+        /*
+         * Variation prices for the block add to cart (woocommerce/add-to-cart-with-options).
+         *
+         * The block replaces the classic variation form, and fires no JS event
+         * on selection — its state lives in Interactivity API stores that
+         * WooCommerce registers as private. The one piece of public markup it
+         * does render is a hidden input[name="variation_id"] holding the
+         * resolved variation, which the JS watches. That gives an ID but no
+         * price, so the lookup table is built here instead of reading it out of
+         * a store WooCommerce says will break between releases.
+         *
+         * Only built for variable products: get_available_variations() loads
+         * every variation, which is wasted work for every other product type.
+         */
+        $variations = array();
+
+        if ($type === 'variable') {
+            foreach ($product->get_available_variations() as $variation) {
+                $variations[ (string) $variation['variation_id'] ] = (int) round(floatval($variation['display_price']) * 100);
+            }
+        }
+
         if ($helloextend_enabled == '1' && $helloextend_pp_enabled == '1' ) {
             wp_enqueue_script('helloextend_script');
             wp_enqueue_script('helloextend_product_integration_script');
             wp_localize_script(
                 'helloextend_product_integration_script',
                 'ExtendProductIntegration',
-                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pp_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector')
+                compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pp_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector', 'variations')
             );
+        }
+
+        if ($helloextend_pdp_offers_enabled) {
             echo "<div class='helloextend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }
     }
