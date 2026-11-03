@@ -711,7 +711,17 @@ function helloextend_remove_shipping_protection_fee()
  */
 function helloextend_clear_shipping_protection_off_checkout()
 {
-    if (is_admin() || wp_doing_ajax() || is_null(WC()->cart) || is_null(WC()->session)) {
+    /*
+     * This callback is registered at file scope, so it stays hooked even when
+     * helloextend_bootstrap() skips startup because WooCommerce is inactive.
+     * function_exists() has to come first: WC() is WooCommerce's own function,
+     * and calling it without WooCommerce fatals the front end.
+     */
+    if (!function_exists('WC') || is_admin() || wp_doing_ajax()) {
+        return;
+    }
+
+    if (is_null(WC()->cart) || is_null(WC()->session)) {
         return;
     }
 

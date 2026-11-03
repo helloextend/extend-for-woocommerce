@@ -85,7 +85,13 @@ class HelloExtend_Protection_Shipping
      * 
      * @since 1.3
      */
-    private function extend_store_api_schema()
+    /*
+     * Public because hooks() also registers this as a woocommerce_blocks_loaded
+     * callback. WordPress invokes callbacks from outside the class, so a private
+     * method fatals there — and only the did_action() branch, which calls it
+     * internally, would keep working.
+     */
+    public function extend_store_api_schema()
     {
         woocommerce_store_api_register_update_callback([
             'namespace' => 'helloextend/shipping-protection',
@@ -93,7 +99,9 @@ class HelloExtend_Protection_Shipping
                 if (!isset($data['action'])) return;
 
                 if ($data['action'] == 'add') {
-                    $this->add_sp_to_cart($data['quote']);
+                    // The whole payload is client-supplied, so 'quote' may be
+                    // absent even when 'action' is not.
+                    $this->add_sp_to_cart(isset($data['quote']) ? $data['quote'] : []);
                 } else if ($data['action'] == 'remove') {
                     $this->remove_sp_from_cart();
                 }
@@ -193,6 +201,26 @@ class HelloExtend_Protection_Shipping
     {
         if (!isset($quote['premium']) || !isset($quote['id'])) {
             HelloExtend_Protection_Logger::helloextend_log_error('SP data missing quote');
+            return;
+        }
+
+        /*
+         * The quote reaches us straight from the browser through the Store API,
+         * so the premium is shopper-controlled until it is checked. An unchecked
+         * value is spendable: in fee mode a negative premium becomes a negative
+         * add_fee(), i.e. an arbitrary discount, and in SKU mode it sets the
+         * price of the shared protection product for the whole store.
+         */
+        if (!is_numeric($quote['premium']) || (float) $quote['premium'] <= 0) {
+            HelloExtend_Protection_Logger::helloextend_log_error('SP quote rejected, premium is not a positive number: ' . wp_json_encode($quote['premium']));
+            return;
+        }
+
+        $quote['premium'] = (float) $quote['premium'];
+        $quote['id']      = sanitize_text_field((string) $quote['id']);
+
+        if ($quote['id'] === '') {
+            HelloExtend_Protection_Logger::helloextend_log_error('SP quote rejected, quote id is empty');
             return;
         }
 

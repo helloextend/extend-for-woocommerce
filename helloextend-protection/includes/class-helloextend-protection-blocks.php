@@ -95,6 +95,18 @@ class HelloExtend_Protection_Blocks
         $manifest_path   = $collection_path . '/blocks-manifest.php';
 
         /*
+         * wp_register_block_types_from_metadata_collection() landed in
+         * WordPress 6.8, and the blocks themselves are apiVersion 3 (6.3+).
+         * readme.txt still advertises support back to 4.1, so without this
+         * guard an older install fatals on an undefined function on every
+         * request — the plugin would not load at all, blocks or not.
+         */
+        if (!function_exists('wp_register_block_types_from_metadata_collection')) {
+            HelloExtend_Protection_Logger::helloextend_log_notice('Skipping block registration: WordPress 6.8 or later is required. The rest of the plugin is unaffected.');
+            return;
+        }
+
+        /*
          * A missing manifest is silent unless WP_DEBUG is on: the collection
          * fails to register and every block disappears from the inserter with
          * no other symptom. Log it so the cause is visible in the plugin log.
