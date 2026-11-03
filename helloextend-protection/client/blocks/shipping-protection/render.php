@@ -62,5 +62,5 @@ $items      = array_values(
 ?>
 <div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core escapes the attribute string it returns. ?>
 data-block-name="helloextend/shipping-protection">
-<div id="helloextend-block-shipping-offer" style="max-height: 100px; padding-right: 1rem;" data-items="<?php echo esc_html_e(json_encode($items), 'helloextend-protection');?>"></div>
+<div id="helloextend-block-shipping-offer" style="max-height: 100px; padding-right: 1rem;" data-items="<?php echo esc_attr(wp_json_encode($items)); ?>"></div>
 </div>

@@ -12,6 +12,9 @@ importers:
         specifier: 16.2.0
         version: 16.2.0(react-dom@19.3.0(react@19.3.0))(react@19.3.0)
     devDependencies:
+      '@woocommerce/dependency-extraction-webpack-plugin':
+        specifier: 3.0.1
+        version: 3.0.1(webpack@5.111.1)
       '@wordpress/scripts':
         specifier: ^36.1.0
         version: 36.1.0(@opentelemetry/core@2.12.0(@opentelemetry/api@1.9.1))(@playwright/test@1.64.0)(@types/node@26.6.5)(@typescript-eslint/eslint-plugin@8.71.1(@typescript-eslint/parser@8.71.1(eslint@10.12.0)(typescript@6.0.3))(eslint@10.12.0)(typescript@6.0.3))(@typescript-eslint/parser@8.71.1(eslint@10.12.0)(typescript@6.0.3))(react-dom@19.3.0(react@19.3.0))(react@19.3.0)(type-fest@4.41.0)(typescript@6.0.3)(yauzl@2.10.0)
@@ -1675,6 +1678,10 @@ packages:
       webpack-dev-server:
         optional: true
 
+  '@woocommerce/dependency-extraction-webpack-plugin@3.0.1':
+    resolution: {integrity: sha512-klUM4B3mzDTKSBc9iSyPb2U4wUwKdGuFRBB3cqpNNOziOJUR3v/UHQ4pCLqe3Vqq5lPvKwcMsO4iSoNqjiJWOg==}
+    engines: {node: ^20.11.1, pnpm: ^8.12.1}
+
   '@wordpress/a11y@4.57.0':
     resolution: {integrity: sha512-1BhlEYblenx5w5SkHaEdBodcNf93NDt5nd7QmOc1PpDVxWsGc/ARO30puvUlTnc1tq0Z8KEwy/wiPaTJUoprLw==}
     engines: {node: '>=18.12.0'}
@@ -1740,6 +1747,12 @@ packages:
         optional: true
       '@types/react-dom':
         optional: true
+
+  '@wordpress/dependency-extraction-webpack-plugin@3.7.0':
+    resolution: {integrity: sha512-SHyp88D1ICSaRVMfs/kKEicjKXWf1y2wecUeZIiMtkfAi8Bnk3JsnUo11LH7drJIXfjmDoer2B2rrBMZmRm8VA==}
+    engines: {node: '>=12'}
+    peerDependencies:
+      webpack: ^4.8.3 || ^5.0.0
 
   '@wordpress/dependency-extraction-webpack-plugin@6.57.0':
     resolution: {integrity: sha512-5tX33Zxm2f7RdFMWr1AysScAPT5NGi6v5/iYqGZyYw/kqvH6vYPQLEEK0YO4CnG1p5FO44pu0gu6OQySLRwN1A==}
@@ -3898,6 +3911,9 @@ packages:
   json-stringify-safe@5.0.1:
     resolution: {integrity: sha1-Epai1Y/UXxmg9s4B1lcB4sc1tus=}
 
+  json2php@0.0.4:
+    resolution: {integrity: sha1-a9haHdpqXdfpECK7JEA8wbfC7jQ=}
+
   json2php@0.0.9:
     resolution: {integrity: sha512-fQMYwvPsQt8hxRnCGyg1r2JVi6yL8Um0DIIawiKiMK9yhAAkcRNj5UsBWoaFvFzPpcWbgw9L6wzj+UMYA702Mw==}
 
@@ -3960,8 +3976,8 @@ packages:
     resolution: {integrity: sha1-eZllXoZGwX8In90YfRUNMyTVRRM=}
     engines: {node: '> 0.8'}
 
-  legacy-javascript@0.0.3:
-    resolution: {integrity: sha512-1r6MT4dVaJyXt4G07Cm2cQ0AUaLJdefiEp4SmIAylA++gnEQ82YvmzE58RkM5EP0fk5hROLCslUPGnwIYdZQVA==}
+  legacy-javascript@0.0.4:
+    resolution: {integrity: sha512-UTmeKBVxnfJcpmpOvzzNnLsQT99BXHpPlc/ZKddIRmWmrR0fw6335I3lq4+sJoP60UTbBNaYsGYVPc65YB1x3A==}
 
   levn@0.4.1:
     resolution: {integrity: sha512-+bT2uH4E5LGE7h/n3evcS/sQlJXCpIp6ym8OWJ5eV6+67Dsql/LaaT7qJBAt2rzfoa/5QBGBhxDix1dMt2kQKQ==}
@@ -7360,7 +7376,7 @@ snapshots:
 
   '@paulirish/trace_engine@0.0.65':
     dependencies:
-      legacy-javascript: 0.0.3
+      legacy-javascript: 0.0.4
       third-party-web: 0.30.0
 
   '@peculiar/asn1-cms@2.10.0':
@@ -8043,6 +8059,12 @@ snapshots:
     optionalDependencies:
       webpack-dev-server: 5.2.6(webpack-cli@5.1.4)(webpack@5.111.1)
 
+  '@woocommerce/dependency-extraction-webpack-plugin@3.0.1(webpack@5.111.1)':
+    dependencies:
+      '@wordpress/dependency-extraction-webpack-plugin': 3.7.0(webpack@5.111.1)
+    transitivePeerDependencies:
+      - webpack
+
   '@wordpress/a11y@4.57.0':
     dependencies:
       '@wordpress/dom-ready': 4.57.0
@@ -8137,6 +8159,12 @@ snapshots:
       react-dom: 19.3.0(react@19.3.0)
       redux: 5.0.1
       rememo: 4.0.2
+
+  '@wordpress/dependency-extraction-webpack-plugin@3.7.0(webpack@5.111.1)':
+    dependencies:
+      json2php: 0.0.4
+      webpack: 5.111.1(cssnano@6.1.2(postcss@8.5.29))(postcss@8.5.29)(webpack-cli@5.1.4)
+      webpack-sources: 3.6.0
 
   '@wordpress/dependency-extraction-webpack-plugin@6.57.0(webpack@5.111.1)':
     dependencies:
@@ -10607,6 +10635,8 @@ snapshots:
 
   json-stringify-safe@5.0.1: {}
 
+  json2php@0.0.4: {}
+
   json2php@0.0.9: {}
 
   json5@1.0.2:
@@ -10666,7 +10696,7 @@ snapshots:
 
   lazy-ass@1.6.0: {}
 
-  legacy-javascript@0.0.3: {}
+  legacy-javascript@0.0.4: {}
 
   levn@0.4.1:
     dependencies:

@@ -24,6 +24,7 @@
   },
   "homepage": "https://github.com/helloextend/extend-for-woocommerce#readme",
   "devDependencies": {
+    "@woocommerce/dependency-extraction-webpack-plugin": "3.0.1",
     "@wordpress/scripts": "^36.1.0",
     "cypress": "10.11.0",
     "prettier": "3.2.5"
