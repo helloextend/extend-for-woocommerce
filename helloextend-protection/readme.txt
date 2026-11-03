@@ -85,6 +85,7 @@ For more information on our terms of service and privacy policy, visit the links
 * Fix - add to cart on the product page is intercepted in the capture phase, so the protection offer still applies on themes that drive add to cart from their own capture-phase listener and stop the event before anything else sees it
 * Fix - the add to cart button could be left unresponsive when adding the protection plan failed; the add to cart now continues either way
 * Fix - cart normalization could re-enter itself through WooCommerce's quantity update hook until the request exhausted the memory limit
+* Fix - the plugin's scripts were served with a fixed `ver=1.0.0` cache-buster, so updating the plugin left CDNs and browsers serving the previous release's JavaScript. Each script is now versioned by its own modified time
 
 = 1.2.14 2026-10-07 =
 * Add - "Fulfillment Order Statuses" setting (Product Protection tab) to choose which order statuses fulfill product protection contracts and activate shipping protection, including custom statuses such as "Delivered". Defaults to Completed, so existing stores are unchanged
