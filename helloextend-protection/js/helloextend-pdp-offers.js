@@ -25,6 +25,7 @@
         price,
         helloextend_enabled,
         helloextend_pp_enabled,
+        helloextend_pdp_offers_enabled,
         helloextend_modal_offers_enabled,
         atc_button_selector,
         variations = {},
@@ -37,12 +38,19 @@
 
       let reference_id = product_id;
 
-      // If PDP offers are not enabled, hide Extend offer div
+      /*
+       * PDP offers turned off in the settings. class-helloextend-protection-pdp-offer.php
+       * gates the container on the same setting, so there is nothing to render
+       * into — and without this, add to cart was still intercepted and replayed
+       * on every click to resolve a plan that could never exist. PHP treats
+       * both "" and "0" as off; "0" is truthy in JavaScript, so match it by name.
+       */
       if (
-        helloextend_pp_enabled == "0" ||
-        helloextend_enabled == "0"
+        !helloextend_pdp_offers_enabled ||
+        helloextend_pdp_offers_enabled === "0"
       ) {
         $(".helloextend-offer").hide();
+        return;
       }
 
       /**
@@ -67,7 +75,7 @@
 
           const activeProduct = component.getActiveProduct();
           const referenceId = activeProduct ? activeProduct.id : reference_id;
-          const productPrice = activeProduct.price;
+          const productPrice = activeProduct ? activeProduct.price : price;
           const plan = component.getPlanSelection();
 
           /* get the users plan selection */
@@ -183,6 +191,7 @@
         if (removeAtcInterceptor) removeAtcInterceptor();
 
         let replaying = false;
+        let pending = false;
 
         function onAddToCartClick(e) {
           const target = e.target;
@@ -202,11 +211,21 @@
           e.preventDefault();
           e.stopPropagation();
 
+          /* A decision is already in flight — the shopper clicked again
+                   while the modal was open, or before the plan request came
+                   back. Swallow the click instead of opening a second modal
+                   and adding the plan twice. */
+          if (pending) return;
+
+          pending = true;
+
           /* Resume on failure as well as success: a plan request that
                    fails must not leave the shopper with a dead button. */
           getPlanDecision().then(submitPlan).then(replayClick, replayClick);
 
           function replayClick() {
+            pending = false;
+
             /* btn.click() dispatches synchronously, so every handler
                        has run by the time it returns. Clearing the flag here
                        rather than on re-entry keeps it correct even when a
@@ -282,7 +301,13 @@
         function syncOffer() {
           const variationId = input.value;
 
-          if (!variationId || variationId === lastVariationId) return;
+          /* The input renders with "0" until the shopper's attribute
+                     choices resolve to a variation. That is a non-empty string,
+                     so it has to be rejected by name or every unresolved state
+                     warns about a variation that was never selected. */
+          if (!variationId || variationId === "0") return;
+
+          if (variationId === lastVariationId) return;
 
           const variationPrice = variations[variationId];
 
