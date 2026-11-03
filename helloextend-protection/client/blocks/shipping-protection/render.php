@@ -59,8 +59,16 @@ $items      = array_values(
     )
 );
 
+/*
+ * JSON_HEX_AMP escapes every ampersand in the JSON, so nothing that looks
+ * like an HTML entity can survive into the attribute. esc_attr() does not
+ * double-encode, so without it a product name containing the literal text
+ * "&quot;" reaches the browser as an entity, decodes to a bare quote and
+ * breaks the JSON — leaving jQuery's .data() to hand the offer a string
+ * instead of the item array.
+ */
 ?>
 <div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core escapes the attribute string it returns. ?>
 data-block-name="helloextend/shipping-protection">
-<div id="helloextend-block-shipping-offer" style="max-height: 100px; padding-right: 1rem;" data-items="<?php echo esc_attr(wp_json_encode($items)); ?>"></div>
+<div id="helloextend-block-shipping-offer" style="max-height: 100px; padding-right: 1rem;" data-items="<?php echo esc_attr(wp_json_encode($items, JSON_HEX_AMP)); ?>"></div>
 </div>

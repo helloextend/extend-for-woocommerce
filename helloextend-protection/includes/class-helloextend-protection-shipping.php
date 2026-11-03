@@ -210,13 +210,19 @@ class HelloExtend_Protection_Shipping
          * value is spendable: in fee mode a negative premium becomes a negative
          * add_fee(), i.e. an arbitrary discount, and in SKU mode it sets the
          * price of the shared protection product for the whole store.
+         *
+         * is_finite() is not covered by the range check below. is_numeric()
+         * accepts "1e309", which casts to INF, and INF is greater than zero —
+         * so a non-finite amount would reach add_fee() or the product price.
          */
-        if (!is_numeric($quote['premium']) || (float) $quote['premium'] <= 0) {
-            HelloExtend_Protection_Logger::helloextend_log_error('SP quote rejected, premium is not a positive number: ' . wp_json_encode($quote['premium']));
+        $premium = is_numeric($quote['premium']) ? (float) $quote['premium'] : 0.0;
+
+        if (!is_finite($premium) || $premium <= 0) {
+            HelloExtend_Protection_Logger::helloextend_log_error('SP quote rejected, premium is not a positive finite number: ' . wp_json_encode($quote['premium']));
             return;
         }
 
-        $quote['premium'] = (float) $quote['premium'];
+        $quote['premium'] = $premium;
         $quote['id']      = sanitize_text_field((string) $quote['id']);
 
         if ($quote['id'] === '') {

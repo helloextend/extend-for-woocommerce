@@ -31,6 +31,8 @@ if (!defined('ABSPATH')) {
 
 class HelloExtend_Protection_Blocks
 {
+    private const WP_VERSION_NOTICE_TRANSIENT = 'helloextend_blocks_wp_version_notice';
+
     public function __construct()
     {
         $this->hooks();
@@ -102,7 +104,17 @@ class HelloExtend_Protection_Blocks
          * request — the plugin would not load at all, blocks or not.
          */
         if (!function_exists('wp_register_block_types_from_metadata_collection')) {
-            HelloExtend_Protection_Logger::helloextend_log_notice('Skipping block registration: WordPress 6.8 or later is required. The rest of the plugin is unaffected.');
+            /*
+             * Rate limited because this runs on every init. The notice log is
+             * an option that helloextend_log_notice() reads, appends to and
+             * rewrites whole, with no cap — so on a site that has opted into
+             * logging it would grow by one record and one write per request.
+             */
+            if (!get_transient(self::WP_VERSION_NOTICE_TRANSIENT)) {
+                set_transient(self::WP_VERSION_NOTICE_TRANSIENT, 1, DAY_IN_SECONDS);
+                HelloExtend_Protection_Logger::helloextend_log_notice('Skipping block registration: WordPress 6.8 or later is required. The rest of the plugin is unaffected.');
+            }
+
             return;
         }
 
