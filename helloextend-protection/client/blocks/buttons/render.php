@@ -24,5 +24,14 @@ if (!defined('ABSPATH')) {
 ?>
 <div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core escapes the attribute string it returns. ?>
 data-block-name="helloextend/pdp-block-offer">
-<div class='helloextend-offer'></div>
+<?php
+/*
+ * data-helloextend-offer marks this as the block's container. A product
+ * template can render an offer container twice — once here and once from the
+ * classic PDP hook in class-helloextend-protection-pdp-offer.php, which still
+ * fires on many block themes. helloextend-pdp-offers.js reads this attribute
+ * to decide which one to keep.
+ */
+?>
+<div class='helloextend-offer' data-helloextend-offer='block'></div>
 </div>

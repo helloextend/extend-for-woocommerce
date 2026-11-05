@@ -53,6 +53,47 @@
         return;
       }
 
+      /*
+       * A product template can end up with two offer containers: the one
+       * class-helloextend-protection-pdp-offer.php echoes on the configured
+       * PDP hook, and the one the Extend Buttons block renders. Block themes
+       * still fire those classic hooks, so placing the block does not stop the
+       * backend from echoing its own.
+       *
+       * Everything below addresses the offer by the .helloextend-offer
+       * selector, so a second match is at best a stray empty box and at worst
+       * the element the SDK picks instead of the one the merchant placed.
+       * Inserting the block is a deliberate placement choice, so the block's
+       * container wins and the rest are dropped before anything renders.
+       */
+      const blockOffer = document.querySelector(
+        '.helloextend-offer[data-helloextend-offer="block"]',
+      );
+
+      if (blockOffer) {
+        const strays = Array.prototype.filter.call(
+          document.querySelectorAll(".helloextend-offer"),
+          function (el) {
+            return el !== blockOffer;
+          },
+        );
+
+        strays.forEach(function (el) {
+          el.remove();
+        });
+
+        /* Worth a log line: from the merchant's side this looks like the
+                 PDP "Offer Location" setting silently doing nothing. */
+        if (strays.length && ExtendWooCommerce.debugLogEnabled) {
+          ExtendWooCommerce.extendAjaxLog(
+            "debug",
+            "helloextend-pdp-offers.js: Extend Buttons block found, dropped " +
+              strays.length +
+              " offer container(s) rendered by the classic PDP hook.",
+          );
+        }
+      }
+
       /**
        * Find out whether the shopper wants protection with this add to cart.
        *
