@@ -109,8 +109,23 @@ class HelloExtend_Protection_Blocks
              * an option that helloextend_log_notice() reads, appends to and
              * rewrites whole, with no cap — so on a site that has opted into
              * logging it would grow by one record and one write per request.
+             *
+             * The transient is only worth setting when the notice is actually
+             * written. helloextend_log_notice() returns early while logging is
+             * off, so setting it unconditionally would mark a notice as
+             * delivered that never reached the log, and a merchant who turns
+             * logging on to find out why the blocks are missing would wait up
+             * to a day for it to appear.
              */
-            if (!get_transient(self::WP_VERSION_NOTICE_TRANSIENT)) {
+            $settings    = HelloExtend_Protection_Global::helloextend_get_settings();
+            $log_enabled = $settings['enable_helloextend_log'] ?? 0;
+
+            /*
+             * Loose != 0 on purpose: it is the comparison the logger itself
+             * makes, so the gate and the logger can never disagree about
+             * whether a given setting value counts as on.
+             */
+            if ($log_enabled != 0 && !get_transient(self::WP_VERSION_NOTICE_TRANSIENT)) {
                 set_transient(self::WP_VERSION_NOTICE_TRANSIENT, 1, DAY_IN_SECONDS);
                 HelloExtend_Protection_Logger::helloextend_log_notice('Skipping block registration: WordPress 6.8 or later is required. The rest of the plugin is unaffected.');
             }
