@@ -28,9 +28,19 @@ jobs:
           node-version: 22
           cache: pnpm
 
-      # Also installs Cypress 10.11.0, which is pinned in devDependencies.
       - name: Install dependencies
         run: pnpm install --frozen-lockfile
+
+      # Cypress ships its browser binary through a postinstall script that
+      # writes to ~/.cache/Cypress, outside the pnpm store. pnpm skips a
+      # dependency's build scripts once its store entry is marked built, and
+      # setup-node's `cache: pnpm` restores the store but not that directory —
+      # so on a store cache hit the postinstall never runs and the binary is
+      # absent, failing `cypress run` before a single test executes. This
+      # command is a no-op when the pinned version is already unpacked, and
+      # takes about ten seconds when it is not.
+      - name: Ensure the Cypress binary is installed
+        run: pnpm exec cypress install
 
       - name: Build blocks
         run: pnpm run build
