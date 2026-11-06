@@ -4,7 +4,13 @@
   "description": "Product and Shipping Protection plugin for WooCommerce. Generate additional revenue for your e-commerce store by allowing your customers to protect the products they love!",
   "main": "index.js",
   "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "build": "wp-scripts build --blocks-manifest --source-path=helloextend-protection/client/blocks --output-path=helloextend-protection/build",
+    "format": "wp-scripts format",
+    "lint:css": "wp-scripts lint-style",
+    "lint:js": "wp-scripts lint-js",
+    "packages-update": "wp-scripts packages-update",
+    "plugin-zip": "wp-scripts plugin-zip",
+    "start": "wp-scripts start --blocks-manifest --source-path=helloextend-protection/client/blocks --output-path=helloextend-protection/build"
   },
   "repository": {
     "type": "git",
@@ -18,6 +24,8 @@
   },
   "homepage": "https://github.com/helloextend/extend-for-woocommerce#readme",
   "devDependencies": {
+    "@woocommerce/dependency-extraction-webpack-plugin": "3.0.1",
+    "@wordpress/scripts": "^36.1.0",
     "cypress": "10.11.0",
     "prettier": "3.2.5"
   },
@@ -26,5 +34,8 @@
     "onlyBuiltDependencies": [
       "cypress"
     ]
+  },
+  "dependencies": {
+    "@wordpress/blocks": "16.2.0"
   }
 }

@@ -13,7 +13,7 @@
 
         async function addPlanToCart(opts)
         {
-            return await jQuery.post(
+            return await $.post(
                 ajaxurl, {
                     action: "add_to_cart_helloextend",
                     nonce: ExtendWooCommerce.nonce,
@@ -29,7 +29,7 @@
         async function getCart()
         {
             return JSON.parse(
-                await jQuery.post(
+                await $.post(
                     ajaxurl, {
                         action: "get_cart_helloextend"
                     }
@@ -39,10 +39,17 @@
 
         function warrantyAlreadyInCart(variantId, cart)
         {
-            let cartContents = cart['cart_contents'];
-            if (!cartContents) {
-                cartContents = cart;
-            }
+            /*
+             * The cart passed by the caller wins. Failing that, fall back to
+             * whatever the page localized: the cart page puts the items on
+             * ExtendCartIntegration.cart, the mini cart puts them on
+             * .cart_contents, and on every other page the object is not there
+             * at all. An empty cart is the right answer in that last case —
+             * reading straight through used to throw and take down whichever
+             * script called in.
+             */
+            const integration = window.ExtendCartIntegration || {};
+            const cartContents = cart || integration.cart || integration.cart_contents || {};
             const cartItems = Object.values(cartContents);
             const extendWarranties = cartItems.filter(
                 function (lineItem) {
@@ -99,6 +106,3 @@
         $(document).trigger('integration.extend');
     });
 })(jQuery);
-
-
-

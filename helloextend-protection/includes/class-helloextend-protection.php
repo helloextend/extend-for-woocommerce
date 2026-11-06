@@ -89,6 +89,7 @@ class HelloExtend_Protection
     private HelloExtend_Protection_Cart_Offer $cart_offer;
     private HelloExtend_Protection_Orders $orders;
     private HelloExtend_Protection_Shipping $shipping_protection;
+    private HelloExtend_Protection_Blocks $blocks;
 
     /**
      * Define the core functionality of the plugin.
@@ -120,6 +121,7 @@ class HelloExtend_Protection
         $this->define_cart_offer_hooks();
         $this->define_orders_hooks();
         $this->define_shipping_protection_offer_hooks();
+        $this->define_block_hooks();
     }
 
     /**
@@ -197,6 +199,11 @@ class HelloExtend_Protection
          */
         include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-shipping.php';
 
+        /**
+         * The class responsible for registering the plugin's editor blocks
+         */
+        include_once plugin_dir_path(dirname(__FILE__)) . 'includes/class-helloextend-protection-blocks.php';
+
         $this->loader = new HelloExtend_Protection_Loader();
 
     }
@@ -237,6 +244,31 @@ class HelloExtend_Protection
     }
 
     /**
+     * Register one of the plugin's own front-end scripts.
+     *
+     * The version is the file's modified time rather than a constant, because
+     * the asset URLs never change and anything caching in front of the store —
+     * a CDN, the host's accelerator cache, the shopper's browser — keys on the
+     * version alone. With a fixed version an updated plugin keeps serving the
+     * previous release's JavaScript, and because each file expires on its own
+     * schedule a page can end up running a new script against an old one.
+     *
+     * @param  string   $handle Script handle.
+     * @param  string   $file   File name within js/.
+     * @param  string[] $deps   Handles this script depends on.
+     * @return void
+     * @since  1.3
+     * @access private
+     */
+    private function register_js($handle, $file, $deps)
+    {
+        $js_path     = $this->path . '../js/' . $file;
+        $lastmodtime = file_exists($js_path) ? filemtime($js_path) : $this->version;
+
+        wp_register_script($handle, $this->url . '../js/' . $file, $deps, $lastmodtime, true);
+    }
+
+    /**
      * Register globals class and add hooks to render Extend offers on PDP page
      *
      * @since  1.0.0
@@ -245,12 +277,12 @@ class HelloExtend_Protection
     private function define_global_hooks()
     {
         wp_register_script('helloextend_script', $this->sdk_url, array(), '1.0.0', true);
-        wp_register_script('helloextend_global_script', $this->url . '../js/helloextend-global.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
-        wp_register_script('helloextend_global_post_purchase_script', $this->url . '../js/helloextend-post-purchase.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
-        wp_register_script('helloextend_product_integration_script', $this->url . '../js/helloextend-pdp-offers.js', [ 'jquery', 'helloextend_global_script' ], '1.0.0', true);
-        wp_register_script('helloextend_cart_integration_script', $this->url . '../js/helloextend-cart-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
-        wp_register_script('helloextend_minicart_integration_script', $this->url . '../js/helloextend-minicart-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
-        wp_register_script('helloextend_shipping_integration_script', $this->url . '../js/helloextend-shipping-offers.js', [ 'jquery', 'helloextend_script' ], '1.0.0', true);
+        $this->register_js('helloextend_global_script', 'helloextend-global.js', [ 'jquery', 'helloextend_script' ]);
+        $this->register_js('helloextend_global_post_purchase_script', 'helloextend-post-purchase.js', [ 'jquery', 'helloextend_script' ]);
+        $this->register_js('helloextend_product_integration_script', 'helloextend-pdp-offers.js', [ 'jquery', 'helloextend_global_script' ]);
+        $this->register_js('helloextend_cart_integration_script', 'helloextend-cart-offers.js', [ 'jquery', 'helloextend_script' ]);
+        $this->register_js('helloextend_minicart_integration_script', 'helloextend-minicart-offers.js', [ 'jquery', 'helloextend_script' ]);
+        $this->register_js('helloextend_shipping_integration_script', 'helloextend-shipping-offers.js', [ 'jquery', 'helloextend_script' ]);
 
         $this->global_hooks = new HelloExtend_Protection_Global($this->helloextend_get_protection(), $this->get_version());
     }
@@ -288,7 +320,7 @@ class HelloExtend_Protection
      */
     private function define_shipping_protection_offer_hooks()
     {
-        $this->shipping_protection_offer = new HelloExtend_Protection_Shipping($this->helloextend_get_protection(), $this->get_version());
+        $this->shipping_protection = new HelloExtend_Protection_Shipping($this->helloextend_get_protection(), $this->get_version());
     }
 
     /**
@@ -301,6 +333,17 @@ class HelloExtend_Protection
     private function define_orders_hooks()
     {
         $this->orders = new HelloExtend_Protection_Orders($this->helloextend_get_protection(), $this->get_version());
+    }
+
+    /**
+     * Register the plugin's editor blocks.
+     *
+     * @since  1.3
+     * @access private
+     */
+    private function define_block_hooks()
+    {
+        $this->blocks = new HelloExtend_Protection_Blocks();
     }
 
     /**
