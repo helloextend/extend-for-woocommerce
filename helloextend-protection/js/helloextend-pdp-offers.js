@@ -39,18 +39,25 @@
       let reference_id = product_id;
 
       /*
-       * PDP offers turned off in the settings. class-helloextend-protection-pdp-offer.php
-       * gates the container on the same setting, so there is nothing to render
-       * into — and without this, add to cart was still intercepted and replayed
-       * on every click to resolve a plan that could never exist. PHP treats
-       * both "" and "0" as off; "0" is truthy in JavaScript, so match it by name.
+       * PDP offers turned off in the settings, so the inline selection stays
+       * hidden. The modal trigger is a separate setting, and it still needs
+       * everything below: the offer is rendered into the hidden container so
+       * Extend.buttons.instance() can resolve a plan and setActiveProduct can
+       * follow a variation change, and handleAddToCartLogic has to run or the
+       * click is never intercepted and the modal never opens.
+       *
+       * Returning outright is only right when there is no modal either —
+       * otherwise add to cart is intercepted and replayed on every click to
+       * resolve a plan that could never exist. PHP treats both "" and "0" as
+       * off; "0" is truthy in JavaScript, so match it by name.
        */
       if (
         !helloextend_pdp_offers_enabled ||
         helloextend_pdp_offers_enabled === "0"
       ) {
         $(".helloextend-offer").hide();
-        return;
+
+        if (helloextend_modal_offers_enabled != "1") return;
       }
 
       /*

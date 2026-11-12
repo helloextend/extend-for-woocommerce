@@ -23,7 +23,7 @@ if (!defined('ABSPATH')) {
 
 ?>
 <div <?php echo get_block_wrapper_attributes(); // phpcs:ignore WordPress.Security.EscapeOutput.OutputNotEscaped -- Core escapes the attribute string it returns. ?>
-data-block-name="helloextend/pdp-block-offer">
+data-block-name="helloextend/buttons">
 <?php
 /*
  * data-helloextend-offer marks this as the block's container. A product

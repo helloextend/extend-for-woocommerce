@@ -134,7 +134,14 @@ class HelloExtend_Protection_PDP_Offer
             );
         }
 
-        if ($helloextend_pdp_offers_enabled) {
+        /*
+         * The container is also needed with PDP offers off but the modal on.
+         * The modal resolves its plan, reference id and price through the live
+         * Extend.buttons component, and the component has to be rendered into
+         * something — so the container ships either way and
+         * helloextend-pdp-offers.js hides it when the inline offer is off.
+         */
+        if ($helloextend_pdp_offers_enabled || $helloextend_modal_offers_enabled) {
             echo "<div class='helloextend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }
     }
