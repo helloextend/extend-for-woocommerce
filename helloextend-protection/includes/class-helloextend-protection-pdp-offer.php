@@ -57,7 +57,7 @@ class HelloExtend_Protection_PDP_Offer
     /**
      * Whether the product integration has been enqueued for this request.
      *
-     * @since 1.0.0
+     * @since 1.3.1
      * @var   bool
      */
     private bool $localized = false;
@@ -103,7 +103,7 @@ class HelloExtend_Protection_PDP_Offer
      * global, which the loop has not set up this early.
      *
      * @return void
-     * @since  1.0.0
+     * @since  1.3.1
      */
     public function enqueue_product_integration()
     {

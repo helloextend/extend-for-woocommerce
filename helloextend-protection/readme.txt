@@ -5,7 +5,7 @@ Contributors: santiagoenciso33, jmbextend, alexsmithext, helloextend
 Tags: extend, protection, tracking
 Requires at least: 4.1
 Tested up to: 7.1
-Stable tag: 1.3
+Stable tag: 1.3.1
 Requires PHP: 7.4
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -78,6 +78,10 @@ For more information on our terms of service and privacy policy, visit the links
 4. Extend's settings page in wp-admin.
 
 == Changelog ==
+= 1.3.1 2026-11-12 =
+* Fix - the product protection offer did not appear at all on themes whose product template fires none of WooCommerce's add to cart hooks, because the offer's scripts were loaded from that same hook. They now load on every product page, and the offer is placed next to the add to cart button when the theme renders nowhere for it to go
+* Fix - turning off "Display offers on product page" also stopped the offer modal opening on add to cart, even with "Display offers in a modal (PDP and cart)" switched on. The two settings are independent again
+
 = 1.3 2026-10-23 =
 * Add - "Extend Simple Offer" block, so the product protection offer can be placed anywhere in a block (FSE) theme's product template instead of depending on a classic template hook
 * Add - "Extend Shipping Protection" block for the WooCommerce Cart and Checkout blocks, with the fee applied through the Store API
