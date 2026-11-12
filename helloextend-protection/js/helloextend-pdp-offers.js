@@ -39,6 +39,52 @@
       let reference_id = product_id;
 
       /*
+       * No container anywhere on the page: the product template never fired
+       * the hook class-helloextend-protection-pdp-offer.php is attached to,
+       * and no Extend Buttons block was placed. That is a custom template, a
+       * page builder or a block theme that renders add to cart its own way —
+       * common enough that the offer should not simply vanish.
+       *
+       * Place one next to the add to cart button instead. It goes before the
+       * button, matching the default offer location, and the plugin already
+       * knows how to find that button from the atc_button_selector setting.
+       *
+       * The selector is free text from the settings screen, so the same
+       * try/catch handleAddToCartLogic uses applies here; an invalid one
+       * leaves the page untouched rather than throwing on load.
+       */
+      if (!document.querySelector(".helloextend-offer")) {
+        let atcButton = null;
+
+        try {
+          atcButton = document.querySelector(atc_button_selector);
+        } catch (e) {
+          console.warn(
+            "helloextend-pdp-offers.js error: invalid add to cart button selector: ",
+            atc_button_selector,
+          );
+        }
+
+        if (atcButton && atcButton.parentNode) {
+          const injected = document.createElement("div");
+
+          injected.className = "helloextend-offer";
+          injected.setAttribute("data-extend", "pdpOfferContainer");
+          injected.setAttribute("data-helloextend-offer", "injected");
+          injected.style.width = "100%";
+
+          atcButton.parentNode.insertBefore(injected, atcButton);
+
+          if (ExtendWooCommerce.debugLogEnabled) {
+            ExtendWooCommerce.extendAjaxLog(
+              "debug",
+              "helloextend-pdp-offers.js: no offer container was rendered, placed one before the add to cart button.",
+            );
+          }
+        }
+      }
+
+      /*
        * PDP offers turned off in the settings, so the inline selection stays
        * hidden. The modal trigger is a separate setting, and it still needs
        * everything below: the offer is rendered into the hidden container so

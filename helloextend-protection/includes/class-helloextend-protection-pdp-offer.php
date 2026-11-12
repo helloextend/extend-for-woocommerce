@@ -55,6 +55,14 @@ class HelloExtend_Protection_PDP_Offer
     private array $settings;
 
     /**
+     * Whether the product integration has been enqueued for this request.
+     *
+     * @since 1.0.0
+     * @var   bool
+     */
+    private bool $localized = false;
+
+    /**
      * Initialize the class and set its properties.
      *
      * @param string $helloextend_protection The name of this plugin.
@@ -73,18 +81,57 @@ class HelloExtend_Protection_PDP_Offer
         /* retrieve environment variables */
         $this->settings = HelloExtend_Protection_Global::helloextend_get_settings();
 
+        /*
+         * The scripts load on their own hook rather than on the offer
+         * location. A theme whose product template fires no add to cart hook
+         * at all used to get nothing: no script, no ExtendProductIntegration,
+         * and helloextend-pdp-offers.js returning on its first line. Only the
+         * container has to sit at a particular point in the markup, and
+         * helloextend-pdp-offers.js can place one itself when the template
+         * never offered it the chance.
+         */
+        add_action('wp_enqueue_scripts', [ $this, 'enqueue_product_integration' ]);
+
         /* Initializes product_offer on the PDP Offer Location selected in wp-admin > Extend */
         add_action($this->settings['helloextend_pdp_offer_location'], [ $this, 'product_offer' ]);
     }
 
     /**
+     * Enqueue the product integration on a single product page.
+     *
+     * Reads the product from the queried object rather than the $product
+     * global, which the loop has not set up this early.
+     *
+     * @return void
+     * @since  1.0.0
+     */
+    public function enqueue_product_integration()
+    {
+        if (!function_exists('is_product') || !is_product()) {
+            return;
+        }
+
+        $this->localize_product_integration(wc_get_product(get_queried_object_id()));
+    }
+
+    /**
      * Grabs required variables, and enqueues product scripts
      *
-     * @since 1.0.0
+     * Runs at most once a request: whichever of the two entry points gets
+     * here first does the work and the other returns immediately.
+     *
+     * @param WC_Product|mixed $product The product being displayed.
+     *
+     * @return void
+     * @since  1.0.0
      */
-    public function product_offer()
+    private function localize_product_integration($product)
     {
-        global $product;
+        if ($this->localized || !$product instanceof WC_Product) {
+            return;
+        }
+
+        $this->localized = true;
 
         // Variables that are passed to the PDP JS Script
         $id                          = $product->get_id();
@@ -133,6 +180,31 @@ class HelloExtend_Protection_PDP_Offer
                 compact('id', 'sku', 'first_category', 'price', 'type', 'env', 'helloextend_enabled', 'helloextend_pp_enabled', 'helloextend_pdp_offers_enabled', 'helloextend_modal_offers_enabled', 'atc_button_selector', 'variations')
             );
         }
+    }
+
+    /**
+     * Echo the offer container at the configured PDP offer location.
+     *
+     * Only the markup lives here — the scripts are enqueued separately, so a
+     * theme that never fires this hook still gets a working integration and
+     * helloextend-pdp-offers.js places a container of its own.
+     *
+     * @return void
+     * @since  1.0.0
+     */
+    public function product_offer()
+    {
+        /*
+         * The one read of the $product global in the plugin, and the only
+         * place a product is available: [product_page] renders the single
+         * product template on an ordinary page, where is_product() is false
+         * and the queried object is the page, so the enqueue above never
+         * fires. On a normal product page this is a no-op — the scripts were
+         * localized from wp_enqueue_scripts and the guard returns at once.
+         */
+        global $product;
+
+        $this->localize_product_integration($product);
 
         /*
          * The container is also needed with PDP offers off but the modal on.
@@ -141,7 +213,7 @@ class HelloExtend_Protection_PDP_Offer
          * something — so the container ships either way and
          * helloextend-pdp-offers.js hides it when the inline offer is off.
          */
-        if ($helloextend_pdp_offers_enabled || $helloextend_modal_offers_enabled) {
+        if ($this->settings['helloextend_enable_pdp_offers'] || $this->settings['helloextend_enable_modal_offers']) {
             echo "<div class='helloextend-offer' data-extend='pdpOfferContainer' style='width: 100%;'></div>";
         }
     }
